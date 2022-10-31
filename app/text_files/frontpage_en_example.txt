@@ -1,0 +1,16 @@
+Dear {longName} team,<br>
+<br>
+ERT is pleased to provide you with the following Monthly Security Report. This report covers the most
+notable attack events detected by our Attack Mitigation Solution in the month of {monthText}/{year}.<br>
+<br>
+The purpose of this Monthly Security Report is to record Radware's Attack Mitigation Solutions
+performance. Each month we attempt to give a full security overview by using various metrics
+and aspects. The report focuses on security events detected by Radware's Attack Mitigation 
+Solution and delivered to the Radware Cloud Scrubbing Center. It is based on various protected 
+objects and different security modules across one or more mitigation devices in your Data Center.<br>
+<br>
+Further information you can find on this Radware web pages:<br>
+<a href="https://blog.radware.com/security/attack-types-and-vectors/" title="Attack Vectors">Attack Vectors</a>
+<br>
+<a href="https://security.radware.com/ddos-knowledge-center/ddospedia/" title="DDoSPedias">Radware DDoSPedia</a>
+<br>

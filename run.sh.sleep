@@ -1,0 +1,6 @@
+#!/bin/bash
+
+#https_proxy="proxyserver.com:3128"
+#export https_proxy="$https_proxy"
+
+sleep 60m
