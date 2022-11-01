@@ -25,7 +25,7 @@ pip install openpyxl
 
 -------------------
 
-Before running the script, setting variables is required
+1.1 Before running the script, setting variables is required
 
 1. Rename "run_example.sh" to "run.sh"
 2. Modify "run.sh" and set the mandatory "cust_id" variable and other optional variables (email, proxy)
@@ -45,14 +45,14 @@ Before running the script, setting variables is required
 	"report" #this is source file with instructions which charts/settings will be included in the report
 
 -------------------
-Run from WSL - generate report for the previous month from now and send the summary email
+2.1 Run from WSL - generate report for the previous month from now and send the summary email
 
 1. Navigate to the ./app directory
 
 2. From the ./app directory, execute ./run.sh
 
 -------------------
-Run from WSL - generate report manually using specific variables
+3.1 Run from WSL - generate report manually using specific variables
 
 
 	"Long_customer_name" - can be set to the "Customer_name" or long customer name. for example - short USCC, long US Cellular.
@@ -112,5 +112,125 @@ Run from WSL - generate report manually using specific variables
 
 
 -------------------
-Deploy as a docker container, can be run as a container on APSolute Vision
+4.1 Deploy as a docker container, can be run as a container on APSolute Vision
+
+4.1.1 If vision has access to the internet (online deployment)
+
+	1. Create a container- it will pull the image from the dockerhub
+
+		docker create --name=radware_report --net=host -v /opt/radware/scripts/radware_report/app:/app egori4/radware_report
+
+	2. Create a crontab task (optional)
+
+		Below example will run container every 1st of each month at 3 am.
+
+		echo "00 03 1 * * root docker start radware_report" > /etc/cron.d/radware_report
+
+	3. Upload the monthly report app (copy repository contents under /opt/radware/scripts/radware_report/ )
+
+		https://github.com/egori4/auto_monthly_report
+
+	4. Set the variables (follow the instructions from the section #1.1)
+
+
+4.1.2 If Vision does not have access to the internet (offline installation)
+
+Instructions how to deploy(offline installation):
+ 
+	1. Login to the Vision server via SSH using root user.
+	2. Copy docker installation package “radware_report.tar.gz” to /tmp/ folder on the Vision server.
+		
+		Option 1 - using SCP with user root 
+		
+		Option 2 (if Vision has access to the internet) - download the installation package from the filepile directly to the vision:
+		
+			cd /tmp
+			curl -o dp_bdos_monitor.tar.gz https://filepile.radware.com/files/download/xxx -k -L -v --progress-bar
+	
+	3. Create the scripts folder under /opt/radware/ as this location will not get erased during future upgrades.
+	
+			mkdir /opt/radware/scripts/
+			mkdir /opt/radware/scripts/radware_report
+			
+				
+	4. Extract the files into /opt/radware/scripts/radware_report directory.
+	
+			tar -zxvf dp_bdos_monitor.tar.gz -C /opt/radware/scripts/radware_report
+			tar
+	5. Navigate to the script directory
+		
+			cd /opt/radware/scripts/radware_report
+	
+	6. Modify config.py to the desired values (config.py file include explanations for every configurable variable)
+		
+			vi app/
+		
+			Note: 
+						· When running on the Vision as a docker container, VISION_IP variable can be set to the localhost (127.0.0.1) instead of the external IP.
+					
+		
+	7. Modify the ./install.sh file if scheduled task needs to be configured/modified
+		
+			vi install.sh
+				
+				Modify to the desired cron job frequency
+		
+		
+	8. Run the installation
+		
+			./install.sh
+					
+					
+	9. Validate the installation
+	
+			docker ps -a
+	
+			Expected output - you should see dp_bdos_monitor line with empty status
+
+	10.  Before running the script, setting variables is required
+	1. Rename "run_example.sh" to "run.sh"
+	2. Modify "run.sh" and set the mandatory "cust_id" variable and other optional variables (email, proxy)
+	3. Rename "config_files\customers_example.json" to "config_files\customers.json"
+	4. Modify "config_files\customers.json" and set the mandatory variables
+		"id"
+		"longName"
+		"ip" #This is Vision IP
+		"dps" #This is comma separated list of DefensePro IP's for which the data will be collected
+		"defensepros" #Key = DefensePro IP, value = DefensePro name
+		"user" #This is Vision login username
+		"pass" #This is Vision login password
+		"exclude" #These are the excluded categories from the data report
+		
+	5. Modify optionals variables 
+		"variables" #this is to set the units Mbps/Gbps, Millions/Billions etc.
+		"report" #this is source file with instructions which charts/settings will be included in the report
+
+		
+	11. To run the script immediately without waiting for cron job (optional, if configured) , use the command: 
+			
+			docker start radware_report
+			
+			To confirm docker container started, run docker ps -a again
+			
+			STATUS column should show Up
+			
+	
+		
+	12. To confirm docker container finished running successfully
+		
+			docker ps -a
+			
+			STATUS should show “Existed (0)”
+			
+	
+	13. To check container logs/errors/script failure in case STATUS is not (0)
+			
+			docker logs radware_report
+	
+	
+	Instructions how to uninstall:
+	
+	. /opt/radware/scripts/radware_report/uninstall.sh
+
+
 
