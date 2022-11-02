@@ -42,8 +42,6 @@ smtp_password = sys.argv[8] # Email password (optional)
 
 smtp_list = sys.argv[10:] # Email address/address list recepient/s(comma separated)
 
-#smtp_list.remove('EA')
-
 smtp_subject_prefix = sys.argv[9] # Email Subject
 
 
