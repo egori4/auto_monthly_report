@@ -1,1 +1,8 @@
-run.sh
+app/run.sh
+app/config_files/customers.json
+app/source_files/
+app/database_files/
+app/report_files/
+app/script_files/AbuseIPDB/
+app/script_files/__pycache__/
+app/tools/
