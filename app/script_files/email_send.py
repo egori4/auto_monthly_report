@@ -117,17 +117,17 @@ def email_body(cust_id):
         events_delta = int(total_events) - int(total_events_prev)
 
         if events_delta > 0:
-                events_text = f'This month, amount of events has increased from {total_events_prev} to {total_events} by a total of {events_delta} events compared to the previous month.'
+                events_text = f'This month, the number of events has increased from {total_events_prev} to {total_events} by a total of {events_delta} events compared to the previous month.'
                 #events_chart_data = epm_bar_chart(cust_id,currentmonth,currentyear) #/script_files/epm_bar_chart.py df function
                 email_body = email_body + events_text
 
         if events_delta < 0:
                 events_delta = abs(events_delta)
-                events_text = f'This month, amount of events has decreased from {total_events_prev} to {total_events} by a total of {events_delta} events compared to the previous month.'
+                events_text = f'This month, the number of events has decreased from {total_events_prev} to {total_events} by a total of {events_delta} events compared to the previous month.'
                 email_body = email_body + events_text
 
         if events_delta == 0:
-                events_text = f'This month, amount of events remained the same as a previous month - {total_events} events in total.'
+                events_text = f'This month, the amount of events remained the same as a previous month - {total_events} events in total.'
                 email_body = email_body + events_text
 
         ## Maplicious packets count this month with previous month ##############################
@@ -466,7 +466,7 @@ def email_body(cust_id):
                         <td style="font-family: sans-serif; font-size: 14px; vertical-align: top;" valign="top">
                                 <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px;">Dear {cust_id} Team,</p>
                                 <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px;">This email is an automated reoccuring monthly report.</p>
-                                                        <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px;"><h4>High Level Management summary:</h4></p>    
+                                                        <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px;"><h4>High-Level summary:</h4></p>    
                                 <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px;">{html_summary}</p>
                                 <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px;">The most aggressive DDoS attack mitigated by Radware on-premise equipment was a {attack_cat_maxAttackRateBps} type {attack_name_maxAttackRateBps}. The attack occurred on {attack_start_maxAttackRateBps}(UTC) lasting {dur_maxAttackRateBps_min} min, directed at destination IP {dst_ip_maxAttackRateBps} at peak rate of {attack_maxbps_maxAttackRateBps_formatted} Gbps. The mitigation equipment dropped cumulatively {attack_pkt_maxAttackRateBps} packets for a total of {attack_bw_maxAttackRateBps_formatted} GB data during this attack.</p>
                                                         <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px;"><h4>Month to month trends</h4></p>    

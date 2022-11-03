@@ -1,3 +1,4 @@
+
 Generate HTML/PDF reports using Google Charts and SQLite/CSV/Text/Python
 
 The script can be run either from Linux, Windows WSL or Container
@@ -22,6 +23,10 @@ sudo apt-get update
 sudo apt install python3-pip
 pip install pandas
 pip install openpyxl
+
+Download, extract and put contents of the archive ("tools") uner "app" directory
+https://mega.nz/file/lbwE3a4b#v_wu1hGNqzRjRkp5JowjPSGC_Wh6MiwEzCMPCtFiJF0
+
 
 -------------------
 
