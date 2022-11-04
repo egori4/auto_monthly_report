@@ -60,8 +60,8 @@ if(file_exists('/usr/bin/php')) {
 	$globals->os = 'Linux';
 } else {
 	$globals->os = 'Windows';
-	if(!isset($globals->id))
-		die('This program doenst work correctly under Windows' . NL);
+#	if(!isset($globals->id))
+#		die('This program doenst work correctly under Windows' . NL);
 }
 
 // Define base command
@@ -113,7 +113,7 @@ foreach($globals->customers as $key => $customer) {
 			$cmd .= '-exclude="'.$customer->exclude.'" ';
 		if(isset($customer->window))
 			$cmd .= '-window='.$customer->window.' ';
-		$cmd .= '-vision="'.$vision->ip.'" -user="'.$customer->user.'" -pass='.SQ.$customer->pass.SQ.' ';
+		$cmd .= '-vision="'.$vision->ip.'" -user="'.$customer->user.'" -pass="'.$customer->pass.'" ';
 		$cmd .= '-dps="'.$vision->dps.'" -silent ';
 
 		if($iter)
@@ -136,7 +136,7 @@ foreach($globals->customers as $key => $customer) {
 		$cmd = $collect;
 		$cmd .= '-data="'.$folder.'/traffic_'.$customer->id.'_'.$globals->lower.'.json" -module="traffic" ';
 		$cmd .= '-lower="'.$globals->lower.'" -upper="'.$globals->upper.'" ';
-		$cmd .= '-vision="'.$vision->ip.'" -user="'.$customer->user.'" -pass='.SQ.$customer->pass.SQ.' ';
+		$cmd .= '-vision="'.$vision->ip.'" -user="'.$customer->user.'" -pass="'.$customer->pass.'" ';
 		$cmd .= '-dps="'.$vision->dps.'" -silent ';
 
 		if($iter)

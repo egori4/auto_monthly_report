@@ -59,8 +59,8 @@ if(file_exists('/usr/bin/php')) {
 	$globals->os = 'Linux';
 } else {
 	$globals->os = 'Windows';
-	if(!isset($globals->id))
-		die('This program doenst work correctly under Windows' . NL);
+#	if(!isset($globals->id))
+#		die('This program doenst work correctly under Windows' . NL);
 }
 
 // Define base command
