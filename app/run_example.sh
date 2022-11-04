@@ -23,9 +23,9 @@ proxy_for_email=false
 ####################################################################################################
 
 #######################Action variables switch on/off(optional)####################################################
-collect_data=false
+collect_data=true
 generate_report=true
-db_del_old_data=true #Delete old data from S
+db_del_old_data=true #Delete old data from SQL DB
 del_old_files=true
 generate_appendix=true
 email_send=true
