@@ -24,7 +24,7 @@ sudo apt install python3-pip
 pip install pandas
 pip install openpyxl
 
-Download, extract and put contents of the archive ("tools") uner "app" directory
+To run from WSL or linux, download, extract and put contents of the archive ("tools") uner "app" directory
 https://mega.nz/file/lbwE3a4b#v_wu1hGNqzRjRkp5JowjPSGC_Wh6MiwEzCMPCtFiJF0
 
 
