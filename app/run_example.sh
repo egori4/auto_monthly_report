@@ -18,8 +18,13 @@ smtp_list=(user1@mail.com user2@mail.com) #space separated list of email address
 
 
 #######################Proxy variables##############################################################
-proxy=false
-proxy_for_email=false
+is_http_proxy=false
+is_https_proxy=false
+
+is_proxy_for_email=false
+
+http_proxy="proxyserver.com:3128"
+https_proxy="proxyserver.com:3128"
 ####################################################################################################
 
 #######################Action variables switch on/off(optional)####################################################
@@ -58,12 +63,13 @@ if [ $proxy == "true" ]; then	#set proxy if needed
 
 		echo "Setting Proxy"
 
-		https_proxy="proxyserver.com:3128"
-		export https_proxy="$https_proxy"
+		if [ $is_https_proxy == "true" ]; then
+			export https_proxy="$https_proxy"
+		fi
 
-		http_proxy="proxyserver.com:3128"
-		export http_proxy="$http_proxy"
-
+		if [ $is_http_proxy == "true" ]; then
+			export http_proxy="$http_proxy"
+		fi	
 fi
 ########################################################################################################
 
@@ -117,8 +123,8 @@ for cust_id in "${cust_list[@]}"
 do
 	if [[ "$cur_month" != 1 ]]; then
 		# Case for current month except January
-		if [ $proxy_for_email == "true" ]; then
-			# if variable proxy_for_email is set to true, then proxy will be set for email sending
+		if [ $is_proxy_for_email == "true" ]; then
+			# if variable is_proxy_for_email is set to true, then proxy will be set for email sending
 			if [ $email_send == "true" ]; then
 				echo "Sending email using proxy"
 				python3 script_files/email_send.py $cust_id $prev_month $cur_year $smtp_auth $smtp_server $smtp_server_port $smtp_sender $smtp_password $smtp_subject_prefix ${smtp_list[@]}
@@ -136,8 +142,8 @@ do
 	else
 		# Case for current month January
 
-		if [ $proxy_for_email == "true" ]; then
-			# if variable proxy_for_email is set to true, then proxy will be set for email sending
+		if [ $is_proxy_for_email == "true" ]; then
+			# if variable is_proxy_for_email is set to true, then proxy will be set for email sending
 			if [ $email_send == "true" ]; then
 				echo "Sending email using proxy"
 				python3 script_files/email_send.py $cust_id $prev_month $prev_year $smtp_auth $smtp_server $smtp_server_port $smtp_sender $smtp_password $smtp_subject_prefix ${smtp_list[@]}

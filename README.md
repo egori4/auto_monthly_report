@@ -1,6 +1,12 @@
 
 Generate HTML/PDF reports using Google Charts and SQLite/CSV/Text/Python
 
+Change log
+
+11/7/2022
+- Consolidated proxy variables
+
+
 The script can be run either from Linux, Windows WSL or Container
 
 Prerequisites

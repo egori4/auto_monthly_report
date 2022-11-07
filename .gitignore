@@ -6,3 +6,4 @@ app/report_files/
 app/script_files/AbuseIPDB/
 app/script_files/__pycache__/
 app/tools/
+Container/
