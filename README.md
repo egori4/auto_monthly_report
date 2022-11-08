@@ -5,6 +5,7 @@ Change log
 
 11/7/2022
 - Consolidated proxy variables
+- run.sh bug fix, del_old_files.py bug fix
 
 
 The script can be run either from Linux, Windows WSL or Container
