@@ -59,18 +59,17 @@ fi
 
 
 ################# Set Proxy ##########################################################################
-if [ $proxy == "true" ]; then	#set proxy if needed
 
-		echo "Setting Proxy"
-
-		if [ $is_https_proxy == "true" ]; then
-			export https_proxy="$https_proxy"
-		fi
-
-		if [ $is_http_proxy == "true" ]; then
-			export http_proxy="$http_proxy"
-		fi	
+if [ $is_https_proxy == "true" ]; then
+	echo "Setting HTTPS Proxy"
+	export https_proxy="$https_proxy"
 fi
+
+if [ $is_http_proxy == "true" ]; then
+	echo "Setting HTTP Proxy"
+	export http_proxy="$http_proxy"
+fi	
+
 ########################################################################################################
 
 
@@ -79,7 +78,7 @@ fi
 # if generate_report is true
 if [ $generate_report == "true" ]; then
 	echo "Generating report"
-	php reportAll.php -- -month="$prev_month" -year="$cur_year" -id="USCC" #Generate and compile report to pdf
+	php reportAll.php -- -month="$prev_month" -year="$cur_year" #Generate and compile report to pdf
 fi
 ########################################################################################################
 
