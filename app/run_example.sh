@@ -62,6 +62,7 @@ fi
 
 if [ $is_https_proxy == "true" ]; then
 	echo "Setting HTTPS Proxy"
+
 	export https_proxy="$https_proxy"
 fi
 
@@ -74,20 +75,26 @@ fi
 
 
 
-################# Generate report for all customers ####################################################
-# if generate_report is true
-if [ $generate_report == "true" ]; then
-	echo "Generating report"
-	php reportAll.php -- -month="$prev_month" -year="$cur_year" #Generate and compile report to pdf
-fi
-########################################################################################################
+
+
+
+
+
 
 
 
 ###Loop through customer list, delete old files, generate appendixes ###################################
 for cust_id in "${cust_list[@]}"
 do
+
 	smtp_subject_prefix="$cust_id" # Email Subject
+
+	if [ $generate_report == "true" ]; then
+		echo "Generating report"
+		php reportAll.php -- -month="$prev_month" -year="$cur_year" -id="$cust_id" #Generate and compile report to pdf
+	fi
+
+
 	if [[ "$del_old_files" == "true" ]]; then
 		echo "Deleting old files"
 		python3 script_files/del_old_files.py $cust_id #Delete old files

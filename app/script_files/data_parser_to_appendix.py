@@ -1,3 +1,5 @@
+
+
 #pip install openpyxl
 #python3 script_files/data_parser_to_appendix.py uscc 1 2022  ---> from WSL
 #-------------------
@@ -12,6 +14,10 @@ import time
 
 start_time = time.time()
 
+print(start_time)
+print(datetime.now())
+
+
 
 ########Vars##############
 cust_id = sys.argv[1]
@@ -23,11 +29,17 @@ path_r = f'./report_files/{cust_id}/'
 
 
 con = sqlite3.connect(path_d + 'database_'+cust_id+'.sqlite')
-#data = pd.read_csv("C:\\DATA\\Scripts\\Pull data from Vision by Marcelo\\AutoReport_v3.9\\report_files\\USCC\\USCC 10 2021 attacks.csv", parse_dates=['startDate','endDate'], dtype={"name": "string","attackIpsId":"string","actionType":"string","risk":"string"})
-data = pd.read_sql_query("SELECT * from attacks", con)
+
+# data = pd.read_sql_query("SELECT * from attacks", con)
+data_month = pd.read_sql_query(f"SELECT deviceName,month,year,packetBandwidth,name,packetCount,ruleName,category,sourceAddress,destAddress,startTime,endTime,startDate,attackIpsId,maxAttackPacketRatePps,maxAttackRateBps,destPort,protocol,geoLocation,durationRange,startDayOfMonth from attacks where month={month}", con)
+
+#show memory usage
+print(data_month.memory_usage(index=True).sum())
+print(data_month.info(verbose=True, memory_usage='deep'))
+
 con.close()
 
-data_month = data[(data.month == month)] # data for the speicific month
+# data_month = data[(data.month == month)] # data for the speicific month
 
 data_month.to_csv(path_r+'database_'+cust_id+'_'+str(month)+'_'+str(year)+'.csv', encoding='utf-8', index=False)
 
@@ -208,102 +220,102 @@ with pd.ExcelWriter(path_r+'appendix_'+cust_id+'_'+str(month)+'_'+str(year)+'.xl
     s_bpc.to_excel(writer, sheet_name='Malicious BW per Category')
 print('Malicious bandwidth per Category - complete')
 
-## Top #1 attack by packet count #######################
+# ## Top #1 attack by packet count #######################
 
 
-device = f"Device: {data_month.sort_values(by=['packetCount'], ascending=False).iloc[0]['deviceName']}"
-policy = f"Policy: {data_month.sort_values(by=['packetCount'], ascending=False).iloc[0]['ruleName']}"
-attack_type = f"Attack type: {data_month.sort_values(by=['packetCount'], ascending=False).iloc[0]['name']}"
-src_ip = f"Source IP: {data_month.sort_values(by=['packetCount'], ascending=False).iloc[0]['sourceAddress']}"
-dst_ip = f"Destination IP: {data_month.sort_values(by=['packetCount'], ascending=False).iloc[0]['destAddress']}"
-attack_bw = f"Total attack traffic(cumulative in GB): {((data_month.sort_values(by=['packetCount'], ascending=False).iloc[0]['packetBandwidth'])/8000000)}"
-attack_pkt = f"Total attack packets(cumulative): {format((data_month.sort_values(by=['packetCount'], ascending=False).iloc[0]['packetCount']), ',d')}"
-duration = (data_month.sort_values(by=['packetCount'], ascending=False).iloc[0]['endTime'])-(data_month.sort_values(by=['packetCount'], ascending=False).iloc[0]['startTime'])
-dur = f"Duration: {str(duration/60000) + ' min /' + str(duration/1000) + ' sec'}"
-attack_start = f"Attack start time(UTC): {data_month.sort_values(by=['packetCount'], ascending=False).iloc[0]['startDate']}"
-attack_id = f"Attack ID: {data_month.sort_values(by=['packetCount'], ascending=False).iloc[0]['attackIpsId']}"
+# device = f"Device: {data_month.sort_values(by=['packetCount'], ascending=False).iloc[0]['deviceName']}"
+# policy = f"Policy: {data_month.sort_values(by=['packetCount'], ascending=False).iloc[0]['ruleName']}"
+# attack_type = f"Attack type: {data_month.sort_values(by=['packetCount'], ascending=False).iloc[0]['name']}"
+# src_ip = f"Source IP: {data_month.sort_values(by=['packetCount'], ascending=False).iloc[0]['sourceAddress']}"
+# dst_ip = f"Destination IP: {data_month.sort_values(by=['packetCount'], ascending=False).iloc[0]['destAddress']}"
+# attack_bw = f"Total attack traffic(cumulative in GB): {((data_month.sort_values(by=['packetCount'], ascending=False).iloc[0]['packetBandwidth'])/8000000)}"
+# attack_pkt = f"Total attack packets(cumulative): {format((data_month.sort_values(by=['packetCount'], ascending=False).iloc[0]['packetCount']), ',d')}"
+# duration = (data_month.sort_values(by=['packetCount'], ascending=False).iloc[0]['endTime'])-(data_month.sort_values(by=['packetCount'], ascending=False).iloc[0]['startTime'])
+# dur = f"Duration: {str(duration/60000) + ' min /' + str(duration/1000) + ' sec'}"
+# attack_start = f"Attack start time(UTC): {data_month.sort_values(by=['packetCount'], ascending=False).iloc[0]['startDate']}"
+# attack_id = f"Attack ID: {data_month.sort_values(by=['packetCount'], ascending=False).iloc[0]['attackIpsId']}"
 
-#print(device)
-#print(policy)
-#print(attack_type)
-#print(src_ip)
-#print(dst_ip)
-#print(attack_bw)
-#print(attack_pkt)
-#print(dur)
-#print(attack_start)
-#print(attack_id)
+# #print(device)
+# #print(policy)
+# #print(attack_type)
+# #print(src_ip)
+# #print(dst_ip)
+# #print(attack_bw)
+# #print(attack_pkt)
+# #print(dur)
+# #print(attack_start)
+# #print(attack_id)
 
-workbook_name = path_r+'appendix_'+cust_id+'_'+str(month)+'_'+str(year)+'.xlsx'
-wb = load_workbook(workbook_name)
-wb.create_sheet("Top 1 attack by packet count")
-page = wb["Top 1 attack by packet count"]
+# workbook_name = path_r+'appendix_'+cust_id+'_'+str(month)+'_'+str(year)+'.xlsx'
+# wb = load_workbook(workbook_name)
+# wb.create_sheet("Top 1 attack by packet count")
+# page = wb["Top 1 attack by packet count"]
 
-page.append([str(device)])
-page.append([str(policy)])
-page.append([str(attack_type)])
-page.append([str(src_ip)])
-page.append([str(dst_ip)])
-page.append([str(attack_bw)])
-page.append([str(attack_pkt)])
-page.append([str(dur)])
-page.append([str(attack_start)])
-page.append([str(attack_id)])
+# page.append([str(device)])
+# page.append([str(policy)])
+# page.append([str(attack_type)])
+# page.append([str(src_ip)])
+# page.append([str(dst_ip)])
+# page.append([str(attack_bw)])
+# page.append([str(attack_pkt)])
+# page.append([str(dur)])
+# page.append([str(attack_start)])
+# page.append([str(attack_id)])
 
-wb.save(path_r+'appendix_'+cust_id+'_'+str(month)+'_'+str(year)+'.xlsx')
+# wb.save(path_r+'appendix_'+cust_id+'_'+str(month)+'_'+str(year)+'.xlsx')
 
-#Export the top attacks table by packet count to CSV
-#topattackbypacketcount = data_month.sort_values(by=['packetCount'], ascending=False).iloc[0]['name']
-#data_month[data_month['name'] == topattackbypacketcount].sort_values(by=['packetCount'], ascending=False).to_csv('top_attack_by_packetcount.csv', encoding='utf-8', index=False)
-print('Top #1 attack by packet count - complete')
+# #Export the top attacks table by packet count to CSV
+# #topattackbypacketcount = data_month.sort_values(by=['packetCount'], ascending=False).iloc[0]['name']
+# #data_month[data_month['name'] == topattackbypacketcount].sort_values(by=['packetCount'], ascending=False).to_csv('top_attack_by_packetcount.csv', encoding='utf-8', index=False)
+# print('Top #1 attack by packet count - complete')
 
-## Top #1 attack by bandwidth###########################
+# ## Top #1 attack by bandwidth###########################
 
-device = f"Device: {data_month.sort_values(by=['packetBandwidth'], ascending=False).iloc[0]['deviceName']}"
-policy = f"Policy: {data_month.sort_values(by=['packetBandwidth'], ascending=False).iloc[0]['ruleName']}"
-attack_type = f"Attack type: {data_month.sort_values(by=['packetBandwidth'], ascending=False).iloc[0]['name']}"
-src_ip = f"Source IP: {data_month.sort_values(by=['packetBandwidth'], ascending=False).iloc[0]['sourceAddress']}"
-dst_ip = f"Destination IP: {data_month.sort_values(by=['packetBandwidth'], ascending=False).iloc[0]['destAddress']}"
-attack_bw = f"Total attack traffic(cumulative in GB): {((data_month.sort_values(by=['packetBandwidth'], ascending=False).iloc[0]['packetBandwidth'])/8000000)}"
-attack_pkt = f"Total attack packets(cumulative): {format((data_month.sort_values(by=['packetBandwidth'], ascending=False).iloc[0]['packetCount']), ',d')}"
-duration = (data_month.sort_values(by=['packetBandwidth'], ascending=False).iloc[0]['endTime'])-(data_month.sort_values(by=['packetBandwidth'], ascending=False).iloc[0]['startTime'])
-dur = f"Duration: {str(duration/60000) + ' min /' + str(duration/1000) + ' sec'}"
-attack_start = f"Attack start time(UT): {data_month.sort_values(by=['packetBandwidth'], ascending=False).iloc[0]['startDate']}"
-attack_id = f"Attack ID: {data_month.sort_values(by=['packetBandwidth'], ascending=False).iloc[0]['attackIpsId']}"
+# device = f"Device: {data_month.sort_values(by=['packetBandwidth'], ascending=False).iloc[0]['deviceName']}"
+# policy = f"Policy: {data_month.sort_values(by=['packetBandwidth'], ascending=False).iloc[0]['ruleName']}"
+# attack_type = f"Attack type: {data_month.sort_values(by=['packetBandwidth'], ascending=False).iloc[0]['name']}"
+# src_ip = f"Source IP: {data_month.sort_values(by=['packetBandwidth'], ascending=False).iloc[0]['sourceAddress']}"
+# dst_ip = f"Destination IP: {data_month.sort_values(by=['packetBandwidth'], ascending=False).iloc[0]['destAddress']}"
+# attack_bw = f"Total attack traffic(cumulative in GB): {((data_month.sort_values(by=['packetBandwidth'], ascending=False).iloc[0]['packetBandwidth'])/8000000)}"
+# attack_pkt = f"Total attack packets(cumulative): {format((data_month.sort_values(by=['packetBandwidth'], ascending=False).iloc[0]['packetCount']), ',d')}"
+# duration = (data_month.sort_values(by=['packetBandwidth'], ascending=False).iloc[0]['endTime'])-(data_month.sort_values(by=['packetBandwidth'], ascending=False).iloc[0]['startTime'])
+# dur = f"Duration: {str(duration/60000) + ' min /' + str(duration/1000) + ' sec'}"
+# attack_start = f"Attack start time(UT): {data_month.sort_values(by=['packetBandwidth'], ascending=False).iloc[0]['startDate']}"
+# attack_id = f"Attack ID: {data_month.sort_values(by=['packetBandwidth'], ascending=False).iloc[0]['attackIpsId']}"
 
-#print(policy)
-#print(device)
-#print(attack_type)
-#print(src_ip)
-#print(dst_ip)
-#print(attack_bw)
-#print(attack_pkt)
-#print(dur)
-#print(attack_start)
-#print(attack_id)
+# #print(policy)
+# #print(device)
+# #print(attack_type)
+# #print(src_ip)
+# #print(dst_ip)
+# #print(attack_bw)
+# #print(attack_pkt)
+# #print(dur)
+# #print(attack_start)
+# #print(attack_id)
 
-workbook_name = path_r+'appendix_'+cust_id+'_'+str(month)+'_'+str(year)+'.xlsx'
-wb = load_workbook(workbook_name)
-wb.create_sheet("Top 1 attack by bandwidth")
-page = wb["Top 1 attack by bandwidth"]
+# workbook_name = path_r+'appendix_'+cust_id+'_'+str(month)+'_'+str(year)+'.xlsx'
+# wb = load_workbook(workbook_name)
+# wb.create_sheet("Top 1 attack by bandwidth")
+# page = wb["Top 1 attack by bandwidth"]
 
-page.append([str(device)])
-page.append([str(policy)])
-page.append([str(attack_type)])
-page.append([str(src_ip)])
-page.append([str(dst_ip)])
-page.append([str(attack_bw)])
-page.append([str(attack_pkt)])
-page.append([str(dur)])
-page.append([str(attack_start)])
-page.append([str(attack_id)])
+# page.append([str(device)])
+# page.append([str(policy)])
+# page.append([str(attack_type)])
+# page.append([str(src_ip)])
+# page.append([str(dst_ip)])
+# page.append([str(attack_bw)])
+# page.append([str(attack_pkt)])
+# page.append([str(dur)])
+# page.append([str(attack_start)])
+# page.append([str(attack_id)])
     
-wb.save(path_r+'appendix_'+cust_id+'_'+str(month)+'_'+str(year)+'.xlsx')
+# wb.save(path_r+'appendix_'+cust_id+'_'+str(month)+'_'+str(year)+'.xlsx')
 
-#Export the top attacks table by bandwidth to CSV
+# #Export the top attacks table by bandwidth to CSV
 
-#topattackbybandwidth = data_month.sort_values(by=['packetBandwidth'], ascending=False).iloc[0]['name']
-#data_month[data_month['name'] == topattackbybandwidth].sort_values(by=['packetBandwidth'], ascending=False).to_csv('top_attack_by_bandwidth.csv', encoding='utf-8', index=False)
-print('Top #1 attack by bandwidth - complete')
+# #topattackbybandwidth = data_month.sort_values(by=['packetBandwidth'], ascending=False).iloc[0]['name']
+# #data_month[data_month['name'] == topattackbybandwidth].sort_values(by=['packetBandwidth'], ascending=False).to_csv('top_attack_by_bandwidth.csv', encoding='utf-8', index=False)
+# print('Top #1 attack by bandwidth - complete')
 
 print("--- %s seconds ---" % (time.time() - start_time))
