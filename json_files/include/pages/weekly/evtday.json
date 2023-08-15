@@ -1,0 +1,38 @@
+{
+    "title": "Events per Day",
+    "id": "evtday",
+    "objects": [
+        {
+            "object": "chart",
+            "style": {
+                "top": 100,
+                "left": 50,
+                "width": 1050,
+                "height": 580
+            },
+            "title": "Events per Day",
+            "type": "area",
+            "noLabel": true,
+            "legend": "none",
+            "average": true,
+            "labelAsAlpha": true,
+            "src": "cmd",
+            "cmd": "./script_files/gensql.sh {id} {month} \"{sql_in}\" \"{sql_out}\" {span}",
+            "globals": {
+                "sql_in": "select printf('%02d',endDayOfMonth) as F1, count(*) as F2 from attacks where endTime >= {prevTime} and endTime < {time} group by F1",
+                "sql_out": "select F1 as 'Day of the Month',sum(F2) as 'Number of Events' from data group by F1 order by F1"
+            }
+        },
+        {
+            "object": "chart",
+            "style": {
+                "top": 625,
+                "width": "100%"
+            },
+            "centered": true,
+            "average": true,
+            "type": "table",
+            "src": "last"
+        }
+    ]
+}

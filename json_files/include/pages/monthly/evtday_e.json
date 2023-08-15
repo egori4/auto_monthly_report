@@ -1,0 +1,37 @@
+{
+    "title": "EAAF Events per Day of the Month",
+    "id": "evtday_e",
+    "skipIfNot": "EAAFdb",
+    "objects": [
+        {
+            "object": "chart",
+            "style": {
+                "top": 100,
+                "left": 50,
+                "width": 1050,
+                "height": 580
+            },
+            "title": "EAAF Events per Day of the Month",
+            "type": "area",
+            "noLabel": true,
+            "legend": "none",
+            "average": true,
+            "labelAsAlpha": true,
+            "xMin": 0,
+            "xMax": "{monthDays}",
+            "src": "sql",
+            "sql": "select x as 'Day of the Month', sum(y) as 'Number of Events' from (with recursive cnt(x) as (select 1 union select x+1 from cnt limit {monthDays}) select x ,0 as 'y' from cnt union select endDayOfMonth,count(*) from ertfeed group by endDayOfMonth) group by x order by x"
+        },
+        {
+            "object": "chart",
+            "style": {
+                "top": 625,
+                "width": "100%"
+            },
+            "centered": true,
+            "average": true,
+            "type": "table",
+            "src": "last"
+        }
+    ]
+}

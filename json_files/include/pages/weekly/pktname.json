@@ -1,0 +1,24 @@
+{
+    "title": "Event Packets per Name",
+    "id": "pktname",
+    "objects": [
+        {
+            "include": "cmdChart",
+            "title": "Event Packets per Name",
+            "type": "bar",
+            "divisor": "{pktDivisor}",
+            "decimals": "{pktDecimals}",
+            "fontSize": 11,
+            "cmd": "./script_files/gensql.sh {id} {month} \"{sql_in}\" \"{sql_out}\" {span}",
+            "globals": {
+                "sql_in": "select name as F1,sum(packetCount) as F2 from attacks where endTime >= {prevTime} and endTime < {time} and name!=' ' group by name order by sum(packetCount) desc limit {topN}",
+                "sql_out": "select F1 as 'Event Name',sum(F2) as '{pktUnit}' from data group by F1 order by sum(F2) desc limit {topN}"
+            }
+        },
+        {
+            "include": "lastTable",
+            "divisor": "{pktDivisor}",
+            "decimals": "{pktDecimals}"
+        }
+    ]
+}

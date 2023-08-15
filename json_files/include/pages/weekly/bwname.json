@@ -1,0 +1,25 @@
+{
+    "title": "Event Bandwidth per Name",
+    "id": "bwname",
+    "objects": [
+        {
+            "include": "cmdChart",
+            "title": "Event Bandwidth per Name",
+            "type": "bar",
+            "divisor": "{bwDivisor}",
+            "decimals": "{bwDecimals}",
+            "fontSize": 11,
+            "src": "cmd",
+            "cmd": "./script_files/gensql.sh {id} {month} \"{sql_in}\" \"{sql_out}\" {span}",
+            "globals": {
+                "sql_in": "select name as F1,sum(packetBandwidth) as F2 from attacks where endTime >= {prevTime} and endTime < {time} and name!=' ' group by name order by sum(packetBandwidth) desc limit {topN}",
+                "sql_out": "select F1 as 'Event Name',sum(F2) as '{bwUnit}' from data group by F1 order by sum(F2) desc limit {topN}"
+            }
+        },
+        {
+            "include": "lastTable",
+            "divisor": "{bwDivisor}",
+            "decimals": "{bwDecimals}"
+        }
+    ]
+}

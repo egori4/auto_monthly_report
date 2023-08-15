@@ -1,0 +1,17 @@
+{
+    "title": "EAAF Events by Name",
+    "id": "evtname_e",
+    "skipIfNot": "EAAFdb",
+    "objects": [
+        {
+            "include": "sqlChart",
+            "title": "EAAF Events by Name",
+            "type": "bar",
+            "fontSize": 11,
+            "sql": "select name as 'Event Name',count(*) as 'Number of Events' from ertfeed group by name order by count(*) desc limit {topN}"
+        },
+        {
+            "include": "lastTable"
+        }
+    ]
+}

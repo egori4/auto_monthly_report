@@ -1,0 +1,63 @@
+{
+    "objects": [
+        {
+            "object": "image",
+            "style": {
+                "top": 0,
+                "left": 0
+            },
+            "src": "{relPath}html_files/images/header.jpg",
+            "width": 1100,
+            "height": 100
+        },
+        {
+            "object": "image",
+            "style": {
+                "bottom": 0,
+                "left": 0
+            },
+            "src": "{relPath}html_files/images/footer.jpg",
+            "width": 1100,
+            "height": 100
+        },
+        {
+            "object": "text",
+            "style": {
+                "top": 25,
+                "right": 40,
+                "width": 700,
+                "height": 200,
+                "color": "white",
+                "font-size": 36,
+                "text-align": "right"
+            },
+            "text": "{^range} Report {prevMonthText}/{prevDay} to {monthText}/{$globals->day-1}"
+        },
+        {
+            "object": "text",
+            "style": {
+                "bottom": 120,
+                "right": 40
+            },
+            "text": "<a href='#index'>Back to Index</a>"
+        },
+        {
+            "object": "text",
+            "style": {
+                "bottom": 40,
+                "left": 40,
+                "color": "white"
+            },
+            "text": "Report v{version}"
+        },
+        {
+            "object": "text",
+            "style": {
+                "bottom": 40,
+                "right": 40,
+                "color": "white"
+            },
+            "text": "Page: {pageNumber}"
+        }
+    ]
+}

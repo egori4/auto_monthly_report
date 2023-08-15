@@ -1,0 +1,19 @@
+{
+    "title": "Events per Policy",
+    "id": "evtpol",
+    "objects": [
+        {
+            "include": "cmdChart",
+            "title": "Events per Policy",
+            "type": "bar",
+            "cmd": "./script_files/gensql.sh {id} {month} \"{sql_in}\" \"{sql_out}\" {span}",
+            "globals": {
+                "sql_in": "select ruleName as F1,count(*) as F2 from attacks where endTime >= {prevTime} and endTime < {time} group by ruleName order by count(*) desc limit {topN}",
+                "sql_out": "select F1 as 'Policy Name',sum(F2) as 'Number of Events' from data group by F1 order by sum(F2) desc limit {topN}"
+            }
+        },
+        {
+            "include": "lastTable"
+        }
+    ]
+}

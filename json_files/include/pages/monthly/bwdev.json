@@ -1,0 +1,18 @@
+{
+    "title": "Event Bandwidth per DefensePro Device",
+    "id": "bwdev",
+    "objects": [
+        {
+            "include": "sqlChart",
+            "title": "Event Bandwidth per DefensePro Device",
+            "divisor": "{bwDivisor}",
+            "decimals": "{bwDecimals}",
+            "sql": "select devices.deviceName as 'Device Name',ifnull(sum(packetBandwidth),0) as '{bwUnit}' from devices left outer join attacks on devices.deviceIp = attacks.deviceIp group by devices.deviceIp order by sum(packetBandwidth) desc"
+        },
+        {
+            "include": "lastTable",
+            "divisor": "{bwDivisor}",
+            "decimals": "{bwDecimals}"
+        }
+    ]
+}

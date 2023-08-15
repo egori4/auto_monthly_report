@@ -1,0 +1,19 @@
+{
+    "title": "Event Bandwidth per Month",
+    "id": "bwmon",
+    "objects": [
+        {
+            "include": "cmdChart",
+            "title": "Event Bandwidth per Month",
+            "divisor": "{bwDivisor}",
+            "decimals": "{bwDecimals}",
+            "average": "true",
+            "cmd": "./script_files/bwmon.php {id} {month} {db} '{bwUnit}'"
+        },
+        {
+            "include": "lastTable",
+            "divisor": "{bwDivisor}",
+            "decimals": "{bwDecimals}"
+        }
+    ]
+}

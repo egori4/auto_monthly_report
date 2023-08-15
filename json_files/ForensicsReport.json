@@ -1,0 +1,1438 @@
+{
+	"offline": true,
+	"version": "5.3",
+	"title": "Monthly Report - {month} {year}",
+	"globals": {
+		"db": "database_files/{id}/database_{id}_{month}.sqlite"
+	},
+	"defaults": {
+		"page": {
+			"objects": [
+				{
+					"object": "image",
+					"style": {
+						"top": 0,
+						"left": 0
+					},
+					"src": "{relPath}html_files/images/header.jpg",
+					"width": 1100,
+					"height": 100
+				},
+				{
+					"object": "image",
+					"style": {
+						"bottom": 0,
+						"left": 0
+					},
+					"src": "{relPath}html_files/images/footer.jpg",
+					"width": 1100,
+					"height": 100
+				},
+				{
+					"object": "text",
+					"style": {
+						"top": 25,
+						"right": 40,
+						"width": 700,
+						"height": 200,
+						"color": "white",
+						"font-size": 36,
+						"text-align": "right"
+					},
+					"text": "Monthly Report - {monthText} {year}"
+				},
+				{
+					"object": "text",
+					"style": {
+						"bottom": 120,
+						"right": 40
+					},
+					"text": "<a href='#index'>Back to Index</a>"
+				},
+				{
+					"object": "text",
+					"style": {
+						"bottom": 40,
+						"left": 40,
+						"color": "white"
+					},
+					"text": "Report v{version}"
+				},
+				{
+					"object": "text",
+					"style": {
+						"bottom": 40,
+						"right": 40,
+						"color": "white"
+					},
+					"text": "Page: {pageNumber}"
+				}
+			]
+		}
+	},
+	"pages": [
+		{
+			"title": "Overview",
+			"id": "overview",
+			"skip": false,
+			"objects": [
+				{
+					"object": "text",
+					"style": {
+						"top": 230,
+						"left": 0,
+						"width": "100%",
+						"height": 50,
+						"font-size": 42,
+						"text-align": "center"
+					},
+					"text": "Monthly Report - {monthText} {year}"
+				},
+				{
+					"object": "text",
+					"style": {
+						"top": 330,
+						"left": 0,
+						"width": "100%",
+						"height": 50,
+						"font-size": 42,
+						"text-align": "center"
+					},
+					"text": "{longName}"
+				},
+				{
+					"object": "text",
+					"style": {
+						"top": 450,
+						"left": 200,
+						"width": 700,
+						"height": 700,
+						"font-size": 18
+					},
+					"src": "file",
+					"file": "text_files/frontpage_{language}.txt"
+				},
+				{
+					"object": "text",
+					"style": {
+						"top": 950,
+						"width": "100%",
+						"height": 20,
+						"font-size": 18,
+						"font-weight": "bold"
+					},
+					"centered": true,
+					"text": "Event Statistics Overview"
+				},
+				{
+					"object": "variable",
+					"name": "totalRecs",
+					"src": "sql",
+					"sql": "select count(*) from attacks",
+					"format": "number",
+					"decimals": 0
+				},
+				{
+					"object": "variable",
+					"name": "totalMPackets",
+					"src": "sql",
+					"sql": "select printf('%.{pktDecimals}f', sum(\"Total Packets Dropped\")*1.0/{pktDivisor}) from attacks",
+					"format": "number",
+					"decimals": "{pktDecimals}"
+				},
+				{
+					"object": "variable",
+					"name": "totalGBytes",
+					"src": "sql",
+					"sql": "select printf('%.{bwDecimals}f', sum(\"Total Mbits Dropped\")*1.0/{bwDivisor}) from attacks",
+					"format": "number",
+					"decimals": "{bwDecimals}"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 975,
+						"width": "100%",
+						"height": 400
+					},
+					"type": "table",
+					"fields": [
+						"string",
+						"string"
+					],
+					"centered": true,
+					"options": {
+						"cssClassNames": "{ headerCell: \"noHeader\", tableRow: \"summary\", oddTableRow: \"summary\" }"
+					},
+					"src": "data",
+					"data": [
+						[
+							"col1",
+							"col2"
+						],
+						[
+							"Total events detected",
+							"{totalRecs}"
+						],
+						[
+							"Total number of malicious packets",
+							"{totalMPackets} {pktUnit}"
+						],
+						[
+							"Total malicious bandwidth",
+							"{totalGBytes} {bwUnit}"
+						]
+					]
+				}
+			]
+		},
+		{
+			"title": "Index",
+			"id": "index",
+			"skip": false,
+			"objects": [
+				{
+					"object": "text",
+					"style": {
+						"top": 150,
+						"left": 0,
+						"width": "100%",
+						"height": 50,
+						"font-size": 38,
+						"text-align": "center",
+						"color": "#113150"
+					},
+					"text": "Content Index"
+				},
+				{
+					"object": "index",
+					"style": {
+						"top": 250,
+						"width": "100%"
+					},
+					"centered": true,
+					"minPage": 1,
+					"maxPage": 35,
+					"options": {
+						"cssClassNames": "{ tableRow: \"index\", oddTableRow: \"index\" }"
+					}
+				}
+			]
+		},
+		{
+			"title": "Events per Device",
+			"id": "evtdev",
+			"skip": false,
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 140,
+						"left": 50,
+						"width": 1050,
+						"height": 680
+					},
+					"title": "Events per Device",
+					"type": "pie",
+					"legend": "right",
+					"others": false,
+					"src": "sql",
+					"sql": "select \"Device IP Address\",count(*) as 'Events' from attacks group by \"Device IP Address\" order by count(*) desc limit {topN}"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 850,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"src": "last"
+				}
+			]
+		},
+		{
+			"title": "Malicious packets per Device",
+			"id": "pktdev",
+			"skip": false,
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 140,
+						"left": 50,
+						"width": 1050,
+						"height": 680
+					},
+					"title": "Malicious packets per Device",
+					"type": "column",
+					"divisor": "{pktDivisor}",
+					"decimals": "{pktDecimals}",
+					"slantedText": true,
+					"src": "sql",
+					"sql": "select \"Device IP Address\",sum(\"Total Packets Dropped\") as '{pktUnit}' from attacks group by \"Device IP Address\" order by sum(\"Total Packets Dropped\") desc limit {topN}"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 850,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"divisor": "{pktDivisor}",
+					"decimals": "{pktDecimals}",
+					"src": "last"
+				}
+			]
+		},
+		{
+			"title": "Malicious bandwidth per Device",
+			"id": "bwdev",
+			"skip": false,
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 140,
+						"left": 50,
+						"width": 1050,
+						"height": 680
+					},
+					"title": "Malicious bandwidth per Device",
+					"type": "column",
+					"divisor": "{bwDivisor}",
+					"decimals": "{bwDecimals}",
+					"slantedText": true,
+					"src": "sql",
+					"sql": "select \"Device IP Address\",sum(\"Total Mbits Dropped\") as '{bwUnit}' from attacks group by \"Device IP Address\" order by sum(\"Total Mbits Dropped\") desc limit {topN}"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 850,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"divisor": "{bwDivisor}",
+					"decimals": "{bwDecimals}",
+					"src": "last"
+				}
+			]
+		},
+		{
+			"title": "Events per Source IP Address",
+			"id": "evtsip",
+			"skip": false,
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 140,
+						"left": 50,
+						"width": 1050,
+						"height": 680
+					},
+					"title": "Events per Source IP Address",
+					"type": "bar",
+					"legend": "none",
+					"slantedText": true,
+					"src": "sql",
+					"sql": "select \"Source IP Address\",count(*) as 'Number of Events' from attacks group by \"Source IP Address\" order by count(*) desc limit {topN}"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 850,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"src": "last"
+				}
+			]
+		},
+		{
+			"title": "Events per Destination IP Address",
+			"id": "evtdip",
+			"skip": false,
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 140,
+						"left": 50,
+						"width": 1050,
+						"height": 680
+					},
+					"title": "Events per Destination IP Address",
+					"type": "bar",
+					"legend": "none",
+					"slantedText": true,
+					"revDNS": false,
+					"src": "sql",
+					"sql": "select \"Destination IP Address\",count(*) as 'Number of Events' from attacks where \"Destination IP Address\"!='0.0.0.0' and \"Destination IP Address\"!='Multiple' group by \"Destination IP Address\" order by count(*) desc limit {topN}"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 850,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"revDNS": false,
+					"total": true,
+					"src": "last"
+				}
+			]
+		},
+		{
+			"title": "Events per Policy",
+			"id": "evtpol",
+			"skip": false,
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 140,
+						"left": 50,
+						"width": 1050,
+						"height": 680
+					},
+					"title": "Events per Policy",
+					"type": "bar",
+					"legend": "none",
+					"slantedText": true,
+					"src": "sql",
+					"sql": "select \"Policy Name\",count(*) as 'Number of Events' from attacks group by \"Policy Name\" order by count(*) desc limit {topN}"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 850,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"total": true,
+					"src": "last"
+				}
+			]
+		},
+		{
+			"title": "Malicious packets per Policy",
+			"id": "pktpol",
+			"skip": false,
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 140,
+						"left": 50,
+						"width": 1050,
+						"height": 680
+					},
+					"title": "Malicious packets per Policy",
+					"type": "bar",
+					"divisor": "{pktDivisor}",
+					"decimals": "{pktDecimals}",
+					"slantedText": true,
+					"src": "sql",
+					"sql": "select \"Policy Name\",sum(\"Total Packets Dropped\") as '{pktUnit}' from attacks group by \"Policy Name\" order by sum(\"Total Packets Dropped\") desc limit {topN}"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 850,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"divisor": "{pktDivisor}",
+					"decimals": "{pktDecimals}",
+					"src": "last"
+				}
+			]
+		},
+		{
+			"title": "Malicious bandwidth per Policy",
+			"id": "bwpol",
+			"skip": false,
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 140,
+						"left": 50,
+						"width": 1050,
+						"height": 680
+					},
+					"title": "Malicious bandwidth per Policy",
+					"type": "bar",
+					"divisor": "{bwDivisor}",
+					"decimals": "{bwDecimals}",
+					"slantedText": true,
+					"src": "sql",
+					"sql": "select \"Policy Name\",sum(\"Total Mbits Dropped\") as '{bwUnit}' from attacks group by \"Policy Name\" order by sum(\"Total Mbits Dropped\") desc limit {topN}"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 850,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"divisor": "{bwDivisor}",
+					"decimals": "{bwDecimals}",
+					"src": "last"
+				}
+			]
+		},
+		{
+			"title": "Events per Attack Name",
+			"id": "evtname",
+			"skip": false,
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 140,
+						"left": 50,
+						"width": 1050,
+						"height": 680
+					},
+					"title": "Events per Attack Name",
+					"type": "bar",
+					"legend": "none",
+					"src": "sql",
+					"sql": "select \"Attack Name\",count(*) as 'Number of Events' from attacks where \"Attack Name\"!=' ' group by \"Attack Name\" order by count(*) desc limit {topN}"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 850,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"src": "last"
+				}
+			]
+		},
+		{
+			"title": "Malicious packets per Attack Name",
+			"id": "pktname",
+			"skip": false,
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 140,
+						"left": 50,
+						"width": 1050,
+						"height": 680
+					},
+					"title": "Malicious packets per Attack Name",
+					"type": "bar",
+					"divisor": "{pktDivisor}",
+					"decimals": "{pktDecimals}",
+					"slantedText": true,
+					"src": "sql",
+					"sql": "select \"Attack Name\",sum(\"Total Packets Dropped\") as '{pktUnit}' from attacks where \"Attack Name\"!=' ' group by \"Attack Name\" order by sum(\"Total Packets Dropped\") desc limit {topN}"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 850,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"divisor": "{pktDivisor}",
+					"decimals": "{pktDecimals}",
+					"src": "last"
+				}
+			]
+		},
+		{
+			"title": "Malicious bandwidth per Attack Name",
+			"id": "bwname",
+			"skip": false,
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 140,
+						"left": 50,
+						"width": 1050,
+						"height": 680
+					},
+					"title": "Malicious bandwidth per Attack Name",
+					"type": "bar",
+					"divisor": "{bwDivisor}",
+					"decimals": "{bwDecimals}",
+					"slantedText": true,
+					"src": "sql",
+					"sql": "select \"Attack Name\",sum(\"Total Mbits Dropped\") as '{bwUnit}' from attacks where \"Attack Name\"!=' ' group by \"Attack Name\" order by sum(\"Total Mbits Dropped\") desc limit {topN}"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 850,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"divisor": "{bwDivisor}",
+					"decimals": "{bwDecimals}",
+					"src": "last"
+				}
+			]
+		},
+		{
+			"title": "Events per Destination Port",
+			"id": "evtdpt",
+			"skip": false,
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 140,
+						"left": 50,
+						"width": 1050,
+						"height": 680
+					},
+					"title": "Events per Destination Port",
+					"type": "bar",
+					"legend": "none",
+					"src": "sql",
+					"sql": "select \"Destination Port\",count(*) as 'Number of Events' from attacks group by \"Destination Port\" order by count(*) desc limit {topN}"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 850,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"src": "last"
+				}
+			]
+		},
+		{
+			"title": "Events per Protocol",
+			"id": "evtproto",
+			"skip": false,
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 140,
+						"left": 50,
+						"width": 1050,
+						"height": 680
+					},
+					"title": "Events per Protocol",
+					"type": "pie",
+					"legend": "right",
+					"others": false,
+					"src": "sql",
+					"sql": "select \"Protocol\",count(*) as 'Number of Events' from attacks group by \"Protocol\" order by count(*) desc limit {topN}"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 850,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"src": "last"
+				}
+			]
+		},
+		{
+			"title": "Malicious packets per Protocol",
+			"id": "pktproto",
+			"skip": false,
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 140,
+						"left": 50,
+						"width": 1050,
+						"height": 680
+					},
+					"title": "Malicious packets per Protocol",
+					"type": "column",
+					"divisor": "{pktDivisor}",
+					"decimals": "{pktDecimals}",
+					"src": "sql",
+					"sql": "select \"Protocol\",sum(\"Total Packets Dropped\") as '{pktUnit}' from attacks group by \"Protocol\" order by sum(\"Total Packets Dropped\") desc limit {topN}"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 850,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"divisor": "{pktDivisor}",
+					"decimals": "{pktDecimals}",
+					"src": "last"
+				}
+			]
+		},
+		{
+			"title": "Malicious bandwidth per Protocol",
+			"id": "bwproto",
+			"skip": false,
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 140,
+						"left": 50,
+						"width": 1050,
+						"height": 680
+					},
+					"title": "Malicious bandwidth per Protocol",
+					"type": "column",
+					"divisor": "{bwDivisor}",
+					"decimals": "{bwDecimals}",
+					"src": "sql",
+					"sql": "select \"Protocol\",sum(\"Total Mbits Dropped\") as '{bwUnit}' from attacks group by \"Protocol\" order by sum(\"Total Mbits Dropped\") desc limit {topN}"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 850,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"divisor": "{bwDivisor}",
+					"decimals": "{bwDecimals}",
+					"src": "last"
+				}
+			]
+		},
+		{
+			"title": "Events per Category",
+			"id": "evtcat",
+			"skip": false,
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 140,
+						"left": 50,
+						"width": 1050,
+						"height": 680
+					},
+					"title": "Events per Category",
+					"type": "pie",
+					"legend": "right",
+					"others": false,
+					"src": "sql",
+					"sql": "select \"Threat Category\",count(*) as 'Number of Events' from attacks group by \"Threat Category\" order by count(*) desc limit {topN}"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 850,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"src": "last"
+				}
+			]
+		},
+		{
+			"title": "Malicious packets per Category",
+			"id": "pktcat",
+			"skip": false,
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 140,
+						"left": 50,
+						"width": 1050,
+						"height": 680
+					},
+					"title": "Malicious packets per Category",
+					"type": "bar",
+					"divisor": "{pktDivisor}",
+					"decimals": "{pktDecimals}",
+					"slantedText": true,
+					"src": "sql",
+					"sql": "select \"Threat Category\",sum(\"Total Packets Dropped\") as '{pktUnit}' from attacks group by \"Threat Category\" order by sum(\"Total Packets Dropped\") desc limit {topN}"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 850,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"divisor": "{pktDivisor}",
+					"decimals": "{pktDecimals}",
+					"src": "last"
+				}
+			]
+		},
+		{
+			"title": "Malicious bandwidth per Category",
+			"id": "bwcat",
+			"skip": false,
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 140,
+						"left": 50,
+						"width": 1050,
+						"height": 680
+					},
+					"title": "Malicious bandwidth per Category",
+					"type": "bar",
+					"divisor": "{bwDivisor}",
+					"decimals": "{bwDecimals}",
+					"slantedText": true,
+					"src": "sql",
+					"sql": "select \"Threat Category\",sum(\"Total Mbits Dropped\") as '{bwUnit}' from attacks group by \"Threat Category\" order by sum(\"Total Mbits Dropped\") desc limit {topN}"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 850,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"divisor": "{bwDivisor}",
+					"decimals": "{bwDecimals}",
+					"src": "last"
+				}
+			]
+		},
+		{
+			"title": "Malicious bandwidth per Attack and Policy",
+			"id": "bwatkpol",
+			"skip": false,
+			"objects": [
+				{
+					"object": "text",
+					"style": {
+						"top": 230,
+						"width": "100%",
+						"height": 20,
+						"font-size": 24,
+						"font-weight": "bold",
+						"color": "#113150"
+					},
+					"centered": true,
+					"text": "Malicious bandwidth per Attack and Policy"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 300,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"fields": [
+						"string",
+						"string",
+						"number"
+					],
+					"divisor": "{bwDivisor}",
+					"decimals": "{bwDecimals}",
+					"noLabel": true,
+					"src": "sql",
+					"sql": "select \"Attack Name\",\"Policy Name\",sum(\"Total Mbits Dropped\") as '{bwUnit}' from attacks where \"Attack Name\"!=' ' group by \"Attack Name\" order by sum(\"Total Mbits Dropped\") desc limit 20"
+				}
+			]
+		},
+		{
+			"title": "Events by Policy/Attack CTM_BAD_Actor",
+			"id": "custom01",
+			"skip": false,
+			"objects": [
+				{
+					"object": "text",
+					"style": {
+						"top": 230,
+						"width": "100%",
+						"height": 20,
+						"font-size": 24,
+						"font-weight": "bold",
+						"color": "#113150"
+					},
+					"centered": true,
+					"text": "Events by Policy/Attack CTM_BAD_Actor"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 300,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"fields": [
+						"string",
+						"string",
+						"string",
+						"number"
+					],
+					"noLabel": true,
+					"src": "sql",
+					"sql": "select \"Policy Name\",\"Attack Name\",\"Threat Category\",count(*) as 'Events' from attacks where \"Policy Name\" = 'CTM-BAD_ACTOR_CONN_LIMIT' group by \"Policy name\",\"Attack Name\" order by count(*) desc limit 15"
+				}
+			]
+		},
+		{
+			"title": "Events by Policy/Attack TMPE_net_ipv4",
+			"id": "custom01",
+			"skip": false,
+			"objects": [
+				{
+					"object": "text",
+					"style": {
+						"top": 230,
+						"width": "100%",
+						"height": 20,
+						"font-size": 24,
+						"font-weight": "bold",
+						"color": "#113150"
+					},
+					"centered": true,
+					"text": "Events by Policy/Attack TMPE_net_ipv4"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 300,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"fields": [
+						"string",
+						"string",
+						"string",
+						"number"
+					],
+					"noLabel": true,
+					"src": "sql",
+					"sql": "select \"Policy Name\",\"Attack Name\", \"Threat Category\",count(*) as 'Events' from attacks where \"Policy Name\" = 'TMPE_net_ipv4' group by \"Policy name\",\"Attack Name\" order by count(*) desc limit 15"
+				}
+			]
+		},
+		{
+			"title": "Events by Policy/Attack SVDC_DC_ipv4",
+			"id": "custom01",
+			"skip": false,
+			"objects": [
+				{
+					"object": "text",
+					"style": {
+						"top": 230,
+						"width": "100%",
+						"height": 20,
+						"font-size": 24,
+						"font-weight": "bold",
+						"color": "#113150"
+					},
+					"centered": true,
+					"text": "Events by Policy/Attack SVDC_DC_ipv4"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 300,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"fields": [
+						"string",
+						"string",
+						"string",
+						"number"
+					],
+					"noLabel": true,
+					"src": "sql",
+					"sql": "select \"Policy Name\",\"Attack Name\", \"Threat Category\",count(*) as 'Events' from attacks where \"Policy Name\" = 'SVDC_DC_ipv4' group by \"Policy name\",\"Attack Name\" order by count(*) desc limit 15"
+				}
+			]
+		},
+		{
+			"title": "Events by Policy/Attack OXDC_DC_IPv4",
+			"id": "custom01",
+			"skip": false,
+			"objects": [
+				{
+					"object": "text",
+					"style": {
+						"top": 230,
+						"width": "100%",
+						"height": 20,
+						"font-size": 24,
+						"font-weight": "bold",
+						"color": "#113150"
+					},
+					"centered": true,
+					"text": "Events by Policy/Attack OXDC_DC_IPv4"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 300,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"fields": [
+						"string",
+						"string",
+						"string",
+						"number"
+					],
+					"noLabel": true,
+					"src": "sql",
+					"sql": "select \"Policy Name\",\"Attack Name\", \"Threat Category\",count(*) as 'Events' from attacks where \"Policy Name\" = 'OXDC_DC_IPv4' group by \"Policy name\",\"Attack Name\" order by count(*) desc limit 15"
+				}
+			]
+		},
+		{
+			"title": "Events by Policy/Attack SILS_DC_ipv4",
+			"id": "custom01",
+			"skip": false,
+			"objects": [
+				{
+					"object": "text",
+					"style": {
+						"top": 230,
+						"width": "100%",
+						"height": 20,
+						"font-size": 24,
+						"font-weight": "bold",
+						"color": "#113150"
+					},
+					"centered": true,
+					"text": "Events by Policy/Attack SILS_DC_ipv4"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 300,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"fields": [
+						"string",
+						"string",
+						"string",
+						"number"
+					],
+					"noLabel": true,
+					"src": "sql",
+					"sql": "select \"Policy Name\",\"Attack Name\", \"Threat Category\",count(*) as 'Events' from attacks where \"Policy Name\" = 'SILS_DC_ipv4' group by \"Policy name\",\"Attack Name\" order by count(*) desc limit 15"
+				}
+			]
+		},
+		{
+			"title": "Events by Policy/Attack WEC_DC_net_ipv4",
+			"id": "custom01",
+			"skip": false,
+			"objects": [
+				{
+					"object": "text",
+					"style": {
+						"top": 230,
+						"width": "100%",
+						"height": 20,
+						"font-size": 24,
+						"font-weight": "bold",
+						"color": "#113150"
+					},
+					"centered": true,
+					"text": "Events by Policy/Attack WEC_DC_net_ipv4"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 300,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"fields": [
+						"string",
+						"string",
+						"string",
+						"number"
+					],
+					"noLabel": true,
+					"src": "sql",
+					"sql": "select \"Policy Name\",\"Attack Name\", \"Threat Category\",count(*) as 'Events' from attacks where \"Policy Name\" = 'WEC_DC_net_ipv4' group by \"Policy name\",\"Attack Name\" order by count(*) desc limit 15"
+				}
+			]
+		},
+		{
+			"title": "Events by Policy/Attack TEMR_DC_ipv4",
+			"id": "custom01",
+			"skip": false,
+			"objects": [
+				{
+					"object": "text",
+					"style": {
+						"top": 230,
+						"width": "100%",
+						"height": 20,
+						"font-size": 24,
+						"font-weight": "bold",
+						"color": "#113150"
+					},
+					"centered": true,
+					"text": "Events by Policy/Attack TEMR_DC_ipv4"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 300,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"fields": [
+						"string",
+						"string",
+						"string",
+						"number"
+					],
+					"noLabel": true,
+					"src": "sql",
+					"sql": "select \"Policy Name\",\"Attack Name\", \"Threat Category\",count(*) as 'Events' from attacks where \"Policy Name\" = 'TEMR_DC_ipv4' group by \"Policy name\",\"Attack Name\" order by count(*) desc limit 15"
+				}
+			]
+		},
+		{
+			"title": "Events by Policy/Attack ISVC-WAVE-UAG",
+			"id": "custom01",
+			"skip": false,
+			"objects": [
+				{
+					"object": "text",
+					"style": {
+						"top": 230,
+						"width": "100%",
+						"height": 20,
+						"font-size": 24,
+						"font-weight": "bold",
+						"color": "#113150"
+					},
+					"centered": true,
+					"text": "Events by Policy/Attack ISVC-WAVE-UAG"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 300,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"fields": [
+						"string",
+						"string",
+						"string",
+						"number"
+					],
+					"noLabel": true,
+					"src": "sql",
+					"sql": "select \"Policy Name\",\"Attack Name\", \"Threat Category\",count(*) as 'Events' from attacks where \"Policy Name\" = 'ISVC-WAVE-UAG' group by \"Policy name\",\"Attack Name\" order by count(*) desc limit 15"
+				}
+			]
+		},
+		{
+			"title": "Events by Policy/Attack ISVC-Proxy",
+			"id": "custom01",
+			"skip": false,
+			"objects": [
+				{
+					"object": "text",
+					"style": {
+						"top": 230,
+						"width": "100%",
+						"height": 20,
+						"font-size": 24,
+						"font-weight": "bold",
+						"color": "#113150"
+					},
+					"centered": true,
+					"text": "Events by Policy/Attack ISVC-Proxy"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 300,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"fields": [
+						"string",
+						"string",
+						"string",
+						"number"
+					],
+					"noLabel": true,
+					"src": "sql",
+					"sql": "select \"Policy Name\",\"Attack Name\", \"Threat Category\",count(*) as 'Events' from attacks where \"Policy Name\" = 'ISVC-Proxy' group by \"Policy name\",\"Attack Name\" order by count(*) desc limit 15"
+				}
+			]
+		},
+		{
+			"title": "Events by Policy/Attack ISVC-KONT",
+			"id": "custom01",
+			"skip": false,
+			"objects": [
+				{
+					"object": "text",
+					"style": {
+						"top": 230,
+						"width": "100%",
+						"height": 20,
+						"font-size": 24,
+						"font-weight": "bold",
+						"color": "#113150"
+					},
+					"centered": true,
+					"text": "Events by Policy/Attack ISVC-KONT"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 300,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"fields": [
+						"string",
+						"string",
+						"string",
+						"number"
+					],
+					"noLabel": true,
+					"src": "sql",
+					"sql": "select \"Policy Name\",\"Attack Name\", \"Threat Category\",count(*) as 'Events' from attacks where \"Policy Name\" = 'ISVC-KONT' group by \"Policy name\",\"Attack Name\" order by count(*) desc limit 15"
+				}
+			]
+		},
+		{
+			"title": "Events by Policy/Attack ISVC-EMBCM",
+			"id": "custom01",
+			"skip": false,
+			"objects": [
+				{
+					"object": "text",
+					"style": {
+						"top": 230,
+						"width": "100%",
+						"height": 20,
+						"font-size": 24,
+						"font-weight": "bold",
+						"color": "#113150"
+					},
+					"centered": true,
+					"text": "Events by Policy/Attack ISVC-EMBCM"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 300,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"fields": [
+						"string",
+						"string",
+						"string",
+						"number"
+					],
+					"noLabel": true,
+					"src": "sql",
+					"sql": "select \"Policy Name\",\"Attack Name\", \"Threat Category\",count(*) as 'Events' from attacks where \"Policy Name\" = 'ISVC-EMBCM' group by \"Policy name\",\"Attack Name\" order by count(*) desc limit 15"
+				}
+			]
+		},
+		{
+			"title": "Events by Policy/Attack OXDC-MyEd",
+			"id": "custom01",
+			"skip": false,
+			"objects": [
+				{
+					"object": "text",
+					"style": {
+						"top": 230,
+						"width": "100%",
+						"height": 20,
+						"font-size": 24,
+						"font-weight": "bold",
+						"color": "#113150"
+					},
+					"centered": true,
+					"text": "Events by Policy/Attack OXDC-MyEd"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 300,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"fields": [
+						"string",
+						"string",
+						"string",
+						"number"
+					],
+					"noLabel": true,
+					"src": "sql",
+					"sql": "select \"Policy Name\",\"Attack Name\", \"Threat Category\",count(*) as 'Events' from attacks where \"Policy Name\" = 'OXDC-MyEd' group by \"Policy name\",\"Attack Name\" order by count(*) desc limit 15"
+				}
+			]
+		},
+		{
+			"title": "Events by Policy/Attack DCT-EVE-WEC",
+			"id": "custom01",
+			"skip": false,
+			"objects": [
+				{
+					"object": "text",
+					"style": {
+						"top": 230,
+						"width": "100%",
+						"height": 20,
+						"font-size": 24,
+						"font-weight": "bold",
+						"color": "#113150"
+					},
+					"centered": true,
+					"text": "Events by Policy/Attack DCT-EVE-WEC"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 300,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"fields": [
+						"string",
+						"string",
+						"string",
+						"number"
+					],
+					"noLabel": true,
+					"src": "sql",
+					"sql": "select \"Policy Name\",\"Attack Name\", \"Threat Category\",count(*) as 'Events' from attacks where \"Policy Name\" = 'DCT-EVE-WEC' group by \"Policy name\",\"Attack Name\" order by count(*) desc limit 15"
+				}
+			]
+		},
+		{
+			"title": "Events by Policy/Attack SVDC-MyEd",
+			"id": "custom01",
+			"skip": false,
+			"objects": [
+				{
+					"object": "text",
+					"style": {
+						"top": 230,
+						"width": "100%",
+						"height": 20,
+						"font-size": 24,
+						"font-weight": "bold",
+						"color": "#113150"
+					},
+					"centered": true,
+					"text": "Events by Policy/Attack SVDC-MyEd"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 300,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"fields": [
+						"string",
+						"string",
+						"string",
+						"number"
+					],
+					"noLabel": true,
+					"src": "sql",
+					"sql": "select \"Policy Name\",\"Attack Name\", \"Threat Category\",count(*) as 'Events' from attacks where \"Policy Name\" = 'SVDC-MyEd' group by \"Policy name\",\"Attack Name\" order by count(*) desc limit 15"
+				}
+			]
+		},
+		{
+			"title": "Events by Policy/Attack MyEd",
+			"id": "custom01",
+			"skip": false,
+			"objects": [
+				{
+					"object": "text",
+					"style": {
+						"top": 230,
+						"width": "100%",
+						"height": 20,
+						"font-size": 24,
+						"font-weight": "bold",
+						"color": "#113150"
+					},
+					"centered": true,
+					"text": "Events by Policy/Attack MyEd"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 300,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"fields": [
+						"string",
+						"string",
+						"string",
+						"number"
+					],
+					"noLabel": true,
+					"src": "sql",
+					"sql": "select \"Policy Name\",\"Attack Name\", \"Threat Category\",count(*) as 'Events' from attacks where \"Policy Name\" = 'MyEd' group by \"Policy name\",\"Attack Name\" order by count(*) desc limit 15"
+				}
+			]
+		}
+	]
+}

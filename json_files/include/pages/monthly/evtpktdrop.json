@@ -1,0 +1,63 @@
+{
+    "title": "Top Dropped Events by Packets & DefensePro Device",
+    "id": "evtpktdrop",
+    "objects": [
+        {
+            "object": "text",
+            "style": {
+                "top": 230,
+                "width": "100%",
+                "height": 20,
+                "font-size": 24,
+                "font-weight": "bold",
+                "color": "#113150"
+            },
+            "centered": true,
+            "text": "Top Dropped Events by Packets & DefensePro Device"					
+        },
+        {
+            "object": "chart",
+            "style": {
+                "top": 300,
+                "width": "100%"
+            },
+            "centered": true,
+            "type": "table",
+            "fields": [
+                "string",
+                "string",
+                "string",
+                "string",
+                "string",
+                "number",
+                "number",
+                "number"
+            ],
+            "divisor": [
+                "",
+                "",
+                "",
+                "",
+                "",
+                "1",
+                "{pktDivisor}",
+                "{bwDivisor}"
+            ],
+            "decimals": [
+                "",
+                "",
+                "",
+                "",
+                "",
+                0,
+                "{pktDecimals}",
+                "{bwDecimals}"
+            ],
+            "noLabel": true,
+            "total": true,
+            "ta_columns": "5,6,7",
+            "src": "sql",
+            "sql": "select deviceName as 'Device', category as 'Threat Category', ruleName as 'Policy Name', name as 'Event Name', actionType as 'Action', count(*) as '# of Events', sum(packetCount) as '{pktUnit}', sum(packetBandwidth) as '{bwUnit}' from attacks WHERE actionType = 'Drop' group by deviceName,category,ruleName,name,actionType order by sum(packetCount) DESC limit 20"
+        }
+    ]
+}

@@ -1,0 +1,20 @@
+{
+    "title": "Event Bandwidth per Name",
+    "id": "bwname",
+    "objects": [
+        {
+            "include": "sqlChart",
+            "title": "Event Bandwidth per Name",
+            "type": "bar",
+            "divisor": "{bwDivisor}",
+            "decimals": "{bwDecimals}",
+            "fontSize": 11,
+            "sql": "select name as 'Event Name',sum(packetBandwidth) as '{bwUnit}' from attacks where name!=' ' group by name order by sum(packetBandwidth) desc limit {topN}"
+        },
+        {
+            "include": "lastTable",
+            "divisor": "{bwDivisor}",
+            "decimals": "{bwDecimals}"
+        }
+    ]
+}

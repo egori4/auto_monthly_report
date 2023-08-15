@@ -1,0 +1,70 @@
+@page {
+	size: portrait;
+	margin: 0px;
+	padding: 0px;
+}
+@page landscape {
+	size: landscape;
+	margin: 0px;
+	padding: 0px;
+}
+body {
+    font-family: 'Open Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+    font-weight: normal;
+    color: #3b3b3b;
+	margin: 0px;
+	padding: 0px;
+}
+div.page {
+	position: relative;
+	width: 100%;
+	height: 100%;
+	border: 0px;
+	margin: 0px;
+	padding: 0px;
+	page-break-before: always;
+}
+div.page_landscape {
+	page: landscape;
+	position: relative;
+	width: 100%;
+	height: 100%;
+	border: 0px;
+	margin: 0px;
+	padding: 0px;
+	page-break-before: always;
+}
+div.image {
+	position: absolute;
+	border: 0px;
+	margin: 0px;
+	padding: 0px;
+}
+div.text {
+	position: absolute;
+    font-family: 'Open Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+	border: 0px;
+	margin: 0px;
+	padding: 0px;
+}
+div.chart {
+	position: absolute;
+	border: 0px;
+	margin: 0px;
+	padding: 0px;
+}
+tr.summary {
+	font-size: 18px;
+}
+tr.index {
+	font-size: 16px;
+}
+a {
+	text-decoration: none;
+}
+.noHeader {
+	background-color: #fff;
+	border-collapse: collapse;
+	border: none;
+	font-size: 0px;
+}

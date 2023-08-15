@@ -1,0 +1,15 @@
+{
+    "title": "Events per Destination Port",
+    "id": "evtdpt",
+    "objects": [
+        {
+            "include": "sqlChart",
+            "title": "Events per Destination Port",
+            "type": "bar",
+            "sql": "select protocolPort as 'Destination Port',count(*) as 'Number of Events' from attacks group by protocolPort order by count(*) desc limit {topN}"
+        },
+        {
+            "include": "lastTable"
+        }
+    ]
+}

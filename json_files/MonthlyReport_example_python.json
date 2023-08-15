@@ -1,0 +1,1710 @@
+{
+	"offline": true,
+	"title": "Monthly Report - {month} {year}",
+	"globals": {
+		"db": "database_files/{id}/database_{id}_{month}.sqlite"
+	},
+	"defaults": {
+		"page": {
+			"objects": [
+				{
+					"object": "image",
+					"style": {
+						"top": 0,
+						"left": 0
+					},
+					"src": "{relPath}html_files/images/header.jpg",
+					"width": 1100,
+					"height": 100
+				},
+				{
+					"object": "image",
+					"style": {
+						"bottom": 0,
+						"left": 0
+					},
+					"src": "{relPath}html_files/images/footer.jpg",
+					"width": 1100,
+					"height": 100
+				},
+				{
+					"object": "text",
+					"style": {
+						"top": 25,
+						"right": 40,
+						"width": 700,
+						"height": 200,
+						"color": "white",
+						"font-size": 36,
+						"text-align": "right"
+					},
+					"text": "Monthly Report - {monthText} {year}"
+				},
+				{
+					"object": "text",
+					"style": {
+						"bottom": 120,
+						"right": 40
+					},
+					"text": "<a href='#index'>Back to Index</a>"
+				},
+				{
+					"object": "text",
+					"style": {
+						"bottom": 40,
+						"left": 40,
+						"color": "white"
+					},
+					"text": "Report v{version}"
+				},
+				{
+					"object": "text",
+					"style": {
+						"bottom": 40,
+						"right": 40,
+						"color": "white"
+					},
+					"text": "Page: {pageNumber}"
+				}
+			]
+		}
+	},
+	"pages": [
+		{
+			"title": "Overview",
+			"id": "overview",
+			"objects": [
+				{
+					"object": "text",
+					"style": {
+						"top": 230,
+						"left": 0,
+						"width": "100%",
+						"height": 50,
+						"font-size": 42,
+						"text-align": "center"
+					},
+					"text": "Monthly Report - {monthText} {year}"
+				},
+				{
+					"object": "text",
+					"style": {
+						"top": 330,
+						"left": 0,
+						"width": "100%",
+						"height": 50,
+						"font-size": 42,
+						"text-align": "center"
+					},
+					"text": "{longName}"
+				},
+				{
+					"object": "text",
+					"style": {
+						"top": 450,
+						"left": 200,
+						"width": 700,
+						"height": 700,
+						"font-size": 18
+					},
+					"src": "file",
+					"file": "text_files/frontpage_{language}.txt"
+				},
+				{
+					"object": "text",
+					"style": {
+						"top": 950,
+						"width": "100%",
+						"height": 20,
+						"font-size": 18,
+						"font-weight": "bold"
+					},
+					"centered": true,
+					"text": "Event Statistics Overview"
+				},
+				{
+					"object": "variable",
+					"name": "totalRecs",
+					"src": "sql",
+					"sql": "select count(*) from attacks",
+					"format": "number",
+					"decimals": 0
+				},
+				{
+					"object": "variable",
+					"name": "totalMPackets",
+					"src": "sql",
+					"sql": "select printf('%.{pktDecimals}f', sum(packetCount)*1.0/{pktDivisor}) from attacks",
+					"format": "number",
+					"decimals": "{pktDecimals}"
+				},
+				{
+					"object": "variable",
+					"name": "totalGBytes",
+					"src": "sql",
+					"sql": "select printf('%.{bwDecimals}f', sum(packetBandwidth)*1.0/{bwDivisor}) from attacks",
+					"format": "number",
+					"decimals": "{bwDecimals}"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 975,
+						"width": "100%",
+						"height": 400
+					},
+					"type": "table",
+					"fields": [
+						"string",
+						"string"
+					],
+					"centered": true,
+					"options": {
+						"cssClassNames": "{ headerCell: \"noHeader\", tableRow: \"summary\", oddTableRow: \"summary\" }"
+					},
+					"src": "data",
+					"data": [
+						[
+							"col1",
+							"col2"
+						],
+						[
+							"Total events detected",
+							"{totalRecs}"
+						],
+						[
+							"Total number of malicious packets",
+							"{totalMPackets} {pktUnit}"
+						],
+						[
+							"Total malicious bandwidth",
+							"{totalGBytes} {bwUnit}"
+						]						
+					]
+				}
+			]
+		},
+		{
+			"title": "Index",
+			"id": "index",
+			"objects": [
+				{
+					"object": "text",
+					"style": {
+						"top": 150,
+						"left": 0,
+						"width": "100%",
+						"height": 50,
+						"font-size": 38,
+						"text-align": "center",
+						"color": "#113150"
+					},
+					"text": "Content Index"
+				},
+				{
+					"object": "index",
+					"style": {
+						"top": 250,
+						"width": "100%"
+					},
+					"centered": true,
+					"minPage": 1,
+					"maxPage": 35,
+					"options": {
+						"cssClassNames": "{ tableRow: \"index\", oddTableRow: \"index\" }"
+					}
+				}
+			]
+		},
+		{
+			"title": "Traffic in Megabits",
+			"id": "trfmbit",
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 140,
+						"left": 50,
+						"width": 1050,
+						"height": 680
+					},
+					"title": "Traffic in Megabits",
+					"type": "area",
+					"divisor": 1000,
+					"noLabel": true,
+					"slantedText": true,
+					"showTextEvery": 168,
+					"src": "sql",
+					"sql": "select printf('%s', strftime('{monthText} %d', dateTime)) as 'Date',sum(trafficValue) as 'Inbound Traffic',sum(discards) as 'Discarded Traffic',sum(excluded) as 'Excluded Traffic' from traffic where month={month} group by Date,strftime('%H', dateTime) order by timeStamp"
+				},
+				{
+					"object": "text",
+					"style": {
+						"top": 800,
+						"width": "100%"
+					},
+					"centered": true,
+					"text": "<table><tr><td>. Discarded Traffic is traffic detected as malicious and dropped by the device.<br>. Excluded Traffic is traffic which doesn't match any network class.<br>. Excluded Traffic traverses the device and is only checked for packet anomalies.</td></tr></table>"
+				}
+			]
+		},
+		{
+			"title": "Events per Day of the Month",
+			"id": "evtday",
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 120,
+						"left": 50,
+						"width": 1050,
+						"height": 580
+					},
+					"title": "Events per Day of the Month",
+					"type": "area",
+					"noLabel": true,
+					"legend": "none",
+					"average": true,
+					"labelAsAlpha": true,
+					"xMin": 0,
+					"xMax": "{monthDays}",
+					"src": "sql",
+					"sql": "select x as 'Day of the Month', sum(y) as 'Number of Events' from (with recursive cnt(x) as (select 1 union select x+1 from cnt limit {monthDays}) select x ,0 as 'y' from cnt union select endDayOfMonth,count(*) from attacks group by endDayOfMonth) group by x order by x"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 625,
+						"width": "100%"
+					},
+					"centered": true,
+					"average": true,
+					"type": "table",
+					"src": "last"
+				}
+			]
+		},
+		{
+			"title": "Events Count (Month to Month)",
+			"id": "evtmon",
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 140,
+						"left": 50,
+						"width": 1050,
+						"height": 680
+					},
+					"title": "Total Events Count (Month to Month)",
+					"type": "column",
+					"average": true,
+					"slantedText": true,
+					"src": "csv",
+					"csv": "./tmp_files/{id}/epm_total_bar.csv"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 850,
+						"width": "100%"
+					},
+					"centered": true,
+					"total": true,
+					"average": true,
+					"type": "table",
+					"src": "last"
+				}
+			]
+		},
+		{
+			"title": "Top Attack events count - by Last Month",
+			"id": "topatkevtlm",
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 50,
+						"left": 50,
+						"width": 1050,
+						"height": 1100
+					},
+					"title": "Top Attack events count - by Last Month",
+					"type": "area",
+					"legend": "top",
+					"slantedText": true,
+					"noLabel": true,
+					"isStacked": true,
+					"src": "csv",
+					"csv": "./tmp_files/{id}/epm_chart_lm.csv"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 1050,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"src": "csv",
+					"csv": "./tmp_files/{id}/epm_table_lm.csv"
+				}
+			]
+		},
+		{
+			"title": "Top Attack events count- all times",
+			"id": "topatkevt",
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 50,
+						"left": 50,
+						"width": 1050,
+						"height": 1100
+					},
+					"title": "Top Attack events count- all times high",
+					"type": "area",
+					"legend": "top",
+					"slantedText": true,
+					"noLabel": true,
+					"isStacked": true,
+					"src": "csv",
+					"csv": "./tmp_files/{id}/epm_chart_alltimehigh.csv"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 1050,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"src": "csv",
+					"csv": "./tmp_files/{id}/epm_table_alltimehigh.csv"
+				}
+			]
+		},
+
+		{
+			"title": "Malicious packets per Month",
+			"id": "pktmon",
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 140,
+						"left": 50,
+						"width": 1050,
+						"height": 680
+					},
+					"title": "Malicious packets per Month",
+					"type": "column",
+					"slantedText": true,
+					"average": true,
+					"divisor": "{pktDivisor}",
+					"decimals": "{pktDecimals}",
+					"src": "csv",
+					"csv": "./tmp_files/{id}/ppm_total_bar.csv"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 850,
+						"width": "100%"
+					},
+					"centered": true,
+					"total": true,
+					"average": true,
+					"type": "table",
+					"divisor": "{pktDivisor}",
+					"decimals": "{pktDecimals}",
+					"src": "last"
+				}
+			]
+		},
+		{
+			"title": "Top Attacks by Malicious packets - all time high",
+			"id": "atkpkt",
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 50,
+						"left": 50,
+						"width": 1050,
+						"height": 1100
+					},
+					"title": "Top Attacks by Malicious packets - all time high",
+					"type": "area",
+					"legend": "top",
+					"slantedText": true,
+					"noLabel": true,
+					"isStacked": true,
+					"src": "csv",
+					"csv": "./tmp_files/{id}/ppm_chart_alltimehigh.csv"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 1050,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"src": "csv",
+					"csv": "./tmp_files/{id}/ppm_table_alltimehigh.csv"
+				}
+			]
+		},
+		{
+			"title": "Top Attacks by Malicious packets - last month",
+			"id": "atkpktlm",
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 50,
+						"left": 50,
+						"width": 1050,
+						"height": 1100
+					},
+					"title": "Top Attacks by Malicious packets - last month",
+					"type": "area",
+					"legend": "top",
+					"slantedText": true,
+					"noLabel": true,
+					"isStacked": true,
+					"src": "csv",
+					"csv": "./tmp_files/{id}/ppm_chart_lm.csv"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 1050,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"src": "csv",
+					"csv": "./tmp_files/{id}/ppm_table_lm.csv"
+				}
+			]
+		},
+		{
+			"title": "Malicious bandwidth per Month",
+			"id": "bwmon",
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 140,
+						"left": 50,
+						"width": 1050,
+						"height": 680
+					},
+					"title": "Malicious bandwidth per Month",
+					"type": "column",
+					"slantedText": true,
+					"average": true,
+					"divisor": "{bwDivisor}",
+					"decimals": "{bwDecimals}",
+					"src": "csv",
+					"csv": "./tmp_files/{id}/bpm_total_bar.csv"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 850,
+						"width": "100%"
+					},
+					"centered": true,
+					"total": true,
+					"average": true,
+					"type": "table",
+					"divisor": "{bwDivisor}",
+					"decimals": "{bwDecimals}",
+					"src": "last"
+				}
+			]
+		},
+		{
+			"title": "Top Attacks by Malicious Bandwidth- all time high",
+			"id": "atkbw",
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 50,
+						"left": 50,
+						"width": 1050,
+						"height": 1100
+					},
+					"title": "Top Attacks by Malicious Bandwidth- all time high",
+					"type": "area",
+					"legend": "top",
+					"slantedText": true,
+					"isStacked": true,
+					"noLabel": true,
+					"divisor": "{bwDivisor}",
+					"decimals": "{bwDecimals}",
+					"src": "csv",
+					"csv": "./tmp_files/{id}/bpm_chart_alltimehigh.csv"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 1050,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"divisor": "{bwDivisor}",
+					"decimals": "{bwDecimals}",
+					"src": "csv",
+					"csv": "./tmp_files/{id}/bpm_table_alltimehigh.csv"
+				}
+			]
+		},
+		{
+			"title": "Top Attacks by Malicious Bandwidth - last month",
+			"id": "atkbwlm",
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 50,
+						"left": 50,
+						"width": 1050,
+						"height": 1100
+					},
+					"title": "Top Attacks by Malicious Bandwidth - last month",
+					"type": "area",
+					"legend": "top",
+					"slantedText": true,
+					"divisor": "{bwDivisor}",
+					"decimals": "{bwDecimals}",
+					"isStacked": true,
+					"noLabel": true,
+					"src": "csv",
+					"csv": "./tmp_files/{id}/bpm_chart_lm.csv"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 1050,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"divisor": "{bwDivisor}",
+					"decimals": "{bwDecimals}",
+					"src": "csv",
+					"csv": "./tmp_files/{id}/bpm_table_lm.csv"
+				}
+			]
+		},
+		{
+			"title": "Total Attack Time (Month to Month)",
+			"id": "totalattaktime",
+			"objects": [
+					{
+							"object": "chart",
+							"style": {
+									"top": 140,
+									"left": 50,
+									"width": 1050,
+									"height": 680
+							},
+							"title": "Total Attack Time in days (Month to Month)",
+							"type": "column",
+							"average": true,
+							"slantedText": true,
+							"src": "csv",
+							"csv": "./tmp_files/{id}/total_attack_time_bar.csv"
+					},
+					{
+							"object": "chart",
+							"style": {
+									"top": 850,
+									"width": "100%"
+							},
+							"centered": true,
+							"total": true,
+							"average": true,
+							"type": "table",
+							"src": "last"
+					}
+			]
+		},
+		{
+			"title": "Events per Device",
+			"id": "evtdev",
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 140,
+						"left": 50,
+						"width": 1050,
+						"height": 680
+					},
+					"title": "Events per Device",
+					"type": "pie",
+					"legend": "right",
+					"others": false,
+					"src": "sql",
+					"sql": "select devices.deviceName as 'Device Name',ifnull(count(*),0) as 'Number of Events' from devices left outer join attacks on devices.deviceIp = attacks.deviceIp group by devices.deviceIp order by count(*) desc"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 850,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"src": "last"
+				}
+			]
+		},
+		{
+			"title": "Top Attack events count by Device",
+			"id": "topdevevtlm",
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 50,
+						"left": 50,
+						"width": 1050,
+						"height": 1100
+					},
+					"title": "Top Attack events count by Device",
+					"type": "area",
+					"legend": "top",
+					"slantedText": true,
+					"noLabel": true,
+					"isStacked": true,
+					"src": "csv",
+					"csv": "./tmp_files/{id}/device_epm_chart_lm.csv"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 1050,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"src": "csv",
+					"csv": "./tmp_files/{id}/device_epm_table_lm.csv"
+				}
+			]
+		},
+		{
+			"title": "Malicious packets per Device",
+			"id": "pktdev",
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 140,
+						"left": 50,
+						"width": 1050,
+						"height": 680
+					},
+					"title": "Malicious packets per Device",
+					"type": "column",
+					"divisor": "{pktDivisor}",
+					"decimals": "{pktDecimals}",
+					"slantedText": true,
+					"src": "sql",
+					"sql": "select devices.deviceName as 'Device Name',ifnull(sum(packetCount),0) as '{pktUnit}' from devices left outer join attacks on devices.deviceIp = attacks.deviceIp group by devices.deviceIp order by sum(packetCount) desc"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 850,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"divisor": "{pktDivisor}",
+					"decimals": "{pktDecimals}",
+					"src": "last"
+				}
+			]
+		},
+		{
+			"title": "Malicious packets count by Device trend",
+			"id": "devpktslmtrend",
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 50,
+						"left": 50,
+						"width": 1050,
+						"height": 1100
+					},
+					"title": "Malicious packets count by Device",
+					"type": "area",
+					"legend": "top",
+					"slantedText": true,
+					"noLabel": true,
+					"isStacked": true,
+					"divisor": "{pktDivisor}",
+					"decimals": "{pktDecimals}",
+					"src": "csv",
+					"csv": "./tmp_files/{id}/device_ppm_chart_lm.csv"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 1050,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"divisor": "{pktDivisor}",
+					"decimals": "{pktDecimals}",
+					"src": "csv",
+					"csv": "./tmp_files/{id}/device_ppm_table_lm.csv"
+				}
+			]
+		},
+		{
+			"title": "Malicious bandwidth per Device",
+			"id": "bwdev",
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 140,
+						"left": 50,
+						"width": 1050,
+						"height": 680
+					},
+					"title": "Malicious bandwidth per Device",
+					"type": "column",
+					"divisor": "{bwDivisor}",
+					"decimals": "{bwDecimals}",
+					"slantedText": true,
+					"src": "sql",
+					"sql": "select devices.deviceName as 'Device Name',ifnull(sum(packetBandwidth),0) as '{bwUnit}' from devices left outer join attacks on devices.deviceIp = attacks.deviceIp group by devices.deviceIp order by sum(packetBandwidth) desc limit {topN}"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 850,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"divisor": "{bwDivisor}",
+					"decimals": "{bwDecimals}",
+					"src": "last"
+				}
+			]
+		},
+		{
+			"title": "Malicious bandwidth by Device trend",
+			"id": "devbwtrend",
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 50,
+						"left": 50,
+						"width": 1050,
+						"height": 1100
+					},
+					"title": "Malicious bandwidth by Device",
+					"type": "area",
+					"divisor": "{pktDivisor}",
+					"decimals": "{pktDecimals}",
+					"legend": "top",
+					"slantedText": true,
+					"noLabel": true,
+					"isStacked": true,
+					"src": "csv",
+					"csv": "./tmp_files/{id}/device_bpm_chart_lm.csv"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 1050,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"divisor": "{pktDivisor}",
+					"decimals": "{pktDecimals}",
+					"src": "csv",
+					"csv": "./tmp_files/{id}/device_bpm_table_lm.csv"
+				}
+			]
+		},
+		{
+			"title": "Events per Source Country",
+			"id": "evtgeo",
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 140,
+						"left": 50,
+						"width": 1050,
+						"height": 680
+					},
+					"title": "Events per Source Country",
+					"type": "bar",
+					"optional": true,
+					"legend": "none",
+					"src": "sql",
+					"sql": "select '_'||geoLocation||'_' as 'Source Country',count(*) as 'Number of Events' from attacks group by geoLocation order by count(*) desc limit {topN}"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 850,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"src": "last"
+				}
+			]
+		},
+		{
+			"title": "Events per Source IP Address",
+			"id": "evtsip",
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 140,
+						"left": 50,
+						"width": 1050,
+						"height": 680
+					},
+					"title": "Events per Source IP Address",
+					"type": "bar",
+					"legend": "none",
+					"slantedText": true,
+					"src": "sql",
+					"sql": "select sourceAddress||' ('||geoLocation||')' as 'Source IP Address',count(*) as 'Number of Events' from attacks group by sourceAddress order by count(*) desc limit {topN}"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 850,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"src": "last"
+				}
+			]
+		},
+		{
+			"title": "Top 10 Source IP by attack events count",
+			"id": "evtsipmon",
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 50,
+						"left": 50,
+						"width": 1050,
+						"height": 1100
+					},
+					"title": "Top 10 Source IP by attack events count",
+					"type": "area",
+					"legend": "top",
+					"slantedText": true,
+					"noLabel": true,
+					"isStacked": true,
+					"src": "csv",
+					"csv": "./tmp_files/{id}/sip_epm_chart_lm.csv"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 1050,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"fields": [
+                        "string",
+                        "string",
+                        "number",
+                        "string"
+                    ],
+					"src": "csv",
+					"csv": "./tmp_files/{id}/sip_epm_table_lm.csv"
+				}
+			]
+		},
+		{
+			"title": "Top 10 Source IP by malicious packets",
+			"id": "pktsipmon",
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 50,
+						"left": 50,
+						"width": 1050,
+						"height": 1100
+					},
+					"title": "Top 10 Source IP by malicious packets",
+					"type": "area",
+					"legend": "top",
+					"slantedText": true,
+					"noLabel": true,
+					"isStacked": true,
+					"src": "csv",
+					"csv": "./tmp_files/{id}/sip_ppm_chart_lm.csv"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 1050,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"fields": [
+                        "string",
+                        "string",
+                        "number",
+                        "string"
+                    ],
+					"src": "csv",
+					"csv": "./tmp_files/{id}/sip_ppm_table_lm.csv"
+				}
+			]
+		},
+		{
+			"title": "Top 10 Source IP by malicious bandwidth",
+			"id": "bwsipmon",
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 50,
+						"left": 50,
+						"width": 1050,
+						"height": 1100
+					},
+					"title": "Top 10 Source IP by malicious bandwidth",
+					"type": "area",
+					"legend": "top",
+					"slantedText": true,
+					"noLabel": true,
+					"isStacked": true,
+					"src": "csv",
+					"csv": "./tmp_files/{id}/sip_bpm_chart_lm.csv"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 1050,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"fields": [
+                        "string",
+                        "string",
+                        "number",
+                        "string"
+                    ],
+					"src": "csv",
+					"csv": "./tmp_files/{id}/sip_bpm_table_lm.csv"
+				}
+			]
+		},
+		{
+			"title": "Events per Destination IP Address",
+			"id": "evtdip",
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 140,
+						"left": 50,
+						"width": 1050,
+						"height": 680
+					},
+					"title": "Events per Destination IP Address",
+					"type": "bar",
+					"legend": "none",
+					"slantedText": true,
+					"revDNS": true,
+					"src": "sql",
+					"sql": "select destAddress as 'Destination IP Address',count(*) as 'Number of Events' from attacks where destAddress!='0.0.0.0' and destAddress!='Multiple' group by destAddress order by count(*) desc limit {topN}"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 850,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"revDNS": true,
+					"total": true,
+					"src": "last"
+				}
+			]
+		},
+		{
+			"title": "Malicious bandwidth per Destination IP Address",
+			"id": "mbdip",
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 140,
+						"left": 0,
+						"width": 1100,
+						"height": 680
+					},
+					"title": "Malicious bandwidth per Destination IP Address",
+					"type": "bar",
+					"divisor": "{bwDivisor}",
+					"decimals": "{bwDecimals}",
+					"legend": "none",
+					"slantedText": true,
+					"revDNS": true,
+					"src": "sql",
+					"sql": "select destAddress as 'Destination IP Address',ifnull(sum(packetBandwidth),0) as '{bwUnit}' from attacks where month={month} and destAddress!='0.0.0.0' and destAddress!='Multiple' group by destAddress order by sum(packetBandwidth) desc limit {topN}"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 850,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"divisor": "{bwDivisor}",
+					"decimals": "{bwDecimals}",
+					"revDNS": true,
+					"src": "last"
+				}
+			]
+		},
+		{
+			"title": "Events per Policy",
+			"id": "evtpol",
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 140,
+						"left": 50,
+						"width": 1050,
+						"height": 680
+					},
+					"title": "Events per Policy",
+					"type": "bar",
+					"legend": "none",
+					"slantedText": true,
+					"src": "sql",
+					"sql": "select ruleName as 'Policy Name',count(*) as 'Number of Events' from attacks group by ruleName order by count(*) desc limit {topN}"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 850,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"total": true,
+					"src": "last"
+				}
+			]
+		},
+		{
+			"title": "Top Attack events count by Policy Name trend",
+			"id": "topdevevtlmpol",
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 50,
+						"left": 50,
+						"width": 1050,
+						"height": 1100
+					},
+					"title": "Top Attack events count by Policy Name",
+					"type": "area",
+					"legend": "top",
+					"slantedText": true,
+					"noLabel": true,
+					"isStacked": true,
+					"src": "csv",
+					"csv": "./tmp_files/{id}/policy_epm_chart_lm.csv"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 1050,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"src": "csv",
+					"csv": "./tmp_files/{id}/policy_epm_table_lm.csv"
+				}
+			]
+		},
+		{
+			"title": "Malicious packets per Policy",
+			"id": "pktpol",
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 140,
+						"left": 50,
+						"width": 1050,
+						"height": 680
+					},
+					"title": "Malicious packets per Policy",
+					"type": "bar",
+					"divisor": "{pktDivisor}",
+					"decimals": "{pktDecimals}",
+					"slantedText": true,
+					"src": "sql",
+					"sql": "select ruleName as 'Policy Name',sum(packetCount) as '{pktUnit}' from attacks group by ruleName order by sum(packetCount) desc limit {topN}"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 850,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"divisor": "{pktDivisor}",
+					"decimals": "{pktDecimals}",
+					"src": "last"
+				}
+			]
+		},
+		{
+			"title": "Malicious packets count by Policy Name trend",
+			"id": "polpktslmtrend",
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 50,
+						"left": 50,
+						"width": 1050,
+						"height": 1100
+					},
+					"title": "Malicious packets count by Policy Name",
+					"type": "area",
+					"legend": "top",
+					"slantedText": true,
+					"noLabel": true,
+					"isStacked": true,
+					"divisor": "{pktDivisor}",
+					"decimals": "{pktDecimals}",
+					"src": "csv",
+					"csv": "./tmp_files/{id}/policy_ppm_chart_lm.csv"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 1050,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"divisor": "{pktDivisor}",
+					"decimals": "{pktDecimals}",
+					"src": "csv",
+					"csv": "./tmp_files/{id}/policy_ppm_table_lm.csv"
+				}
+			]
+		},
+		{
+			"title": "Malicious bandwidth per Policy",
+			"id": "bwpol",
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 140,
+						"left": 50,
+						"width": 1050,
+						"height": 680
+					},
+					"title": "Malicious bandwidth per Policy",
+					"type": "column",
+					"divisor": "{bwDivisor}",
+					"decimals": "{bwDecimals}",
+					"slantedText": true,
+					"src": "sql",
+					"sql": "select ruleName as 'Policy Name',sum(packetBandwidth) as '{bwUnit}' from attacks group by ruleName order by sum(packetBandwidth) desc limit {topN}"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 850,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"divisor": "{bwDivisor}",
+					"decimals": "{bwDecimals}",
+					"src": "last"
+				}
+			]
+		},
+		{
+			"title": "Malicious bandwidth by Policy Name trend",
+			"id": "polbwtrend",
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 50,
+						"left": 50,
+						"width": 1050,
+						"height": 1100
+					},
+					"title": "Malicious bandwidth by Policy Name",
+					"type": "area",
+					"divisor": "{pktDivisor}",
+					"decimals": "{pktDecimals}",
+					"legend": "top",
+					"slantedText": true,
+					"noLabel": true,
+					"isStacked": true,
+					"src": "csv",
+					"csv": "./tmp_files/{id}/policy_bpm_chart_lm.csv"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 1050,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"divisor": "{pktDivisor}",
+					"decimals": "{pktDecimals}",
+					"src": "csv",
+					"csv": "./tmp_files/{id}/policy_bpm_table_lm.csv"
+				}
+			]
+		},
+		{
+			"title": "Events per Attack Name",
+			"id": "evtname",
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 140,
+						"left": 50,
+						"width": 1050,
+						"height": 680
+					},
+					"title": "Events per Attack Name",
+					"type": "bar",
+					"legend": "none",
+					"fontSize": 11,
+					"src": "sql",
+					"sql": "select name as 'Attack Name',count(*) as 'Number of Events' from attacks where name!=' ' group by name order by count(*) desc limit {topN}"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 850,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"src": "last"
+				}
+			]
+		},
+		{
+			"title": "Malicious packets per Attack Name",
+			"id": "pktname",
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 140,
+						"left": 50,
+						"width": 1050,
+						"height": 680
+					},
+					"title": "Malicious packets per Attack Name",
+					"type": "bar",
+					"divisor": "{pktDivisor}",
+					"decimals": "{pktDecimals}",
+					"slantedText": true,
+					"fontSize": 11,
+					"src": "sql",
+					"sql": "select name as 'Attack Name',sum(packetCount) as '{pktUnit}' from attacks where name!=' ' group by name order by sum(packetCount) desc limit {topN}"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 850,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"divisor": "{pktDivisor}",
+					"decimals": "{pktDecimals}",
+					"src": "last"
+				}
+			]
+		},
+		{
+			"title": "Malicious bandwidth per Attack Name",
+			"id": "bwname",
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 140,
+						"left": 50,
+						"width": 1050,
+						"height": 680
+					},
+					"title": "Malicious bandwidth per Attack Name",
+					"type": "bar",
+					"divisor": "{bwDivisor}",
+					"decimals": "{bwDecimals}",
+					"slantedText": true,
+					"fontSize": 11,
+					"src": "sql",
+					"sql": "select name as 'Attack Name',sum(packetBandwidth) as '{bwUnit}' from attacks where name!=' ' group by name order by sum(packetBandwidth) desc limit {topN}"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 850,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"divisor": "{bwDivisor}",
+					"decimals": "{bwDecimals}",
+					"src": "last"
+				}
+			]
+		},
+		{
+			"title": "Events per Destination Port",
+			"id": "evtdpt",
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 140,
+						"left": 50,
+						"width": 1050,
+						"height": 680
+					},
+					"title": "Events per Destination Port",
+					"type": "bar",
+					"legend": "none",
+					"src": "sql",
+					"sql": "select protocolPort as 'Destination Port',count(*) as 'Number of Events' from attacks group by protocolPort order by count(*) desc limit {topN}"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 850,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"src": "last"
+				}
+			]
+		},
+		{
+			"title": "Events per Protocol",
+			"id": "evtproto",
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 140,
+						"left": 50,
+						"width": 1050,
+						"height": 680
+					},
+					"title": "Events per Protocol",
+					"type": "pie",
+					"legend": "right",
+					"others": false,
+					"src": "sql",
+					"sql": "select protocol as 'Protocol',count(*) as 'Number of Events' from attacks group by protocol order by count(*) desc limit {topN}"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 850,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"src": "last"
+				}
+			]
+		},
+		{
+			"title": "Malicious packets per Protocol",
+			"id": "pktproto",
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 140,
+						"left": 50,
+						"width": 1050,
+						"height": 680
+					},
+					"title": "Malicious packets per Protocol",
+					"type": "column",
+					"divisor": "{pktDivisor}",
+					"decimals": "{pktDecimals}",
+					"src": "sql",
+					"sql": "select protocol as 'Protocol',sum(packetCount) as '{pktUnit}' from attacks group by protocol order by sum(packetCount) desc limit {topN}"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 850,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"divisor": "{pktDivisor}",
+					"decimals": "{pktDecimals}",
+					"src": "last"
+				}
+			]
+		},
+		{
+			"title": "Malicious bandwidth per Protocol",
+			"id": "bwproto",
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 140,
+						"left": 50,
+						"width": 1050,
+						"height": 680
+					},
+					"title": "Malicious bandwidth per Protocol",
+					"type": "column",
+					"divisor": "{bwDivisor}",
+					"decimals": "{bwDecimals}",
+					"src": "sql",
+					"sql": "select protocol as 'Protocol',sum(packetBandwidth) as '{bwUnit}' from attacks group by protocol order by sum(packetBandwidth) desc limit {topN}"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 850,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"divisor": "{bwDivisor}",
+					"decimals": "{bwDecimals}",
+					"src": "last"
+				}
+			]
+		},
+		{
+			"title": "Events per Attack Duration",
+			"id": "evtdur",
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 140,
+						"left": 50,
+						"width": 1050,
+						"height": 680
+					},
+					"title": "Events per Attack Duration",
+					"type": "column",
+					"legend": "none",
+					"src": "sql",
+					"sql": "select durationRange as 'Attack Duration',count(*) as 'Number of Events' from attacks group by durationRange order by durationRange"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 850,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"src": "last"
+				}
+			]
+		},
+		{
+			"title": "Malicious bandwidth per Attack Duration",
+			"id": "bwdur",
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 140,
+						"left": 50,
+						"width": 1050,
+						"height": 680
+					},
+					"title": "Malicious bandwidth per Attack Duration",
+					"type": "column",
+					"divisor": "{bwDivisor}",
+					"decimals": "{bwDecimals}",
+					"src": "sql",
+					"sql": "select durationRange as 'Attack Duration',sum(packetBandwidth) as '{bwUnit}' from attacks group by durationRange order by durationRange"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 850,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"divisor": "{bwDivisor}",
+					"decimals": "{bwDecimals}",
+					"src": "last"
+				}
+			]
+		},
+		{
+			"title": "Malicious packets per Category",
+			"id": "pktcat",
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 140,
+						"left": 50,
+						"width": 1050,
+						"height": 680
+					},
+					"title": "Malicious packets per Category",
+					"type": "column",
+					"divisor": "{pktDivisor}",
+					"decimals": "{pktDecimals}",
+					"slantedText": true,
+					"src": "sql",
+					"sql": "select category as 'Category',sum(packetCount) as '{pktUnit}' from attacks group by category order by sum(packetCount) desc limit {topN}"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 850,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"divisor": "{pktDivisor}",
+					"decimals": "{pktDecimals}",
+					"src": "last"
+				}
+			]
+		},
+		{
+			"title": "Malicious bandwidth per Category",
+			"id": "bwcat",
+			"objects": [
+				{
+					"object": "chart",
+					"style": {
+						"top": 140,
+						"left": 50,
+						"width": 1050,
+						"height": 680
+					},
+					"title": "Malicious bandwidth per Category",
+					"type": "column",
+					"divisor": "{bwDivisor}",
+					"decimals": "{bwDecimals}",
+					"slantedText": true,
+					"src": "sql",
+					"sql": "select category as 'Category',sum(packetBandwidth) as '{bwUnit}' from attacks group by category order by sum(packetBandwidth) desc limit {topN}"
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 850,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"divisor": "{bwDivisor}",
+					"decimals": "{bwDecimals}",
+					"src": "last"
+				}
+			]
+		},
+		{
+			"title": "Malicious bandwidth per Attack and Policy",
+			"id": "bwatkpol",
+			"objects": [
+				{
+					"object": "text",
+					"style": {
+						"top": 230,
+						"width": "100%",
+						"height": 20,
+						"font-size": 24,
+						"font-weight": "bold",
+						"color": "#113150"
+					},
+					"centered": true,
+					"text": "Malicious bandwidth per Attack and Policy"					
+				},
+				{
+					"object": "chart",
+					"style": {
+						"top": 300,
+						"width": "100%"
+					},
+					"centered": true,
+					"type": "table",
+					"fields": [
+						"string",
+						"string",
+						"number"
+					],
+					"divisor": "{bwDivisor}",
+					"decimals": "{bwDecimals}",
+					"noLabel": true,
+					"src": "sql",
+					"sql": "select name as 'Attack Name',ruleName as 'Policy Name',sum(packetBandwidth) as '{bwUnit}' from attacks where name!=' ' group by name order by sum(packetBandwidth) desc limit 20"
+				}
+			]
+		}
+	]
+}

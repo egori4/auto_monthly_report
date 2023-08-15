@@ -1,0 +1,44 @@
+{
+    "title": "Bandwidth per Event and Policy",
+    "id": "bwatkpol",
+    "objects": [
+        {
+            "object": "text",
+            "style": {
+                "top": 230,
+                "width": "100%",
+                "height": 20,
+                "font-size": 24,
+                "font-weight": "bold",
+                "color": "#113150"
+            },
+            "centered": true,
+            "text": "Bandwidth per Event and Policy"					
+        },
+        {
+            "object": "chart",
+            "style": {
+                "top": 300,
+                "width": "100%"
+            },
+            "centered": true,
+            "type": "table",
+            "fields": [
+                "string",
+                "string",
+                "number"
+            ],
+            "divisor": "{bwDivisor}",
+            "decimals": "{bwDecimals}",
+            "noLabel": true,
+            "total": true,
+            "ta_columns": "2",
+            "src": "cmd",
+            "cmd": "./script_files/gensql.sh {id} {month} \"{sql_in}\" \"{sql_out}\" {span}",
+            "globals": {
+                "sql_in": "select name as F1,ruleName as F2,sum(packetBandwidth) as F3 from attacks where endTime >= {prevTime} and endTime < {time} and name!=' ' group by name order by sum(packetBandwidth) desc limit 20",
+                "sql_out": "select F1 as 'Event Name', F2 as 'Policy Name',sum(F3) as '{bwUnit}' from data group by F1 order by sum(F3) desc limit 20"
+            }
+        }
+    ]
+}

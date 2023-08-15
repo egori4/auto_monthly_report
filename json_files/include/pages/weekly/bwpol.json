@@ -1,0 +1,23 @@
+{
+    "title": "Event Bandwidth per Policy",
+    "id": "bwpol",
+    "objects": [
+        {
+            "include": "cmdChart",
+            "title": "Event Bandwidth per Policy",
+            "type": "bar",
+            "divisor": "{bwDivisor}",
+            "decimals": "{bwDecimals}",
+            "cmd": "./script_files/gensql.sh {id} {month} \"{sql_in}\" \"{sql_out}\" {span}",
+            "globals": {
+                "sql_in": "select ruleName as F1,sum(packetBandwidth) as F2 from attacks where endTime >= {prevTime} and endTime < {time} group by ruleName order by sum(packetBandwidth) desc limit {topN}",
+                "sql_out": "select F1 as 'Policy Name',sum(F2) as '{bwUnit}' from data group by F1 order by sum(F2) desc limit {topN}"
+            }
+        },
+        {
+            "include": "lastTable",
+            "divisor": "{bwDivisor}",
+            "decimals": "{bwDecimals}"
+        }
+    ]
+}

@@ -1,0 +1,21 @@
+{
+    "title": "EAAF Events per Destination IP Address",
+    "id": "evtdip_e",
+    "skipIfNot": "EAAFdb",
+    "objects": [
+        {
+            "include": "cmdChart",
+            "title": "EAAF Events per Destination IP Address",
+            "type": "bar",
+            "cmd": "./script_files/gensql.sh {id} {month} \"{sql_in}\" \"{sql_out}\" {span}",
+            "globals": {
+                "sql_in": "select destAddress as F1,count(*) as F2 from ertfeed where endDayOfMonth >= {prevDay} and endDayOfMonth < {day} and destAddress!='0.0.0.0' and destAddress!='Multiple' group by destAddress order by count(*) desc limit {topN}",
+                "sql_out": "select F1 as 'Destination IP Address',sum(F2) as 'Number of Events' from data group by F1 order by sum(F2) desc limit {topN}"
+            }
+        },
+        {
+            "include": "lastTable",
+            "revDNS": false
+        }
+    ]
+}

@@ -1,0 +1,141 @@
+{
+	"offline": true,
+	"version": "5.3",
+	"title": "Monthly Report - {month} {year}",
+	"globals": {
+		"db": "database_files/{id}/database_{id}_{month}.sqlite"
+	},
+	"defaults": {
+		"page": {
+			"include": "monthly/defaults"
+		}
+	},
+	"pages": [
+		{
+			"include": "monthly/overview"
+		},
+		{
+			"include": "monthly/overview_e"
+		},
+		{
+			"include": "monthly/index"
+		},
+		{
+			"include": "monthly/trfmbit"
+		},
+		{
+			"include": "monthly/evtday"
+		},
+		{
+			"include": "monthly/evtday_e"
+		},
+		{
+			"include": "monthly/evtmon"
+		},
+		{
+			"include": "monthly/pktmon"
+		},
+		{
+			"include": "monthly/bwmon"
+		},
+		{
+			"include": "monthly/top20atk"
+		},
+		{
+			"include": "monthly/evtdev"
+		},
+		{
+			"include": "monthly/pktdev"
+		},
+		{
+			"include": "monthly/bwdev"
+		},
+		{
+			"include": "monthly/evtdevact"
+		},
+		{
+			"include": "monthly/evtact"
+		},
+		{
+			"include": "monthly/evtgeo"
+		},
+		{
+			"include": "monthly/evtgeo_e"
+		},
+		{
+			"include": "monthly/evtsip"
+		},
+		{
+			"include": "monthly/evtdip"
+		},
+		{
+			"include": "monthly/evtdip_e"
+		},
+		{
+			"include": "monthly/evtdpt"
+		},
+		{
+			"include": "monthly/evtpol"
+		},
+		{
+			"include": "monthly/pktpol"
+		},
+		{
+			"include": "monthly/bwpol"
+		},
+		{
+			"include": "monthly/evtname"
+		},
+		{
+			"include": "monthly/evtname_e"
+		},
+		{
+			"include": "monthly/pktname"
+		},
+		{
+			"include": "monthly/bwname"
+		},
+		{
+			"include": "monthly/evtproto"
+		},
+		{
+			"include": "monthly/pktproto"
+		},
+		{
+			"include": "monthly/bwproto"
+		},
+		{
+			"include": "monthly/evtdur"
+		},
+		{
+			"include": "monthly/evtcat"
+		},
+		{
+			"include": "monthly/pktcat"
+		},
+		{
+			"include": "monthly/bwcat"
+		},
+		{
+			"include": "monthly/evtcatact"
+		},
+		{
+			"include": "monthly/evtcatdrop"
+		},
+		{
+			"include": "monthly/pktcatdrop"
+		},
+		{
+			"include": "monthly/bwcatdrop"
+		},
+		{
+			"include": "monthly/bwatkpol"
+		},
+		{
+			"include": "monthly/evtpktdrop"
+		},
+		{
+			"include": "monthly/evtpktfwd"
+		}
+	]
+}

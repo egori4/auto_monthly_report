@@ -1,0 +1,18 @@
+{
+    "title": "Events per Duration Range",
+    "id": "evtdur",
+    "objects": [
+        {
+            "include": "cmdChart",
+            "title": "Events per Duration Range",
+            "cmd": "./script_files/gensql.sh {id} {month} \"{sql_in}\" \"{sql_out}\" {span}",
+            "globals": {
+                "sql_in": "select durationRange as F1,count(*) as F2 from attacks where endTime >= {prevTime} and endTime < {time} group by durationRange order by durationRange limit {topN}",
+                "sql_out": "select F1 as 'Duration Range',sum(F2) as 'Number of Events' from data group by F1 order by sum(F2) desc limit {topN}"
+            }
+        },
+        {
+            "include": "lastTable"
+        }
+    ]
+}

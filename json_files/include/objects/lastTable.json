@@ -1,0 +1,12 @@
+{
+    "object": "chart",
+    "style": {
+        "top": 850,
+        "width": "100%"
+    },
+    "centered": true,
+    "type": "table",
+    "src": "last",
+    "total": true,
+    "average": true
+}

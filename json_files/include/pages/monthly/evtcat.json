@@ -1,0 +1,15 @@
+{
+    "title": "Events per Category",
+    "id": "evtcat",
+    "objects": [
+        {
+            "include": "sqlChart",
+            "title": "Events per Category",
+            "type": "bar",
+            "sql": "select category as 'Category',count(*) as 'Number of Events' from attacks group by category order by count(*) desc limit {topN}"
+        },
+        {
+            "include": "lastTable"
+        }
+    ]
+}

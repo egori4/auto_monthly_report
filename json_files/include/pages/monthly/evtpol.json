@@ -1,0 +1,15 @@
+{
+    "title": "Events per Policy",
+    "id": "evtpol",
+    "objects": [
+        {
+            "include": "sqlChart",
+            "title": "Events per Policy",
+            "type": "bar",
+            "sql": "select ruleName as 'Policy Name',count(*) as 'Number of Events' from attacks group by ruleName order by count(*) desc limit {topN}"
+        },
+        {
+            "include": "lastTable"
+        }
+    ]
+}

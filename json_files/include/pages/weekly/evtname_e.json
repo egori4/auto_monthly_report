@@ -1,0 +1,21 @@
+{
+    "title": "EAAF Events by Name",
+    "id": "evtname_e",
+    "skipIfNot": "EAAFdb",
+    "objects": [
+        {
+            "include": "cmdChart",
+            "title": "EAAF Events by Name",
+            "type": "bar",
+            "fontSize": 11,
+            "cmd": "./script_files/gensql.sh {id} {month} \"{sql_in}\" \"{sql_out}\" {span}",
+            "globals": {
+                "sql_in": "select name as F1,count(*) as F2 from ertfeed where endDayOfMonth >= {prevDay} and endDayOfMonth < {day} and name!=' ' group by name order by count(*) desc limit {topN}",
+                "sql_out": "select F1 as 'Event Name',sum(F2) as 'Number of Events' from data group by F1 order by sum(F2) desc limit {topN}"
+            }
+        },
+        {
+            "include": "lastTable"
+        }
+    ]
+}

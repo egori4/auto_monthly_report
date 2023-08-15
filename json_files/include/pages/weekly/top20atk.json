@@ -1,0 +1,45 @@
+{
+    "title": "Top 20 Events Mitigated",
+    "id": "top20atk",
+    "objects": [
+        {
+            "object": "text",
+            "style": {
+                "top": 230,
+                "width": "100%",
+                "height": 20,
+                "font-size": 24,
+                "font-weight": "bold",
+                "color": "#113150"
+            },
+            "centered": true,
+            "text": "Top 20 Events Mitigated"					
+        },
+        {
+            "object": "chart",
+            "style": {
+                "top": 300,
+                "width": "100%"
+            },
+            "centered": true,
+            "type": "table",
+            "fields": [
+                "string",
+                "string",
+                "string",
+                "string",
+                "string",
+                "string",
+                "number",
+                "number"
+            ],
+            "noLabel": true,
+            "src": "cmd",
+            "cmd": "./script_files/gensql.sh {id} {month} \"{sql_in}\" \"{sql_out}\" {span}",
+            "globals": {
+                "sql_in": "select attackIpsId as F1, name as F2, startDate as F3, endDate as F4, protocol as F5, durationRange as F6, printf('%.{bwDecimals}f',cast(packetCount as real)/{pktDivisor}) as F7, printf('%.{bwDecimals}f',cast(packetBandwidth as real)/{bwDivisor}) as F8 from attacks where (endTime >= {prevTime} and endTime < {time}) and actionType='Drop' group by name order by packetbandwidth desc limit 20",
+                "sql_out": "select F1 as 'Event IDs', F2 as 'Event Name',F3 as 'Start Date', F4 as 'End Date', F5 as 'Protocol', F6 as 'Duration', F7 as '{pktUnit}', F8 as '{bwUnit}' from data"
+            }
+        }
+    ]
+}

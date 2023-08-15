@@ -1,0 +1,15 @@
+{
+    "title": "Events per Protocol",
+    "id": "evtproto",
+    "objects": [
+        {
+            "include": "sqlChart",
+            "title": "Events per Protocol",
+            "type": "pie",
+            "sql": "select protocol as 'Protocol',count(*) as 'Number of Events' from attacks group by protocol order by count(*) desc limit {topN}"
+        },
+        {
+            "include": "lastTable"
+        }
+    ]
+}

@@ -1,0 +1,19 @@
+{
+    "title": "Event Bandwidth per Policy",
+    "id": "bwpol",
+    "objects": [
+        {
+            "include": "sqlChart",
+            "title": "Event Bandwidth per Policy",
+            "type": "bar",
+            "divisor": "{bwDivisor}",
+            "decimals": "{bwDecimals}",
+            "sql": "select ruleName as 'Policy Name',sum(packetBandwidth) as '{bwUnit}' from attacks group by ruleName order by sum(packetBandwidth) desc limit {topN}"
+        },
+        {
+            "include": "lastTable",
+            "divisor": "{bwDivisor}",
+            "decimals": "{bwDecimals}"
+        }
+    ]
+}

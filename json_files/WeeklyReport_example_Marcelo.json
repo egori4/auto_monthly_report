@@ -1,0 +1,102 @@
+{
+	"offline": true,
+	"version": "5.3",
+	"title": "{^range} Report {prevMonthText}/{prevDay} to {monthText}/{$globals->day-1}",
+	"globals": {
+		"db": "database_files/{id}/database_{id}_{month}.sqlite"
+	},
+	"defaults": {
+		"page": {
+			"include": "weekly/defaults"
+		}
+	},
+	"pages": [
+		{
+			"include": "weekly/overview"
+		},
+		{
+			"include": "weekly/overview_e"
+		},
+		{
+			"include": "weekly/index"
+		},
+		{
+			"include": "weekly/evtday"
+		},
+		{
+			"include": "weekly/evtday_e"
+		},
+		{
+			"include": "weekly/top20atk"
+		},
+		{
+			"include": "weekly/evtdev"
+		},
+		{
+			"include": "weekly/pktdev"
+		},
+		{
+			"include": "weekly/bwdev"
+		},
+		{
+			"include": "weekly/evtgeo"
+		},
+		{
+			"include": "weekly/evtgeo_e"
+		},
+		{
+			"include": "weekly/evtsip"
+		},
+		{
+			"include": "weekly/evtdip"
+		},
+		{
+			"include": "weekly/evtdip_e"
+		},
+		{
+			"include": "weekly/evtdpt"
+		},
+		{
+			"include": "weekly/evtpol"
+		},
+		{
+			"include": "weekly/pktpol"
+		},
+		{
+			"include": "weekly/bwpol"
+		},
+		{
+			"include": "weekly/evtname"
+		},
+		{
+			"include": "weekly/evtname_e"
+		},
+		{
+			"include": "weekly/pktname"
+		},
+		{
+			"include": "weekly/bwname"
+		},
+		{
+			"include": "weekly/evtproto"
+		},
+		{
+			"include": "weekly/pktproto"
+		},
+		{
+			"include": "weekly/bwproto"
+		},
+		{
+			"include": "weekly/evtdur"
+		},
+		{
+			"include": "weekly/pktcat"
+		},
+		{
+			"include": "weekly/bwcat"
+		},
+		{
+			"include": "weekly/bwatkpol"
+		}
+	]
+}
