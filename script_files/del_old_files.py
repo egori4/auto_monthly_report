@@ -1,6 +1,7 @@
 import os
 import time
 import sys
+import shutil
 
 # get current time
 now = time.time()	
@@ -54,7 +55,8 @@ def delete_old_files():
 					# check if file is a directory
 					if os.path.isdir(dir+'/'+file):
 						# delete directory
-						os.rmdir(dir+'/'+file)
+						#os.rmdir(dir+'/'+file)
+						shutil.rmtree(dir+'/'+file)
 						print(f"{dir+'/'+file} deleted")
 					else:
 						# delete file

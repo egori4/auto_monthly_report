@@ -622,6 +622,8 @@ def send_report(SMTP_AUTH,SMTP_SERVER,SMTP_SERVER_PORT,SMTP_SENDER,SMTP_PASSWORD
         msg["From"] = SMTP_SENDER
         msg["To"] = ', '.join(SMTP_LIST)
 
+        
+        #################################################### Archive files greater than 5MB ####################################################
         for root, dirs, files in os.walk(path_r):
                 if root.split("/")[2] == cust_id:
                         for filename in files:
@@ -634,9 +636,10 @@ def send_report(SMTP_AUTH,SMTP_SERVER,SMTP_SERVER_PORT,SMTP_SENDER,SMTP_PASSWORD
                                                         with tarfile.open(arcfile, "w:gz") as tar:
                                                                 tar.add(os.path.join(root, filename), arcname=os.path.basename(os.path.join(root, filename)))
                                 except:
-                                        print(f"File name {filename} is not in the correct format")
+                                        print(f"Skipping file {filename} for archiving - not in the correct format")
                                         continue
-
+        
+        #################################################### Attach files to the email ########################################################
         for root, dirs, files in os.walk(path_r):
                 if root.split("/")[2] == cust_id:
                         for filename in files:
@@ -652,7 +655,7 @@ def send_report(SMTP_AUTH,SMTP_SERVER,SMTP_SERVER_PORT,SMTP_SENDER,SMTP_PASSWORD
                                                         msg.attach(p)
                                                         attachment.close()
                                 except:
-                                        print(f"File name {filename} is not in the correct format")
+                                        print(f"Skipping file {filename} from attaching to the email- not in the correct format")
                                         continue
  
         body = email_body(cust_id)

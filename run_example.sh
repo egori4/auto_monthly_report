@@ -7,23 +7,12 @@
 
 ###################### Mandatory variables #########################################################
 cust_list=(Customer_name)	#space separated list of customer IDs
-
-# cur_month=6
-cur_month=$(date +'%m') # This sets the month to the current month by default, so the data will be collected and report will be generatd for the previous month. If the data needs to be collected for the different month, set the numberic value. For example if set to 4 (April), the script will collect and generate report for March.
-cur_year=$(date +%Y)
-prev_year=$(expr $cur_year - 1)
-
-if [[ "$cur_month" != 01 ]] || [ "$cur_month" != 1 ]; then
-	prev_month=$(expr $cur_month - 1)
-
-else
-	prev_month=12
-fi
+####################################################################################################
 
 
 abuseipdb_key="xxxx"
+#This variable is needed to fetch the information about top 10 malicious IP addresses from abuseipdb.com.
 #Register and obtain your API key from https://www.abuseipdb.com/account/api
-
 
 delete_old_files_retention=6
 #Number of months to keep the old files. For example if set to 6, the script will delete all files older than 6 months.
@@ -39,6 +28,7 @@ gen_python_csv_data=true #generate csv data using python scripts
 generate_report=true
 del_old_files=true
 generate_appendix=true
+analyze_trends=true
 email_send=true
 ####################################################################################################
 
@@ -63,6 +53,19 @@ is_proxy_for_email=false
 http_proxy="proxyserver.com:3128"
 https_proxy="proxyserver.com:3128"
 ####################################################################################################
+
+# cur_month=6
+cur_month=$(date +'%m') # This sets the month to the current month by default, so the data will be collected and report will be generatd for the previous month. If the data needs to be collected for the different month, set the numberic value. For example if set to 4 (April), the script will collect and generate report for March.
+cur_year=$(date +%Y)
+prev_year=$(expr $cur_year - 1)
+
+if [[ "$cur_month" != 01 ]] || [ "$cur_month" != 1 ]; then
+	prev_month=$(expr $cur_month - 1)
+
+else
+	prev_month=12
+fi
+
 
 #if directory source_files does not exist, create it
 if [ ! -d "source_files" ]; then
@@ -146,6 +149,19 @@ do
 			python3 script_files/data_parser_to_appendix.py $cust_id $prev_month $prev_year #this will generate appendix for the previouis month
 		fi
 	fi
+
+	if [[ "$analyze_trends" == "true" ]]; then
+
+		if [[ "$cur_month" != 01 ]] || [ "$cur_month" != 1 ]; then
+			echo "Analyzing trends for $prev_month $cur_year"
+			python3 script_files/analyze_trends.py $cust_id $prev_month $cur_year #this will generate appendix for the previouis month
+		else
+			echo "Analyzing trends for $prev_month $prev_year"
+			python3 script_files/analyze_trends.py $cust_id $prev_month $prev_year #this will generate appendix for the previouis month
+		fi
+
+	fi
+
 done
 
 
