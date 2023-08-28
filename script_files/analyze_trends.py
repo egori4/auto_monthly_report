@@ -400,14 +400,14 @@ if __name__ == '__main__':
 		  </tr>
 		  <tr>
 			<td style="text-align: left;">
-				<h4>Change in Security Events number this month compared to the previous month</h4>
+				<h4>Change in Security Events number by attack name this month compared to the previous month</h4>
 				{events_total_bar_move}{events_trends_move}</td>
 			<td style="text-align: left;">
-				<h4>Change in Malicious Packets number this month compared to the previous month</h4>
+				<h4>Change in Malicious Packets number by attack name this month compared to the previous month</h4>
 				{pakets_total_bar_move}{packets_trends_move}</td>
 
 			<td style="text-align: left;">
-				<h4>Change in Malicious Traffic sum this month compared to the previous month</h4>
+				<h4>Change in Malicious Traffic sum by attack name this month compared to the previous month</h4>
 				{bw_total_bar_move}{bw_trends_move}</td>
 		  </tr>
 
