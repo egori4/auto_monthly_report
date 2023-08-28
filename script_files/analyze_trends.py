@@ -101,7 +101,7 @@ def convert_bw_units(data, bw_units):
 
 	return converted_data
 
-def trends_move(data):
+def trends_move(data, units="events"):
 
 	analysis = '<ul>'
 	# Extract attack names and attack counts for June and July
@@ -124,7 +124,7 @@ def trends_move(data):
 		if isinstance(difference, float):
 			difference = round(difference, 2)
 
-		change = f"by {difference} (from {count_previous} to {count_last}) "
+		change = f"by {difference} {units} - from {count_previous} to {count_last} {units} "
 
 		analysis += f'<li><strong>{name}:</strong><ul><li> {trend} {change}</li></ul>'
 
@@ -133,7 +133,7 @@ def trends_move(data):
 	return analysis
 
 
-def trends_move_total(data):
+def trends_move_total(data, units="events"):
 	
 	prev_total = data[-2][1]
 	last_total = data[-1][1]
@@ -144,7 +144,7 @@ def trends_move_total(data):
 	if isinstance(difference, float):
 		difference = round(difference, 2)
 
-	result = f"This month the total number {trend} from {prev_total} to {last_total} by {difference} "
+	result = f"This month the total number of {units} {trend} by {difference} {units} - from {prev_total} to {last_total} {units}"
 	return result
 
 
@@ -160,30 +160,40 @@ if __name__ == '__main__':
 	
 	# Total events, packets and bandwidth trends
 	events_total_bar = convert_csv_to_list_of_lists(charts_tables_path + 'epm_total_bar.csv')
-	events_total_bar_move = trends_move_total(events_total_bar) 
+	events_total_bar_move = trends_move_total(events_total_bar, 'events') 
 
 	packets_total_bar = convert_csv_to_list_of_lists(charts_tables_path + 'ppm_total_bar.csv')
 	packets_total_bar = convert_packets_units(packets_total_bar, pkt_units)
-	pakets_total_bar_move = trends_move_total(packets_total_bar) 
+	pakets_total_bar_move = trends_move_total(packets_total_bar, ' packets(' + pkt_units + ')') 
 
 	bw_total_bar = convert_csv_to_list_of_lists(charts_tables_path + 'bpm_total_bar.csv')
 	bw_total_bar = convert_bw_units(bw_total_bar, bw_units)
-	bw_total_bar_move = trends_move_total(bw_total_bar) 
+	bw_total_bar_move = trends_move_total(bw_total_bar, bw_units) 
 
 	# Events, packets and bandwidth trends by Attack Name
 	events_trends = convert_csv_to_list_of_lists(charts_tables_path + 'epm_chart_lm.csv')
-	events_trends_move = trends_move(events_trends)
+	events_trends_move = trends_move(events_trends, 'events')
 
 	packets_trends = convert_csv_to_list_of_lists(charts_tables_path + 'ppm_chart_lm.csv')
 	packets_trends = convert_packets_units(packets_trends, pkt_units)
-	packets_trends_move = trends_move(packets_trends)
+	packets_trends_move = trends_move(packets_trends, ' packets(' + pkt_units + ')')
 
 	bw_trends = convert_csv_to_list_of_lists(charts_tables_path + 'bpm_chart_lm.csv')
 	bw_trends = convert_bw_units(bw_trends, bw_units)
-	bw_trends_move = trends_move(bw_trends)
+	bw_trends_move = trends_move(bw_trends, bw_units)
 
+	# Events, packets and bandwidth trends by Attack Nam
 
+	events_by_device_trends_chart_data = convert_csv_to_list_of_lists(charts_tables_path + 'device_epm_chart_lm.csv')
+	events_by_device_trends_move_text = trends_move(events_by_device_trends_chart_data, 'events')
 
+	packets_by_device_trends_chart_data = convert_csv_to_list_of_lists(charts_tables_path + 'device_ppm_chart_lm.csv')
+	packets_by_device_trends_chart_data = convert_packets_units(packets_by_device_trends_chart_data, pkt_units)
+	packets_by_device_trends_move_text = trends_move(packets_by_device_trends_chart_data, ' packets(' + pkt_units + ')')
+
+	bw_by_device_trends_chart_data = convert_csv_to_list_of_lists(charts_tables_path + 'device_bpm_chart_lm.csv')
+	bw_by_device_trends_chart_data = convert_bw_units(bw_by_device_trends_chart_data, bw_units)
+	bw_by_device_trends_move_text = trends_move(bw_by_device_trends_chart_data, bw_units)
 
 	html_page = f"""
 	<!DOCTYPE html>
@@ -198,33 +208,18 @@ if __name__ == '__main__':
 		  google.charts.setOnLoadCallback(drawChart);
 
 		  function drawChart() {{
-			var epm_data = google.visualization.arrayToDataTable({events_trends});
-			var ppm_data = google.visualization.arrayToDataTable({packets_trends});
-			var bpm_data = google.visualization.arrayToDataTable({bw_trends});
+		  
 			var epm_total_data = google.visualization.arrayToDataTable({events_total_bar});
 			var ppm_total_data = google.visualization.arrayToDataTable({packets_total_bar});
 			var bpm_total_data = google.visualization.arrayToDataTable({bw_total_bar});
 
-			var epm_options = {{
-			  title: 'Events trends',
-			  vAxis: {{minValue: 0}},
-			  legend: {{position: 'top', maxLines: 5}},
-			  width: '100%'
-			}};
+			var epm_data = google.visualization.arrayToDataTable({events_trends});
+			var ppm_data = google.visualization.arrayToDataTable({packets_trends});
+			var bpm_data = google.visualization.arrayToDataTable({bw_trends});
 
-			var ppm_options = {{
-			  title: 'Packets trends ({pkt_units})',
-			  vAxis: {{minValue: 0}},
-			  legend: {{position: 'top', maxLines: 5}},
-			  width: '100%'
-			}};
-
-			var bpm_options = {{
-			  title: 'Bandwidth trends ({bw_units})',
-			  vAxis: {{minValue: 0}},
-			  legend: {{position: 'top', maxLines: 5}},
-			  width: '100%'
-			}};
+			var epm_by_device_data = google.visualization.arrayToDataTable({events_by_device_trends_chart_data});
+			var ppm_by_device_data = google.visualization.arrayToDataTable({packets_by_device_trends_chart_data});
+			var bpm_by_device_data = google.visualization.arrayToDataTable({bw_by_device_trends_chart_data});
 
 			var epm_total_options = {{
 			  title: 'Total Events trends',
@@ -247,20 +242,72 @@ if __name__ == '__main__':
 			  width: '100%'
 			}};
 
-			var epm_chart = new google.visualization.AreaChart(document.getElementById('epm_chart_div'));
-			var ppm_chart = new google.visualization.AreaChart(document.getElementById('ppm_chart_div'));
-			var bpm_chart = new google.visualization.AreaChart(document.getElementById('bpm_chart_div'));
+			var epm_options = {{
+			  title: 'Events trends',
+			  vAxis: {{minValue: 0}},
+			  legend: {{position: 'top', maxLines: 5}},
+			  width: '100%'
+			}};
+
+			var ppm_options = {{
+			  title: 'Packets trends ({pkt_units})',
+			  vAxis: {{minValue: 0}},
+			  legend: {{position: 'top', maxLines: 5}},
+			  width: '100%'
+			}};
+
+			var bpm_options = {{
+			  title: 'Bandwidth trends ({bw_units})',
+			  vAxis: {{minValue: 0}},
+			  legend: {{position: 'top', maxLines: 5}},
+			  width: '100%'
+			}};
+
+			var epm_by_device_options = {{
+			  title: 'Events by device trends',
+			  vAxis: {{minValue: 0}},
+			  legend: {{position: 'top', maxLines: 5}},
+			  width: '100%'
+			}};
+
+			var ppm_by_device_options = {{
+			  title: 'Packets trends ({pkt_units})',
+			  vAxis: {{minValue: 0}},
+			  legend: {{position: 'top', maxLines: 5}},
+			  width: '100%'
+			}};
+
+			var bpm_by_device_options = {{
+			  title: 'Bandwidth trends ({bw_units})',
+			  vAxis: {{minValue: 0}},
+			  legend: {{position: 'top', maxLines: 5}},
+			  width: '100%'
+			}};
+
+
 			var epm_total_chart = new google.visualization.ColumnChart(document.getElementById('epm_total_chart_div'));
 			var ppm_total_chart = new google.visualization.ColumnChart(document.getElementById('ppm_total_chart_div'));
 			var bpm_total_chart = new google.visualization.ColumnChart(document.getElementById('bpm_total_chart_div'));
 
-			
-			epm_chart.draw(epm_data, epm_options);
-			ppm_chart.draw(ppm_data, ppm_options);
-			bpm_chart.draw(bpm_data, bpm_options);
+			var epm_chart = new google.visualization.AreaChart(document.getElementById('epm_chart_div'));
+			var ppm_chart = new google.visualization.AreaChart(document.getElementById('ppm_chart_div'));
+			var bpm_chart = new google.visualization.AreaChart(document.getElementById('bpm_chart_div'));
+
+			var epm_by_device_chart = new google.visualization.AreaChart(document.getElementById('epm_by_device_chart_div'));
+			var ppm_by_device_chart = new google.visualization.AreaChart(document.getElementById('ppm_by_device_chart_div'));
+			var bpm_by_device_chart = new google.visualization.AreaChart(document.getElementById('bpm_by_device_chart_div'));
+
 			epm_total_chart.draw(epm_total_data, epm_total_options);
 			ppm_total_chart.draw(ppm_total_data, ppm_total_options);
 			bpm_total_chart.draw(bpm_total_data, bpm_total_options);
+
+			epm_chart.draw(epm_data, epm_options);
+			ppm_chart.draw(ppm_data, ppm_options);
+			bpm_chart.draw(bpm_data, bpm_options);
+
+			epm_by_device_chart.draw(epm_by_device_data, epm_by_device_options);
+			ppm_by_device_chart.draw(ppm_by_device_data, ppm_by_device_options);
+			bpm_by_device_chart.draw(bpm_by_device_data, bpm_by_device_options);
 
 		  }}
 
@@ -290,6 +337,18 @@ if __name__ == '__main__':
 		padding: 10px;
 	  }}
 
+	  #epm_total_chart_div {{
+		height: 50vh;
+	  }}
+
+	  #ppm_total_chart_div {{
+		height: 50vh;
+	  }}
+
+	  #bpm_total_chart_div {{
+		height: 50vh;
+	  }}
+
 	  #epm_chart_div {{
 		height: 50vh;
 	  }}
@@ -302,15 +361,15 @@ if __name__ == '__main__':
 		height: 50vh;
 	  }}
 
-	  #epm_total_chart_div {{
+	  #epm_by_device_chart_div {{
 		height: 50vh;
 	  }}
 
-	  #ppm_total_chart_div {{
+	  #ppm_by_device_chart_div {{
 		height: 50vh;
 	  }}
 
-	  #bpm_total_chart_div {{
+	  #bpm_by_device_chart_div {{
 		height: 50vh;
 	  }}
 
@@ -333,6 +392,12 @@ if __name__ == '__main__':
 			<td><div id="ppm_total_chart_div"></td>
 			<td><div id="bpm_total_chart_div"></td>
 		  </tr>
+
+		  <tr>
+			<td><div id="epm_chart_div" style="height: 600px;"></td>
+			<td><div id="ppm_chart_div" style="height: 600px;"></td>
+			<td><div id="bpm_chart_div" style="height: 600px;"></td>
+		  </tr>
 		  <tr>
 			<td style="text-align: left;">
 				<h4>Change in Security Events number this month compared to the previous month</h4>
@@ -345,11 +410,29 @@ if __name__ == '__main__':
 				<h4>Change in Malicious Traffic sum this month compared to the previous month</h4>
 				{bw_total_bar_move}{bw_trends_move}</td>
 		  </tr>
+
 		  <tr>
-			<td><div id="epm_chart_div" style="height: 600px;"></td>
-			<td><div id="ppm_chart_div" style="height: 600px;"></td>
-			<td><div id="bpm_chart_div" style="height: 600px;"></td>
+			<td><div id="epm_by_device_chart_div" style="height: 600px;"></td>
+			<td><div id="ppm_by_device_chart_div" style="height: 600px;"></td>
+			<td><div id="bpm_by_device_chart_div" style="height: 600px;"></td>
 		  </tr>
+
+		  <tr>
+
+			<td style="text-align: left;">
+				<h4>Change in Security Events number by device this month compared to the previous month</h4>
+				{events_by_device_trends_move_text}
+			</td>
+			<td style="text-align: left;">
+				<h4>Change in Malicious Packets number by device this month compared to the previous month</h4>
+				{packets_by_device_trends_move_text}</td>
+			
+			<td style="text-align: left;">
+				<h4>Change in Malicious Traffic sum by device this month compared to the previous month</h4>
+				{bw_by_device_trends_move_text}</td>
+
+		  </tr>
+
 		</tbody>
 	  </table>
 	</body>

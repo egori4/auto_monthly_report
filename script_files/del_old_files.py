@@ -24,9 +24,9 @@ def get_retention_seconds(run_file):
 				retention_months = int(line.split('=')[1].replace('\n',''))
 				continue
 
-	print(retention_months)
+	#print(retention_months)
 	retention_seconds = retention_months*2592000
-	print(retention_seconds)
+	#print(retention_seconds)
 				
 
 	return retention_seconds

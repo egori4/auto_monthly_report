@@ -10,6 +10,8 @@ V7.0 8/24/2023
 
 The script can be run either from Linux, WSL for Windows or Container
 
+V7.0.1 8/28/2023
+	- Trends analysis html - added 3 new charts - events, packets and bw per device trends
 
 
 Instructions how to deploy as a docker container (on Vision example):
