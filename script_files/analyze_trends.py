@@ -313,6 +313,7 @@ if __name__ == '__main__':
 			var epm_options = {{
 			  title: 'Security Events trends',
 			  vAxis: {{minValue: 0}},
+			  isStacked: true,
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
 			}};
@@ -320,6 +321,7 @@ if __name__ == '__main__':
 			var ppm_options = {{
 			  title: 'Malicious Packets trends ({pkt_units})',
 			  vAxis: {{minValue: 0}},
+			  isStacked: true,
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
 			}};
@@ -327,6 +329,7 @@ if __name__ == '__main__':
 			var bpm_options = {{
 			  title: 'Malicious Bandwidth trends ({bw_units})',
 			  vAxis: {{minValue: 0}},
+			  isStacked: true,
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
 			}};
@@ -334,6 +337,7 @@ if __name__ == '__main__':
 			var epm_by_device_options = {{
 			  title: 'Events by device trends',
 			  vAxis: {{minValue: 0}},
+			  isStacked: true,
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
 			}};
@@ -341,6 +345,7 @@ if __name__ == '__main__':
 			var ppm_by_device_options = {{
 			  title: 'Packets by device trends ({pkt_units})',
 			  vAxis: {{minValue: 0}},
+			  isStacked: true,
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
 			}};
@@ -348,6 +353,7 @@ if __name__ == '__main__':
 			var bpm_by_device_options = {{
 			  title: 'Malicious Bandwidth by device trends ({bw_units})',
 			  vAxis: {{minValue: 0}},
+			  isStacked: true,
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
 			}};
