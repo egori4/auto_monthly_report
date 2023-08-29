@@ -2,6 +2,7 @@
 
 import csv
 import sys
+import pandas as pd
 
 cust_id = sys.argv[1]
 month = sys.argv[2]
@@ -148,6 +149,62 @@ def trends_move_total(data, units="events"):
 	return result
 
 
+def format_numeric_value(value, bw_units=None, pkt_units=None):
+	# Check if value is a number (integer or float)
+	if pd.notna(value) and isinstance(value, (int, float)):
+		# Apply formatting based on units
+		if pkt_units:
+			if pkt_units.lower() == 'millions':
+				value /= 1000000
+			elif pkt_units.lower() == 'billions':
+				value /= 1000000000
+
+		if bw_units:
+			if bw_units.lower() == 'megabytes':
+				value /= 8000
+			elif bw_units.lower() == 'gigabytes':
+				value /= 8000000
+			elif bw_units.lower() == 'terabytes':
+				value /= 8000000000
+
+		# Format the value with thousands separator
+		if pkt_units:
+			# remove decimal points if the value is integer
+			if isinstance(value, float):
+				value = int(value)
+				return value
+
+		else:
+			return '{:,.2f}'.format(value)
+	else:
+		return value
+
+
+def convert_to_int(column):
+    try:
+        return column.astype(int)
+    except ValueError:
+        return column
+    
+def csv_to_html_table(filename, bw_units=None, pkt_units=None):
+	# Read the CSV file, if the value is integer, leave it as integer, if float, leave it as float
+	
+	df = pd.read_csv(filename)
+
+	# Apply formatting to numeric columns
+	if bw_units or pkt_units:
+		formatted_df = df.applymap(lambda x: format_numeric_value(x, bw_units, pkt_units))
+	
+	else:
+		df = df.apply(convert_to_int, axis=0)
+		formatted_df = df
+
+	# Convert the formatted DataFrame to an HTML table
+	html_table = formatted_df.to_html(index=False, escape=False)
+	
+	return html_table
+
+
 def write_html(html_page,month,year):
 	# write html_page to file function
 
@@ -159,8 +216,8 @@ def write_html(html_page,month,year):
 if __name__ == '__main__':
 	
 	# Total events, packets and bandwidth trends
-	events_total_bar = convert_csv_to_list_of_lists(charts_tables_path + 'epm_total_bar.csv')
-	events_total_bar_move = trends_move_total(events_total_bar, 'events') 
+	events_total_bar_chart = convert_csv_to_list_of_lists(charts_tables_path + 'epm_total_bar.csv')
+	events_total_bar_move_text = trends_move_total(events_total_bar_chart, 'events') 
 
 	packets_total_bar = convert_csv_to_list_of_lists(charts_tables_path + 'ppm_total_bar.csv')
 	packets_total_bar = convert_packets_units(packets_total_bar, pkt_units)
@@ -173,27 +230,38 @@ if __name__ == '__main__':
 	# Events, packets and bandwidth trends by Attack Name
 	events_trends = convert_csv_to_list_of_lists(charts_tables_path + 'epm_chart_lm.csv')
 	events_trends_move = trends_move(events_trends, 'events')
+	events_trends_table = csv_to_html_table(charts_tables_path + 'epm_table_lm.csv')
 
-	packets_trends = convert_csv_to_list_of_lists(charts_tables_path + 'ppm_chart_lm.csv')
-	packets_trends = convert_packets_units(packets_trends, pkt_units)
-	packets_trends_move = trends_move(packets_trends, ' packets(' + pkt_units + ')')
+	packets_trends_chart = convert_csv_to_list_of_lists(charts_tables_path + 'ppm_chart_lm.csv')
+	packets_trends_chart = convert_packets_units(packets_trends_chart, pkt_units)
+	packets_trends_move_text = trends_move(packets_trends_chart, ' packets(' + pkt_units + ')')
+	packets_table = csv_to_html_table(charts_tables_path + 'ppm_table_lm.csv',bw_units=None, pkt_units='Millions')
+
+
 
 	bw_trends = convert_csv_to_list_of_lists(charts_tables_path + 'bpm_chart_lm.csv')
 	bw_trends = convert_bw_units(bw_trends, bw_units)
 	bw_trends_move = trends_move(bw_trends, bw_units)
+	bw_table = csv_to_html_table(charts_tables_path + 'bpm_table_lm.csv',bw_units)
 
 	# Events, packets and bandwidth trends by Attack Nam
 
 	events_by_device_trends_chart_data = convert_csv_to_list_of_lists(charts_tables_path + 'device_epm_chart_lm.csv')
 	events_by_device_trends_move_text = trends_move(events_by_device_trends_chart_data, 'events')
+	events_by_device_table = csv_to_html_table(charts_tables_path + 'device_epm_table_lm.csv')
 
 	packets_by_device_trends_chart_data = convert_csv_to_list_of_lists(charts_tables_path + 'device_ppm_chart_lm.csv')
 	packets_by_device_trends_chart_data = convert_packets_units(packets_by_device_trends_chart_data, pkt_units)
 	packets_by_device_trends_move_text = trends_move(packets_by_device_trends_chart_data, ' packets(' + pkt_units + ')')
+	packets_by_device_table = csv_to_html_table(charts_tables_path + 'device_ppm_table_lm.csv',bw_units=None, pkt_units='Millions')
+
 
 	bw_by_device_trends_chart_data = convert_csv_to_list_of_lists(charts_tables_path + 'device_bpm_chart_lm.csv')
 	bw_by_device_trends_chart_data = convert_bw_units(bw_by_device_trends_chart_data, bw_units)
 	bw_by_device_trends_move_text = trends_move(bw_by_device_trends_chart_data, bw_units)
+	bw_by_device_table = csv_to_html_table(charts_tables_path + 'device_bpm_table_lm.csv',bw_units)
+
+
 
 	html_page = f"""
 	<!DOCTYPE html>
@@ -209,12 +277,12 @@ if __name__ == '__main__':
 
 		  function drawChart() {{
 		  
-			var epm_total_data = google.visualization.arrayToDataTable({events_total_bar});
+			var epm_total_data = google.visualization.arrayToDataTable({events_total_bar_chart});
 			var ppm_total_data = google.visualization.arrayToDataTable({packets_total_bar});
 			var bpm_total_data = google.visualization.arrayToDataTable({bw_total_bar});
 
 			var epm_data = google.visualization.arrayToDataTable({events_trends});
-			var ppm_data = google.visualization.arrayToDataTable({packets_trends});
+			var ppm_data = google.visualization.arrayToDataTable({packets_trends_chart});
 			var bpm_data = google.visualization.arrayToDataTable({bw_trends});
 
 			var epm_by_device_data = google.visualization.arrayToDataTable({events_by_device_trends_chart_data});
@@ -243,21 +311,21 @@ if __name__ == '__main__':
 			}};
 
 			var epm_options = {{
-			  title: 'Events trends',
+			  title: 'Security Events trends',
 			  vAxis: {{minValue: 0}},
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
 			}};
 
 			var ppm_options = {{
-			  title: 'Packets trends ({pkt_units})',
+			  title: 'Malicious Packets trends ({pkt_units})',
 			  vAxis: {{minValue: 0}},
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
 			}};
 
 			var bpm_options = {{
-			  title: 'Bandwidth trends ({bw_units})',
+			  title: 'Malicious Bandwidth trends ({bw_units})',
 			  vAxis: {{minValue: 0}},
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
@@ -271,14 +339,14 @@ if __name__ == '__main__':
 			}};
 
 			var ppm_by_device_options = {{
-			  title: 'Packets trends ({pkt_units})',
+			  title: 'Packets by device trends ({pkt_units})',
 			  vAxis: {{minValue: 0}},
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
 			}};
 
 			var bpm_by_device_options = {{
-			  title: 'Bandwidth trends ({bw_units})',
+			  title: 'Malicious Bandwidth by device trends ({bw_units})',
 			  vAxis: {{minValue: 0}},
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
@@ -329,6 +397,7 @@ if __name__ == '__main__':
 		border-collapse: collapse;
 		table-layout: fixed;
 	  }}
+
 	  
 	  th, td {{
 		width: 33%;
@@ -375,7 +444,7 @@ if __name__ == '__main__':
 
 
 	</style>
-	<title>Responsive Table</title>
+	<title>Radware Monthly Reports</title>
 	</head>
 	<body>
 	  <table>
@@ -401,15 +470,35 @@ if __name__ == '__main__':
 		  <tr>
 			<td style="text-align: left;">
 				<h4>Change in Security Events number by attack name this month compared to the previous month</h4>
-				{events_total_bar_move}{events_trends_move}</td>
+				{events_total_bar_move_text}{events_trends_move}</td>
 			<td style="text-align: left;">
 				<h4>Change in Malicious Packets number by attack name this month compared to the previous month</h4>
-				{pakets_total_bar_move}{packets_trends_move}</td>
+				{pakets_total_bar_move}{packets_trends_move_text}</td>
 
 			<td style="text-align: left;">
 				<h4>Change in Malicious Traffic sum by attack name this month compared to the previous month</h4>
 				{bw_total_bar_move}{bw_trends_move}</td>
 		  </tr>
+
+		  <tr>
+			<td colspan="3">
+			<h4>Security Events table</h4>
+			{events_trends_table}
+			</td>
+		  </tr>
+		  <tr>
+			<td colspan="3">
+			<h4>Malicious packets table ({pkt_units})</h4>
+			{packets_table}
+			</td>
+		  </tr>
+		  <tr>
+			<td colspan="3">
+			<h4>Malicious bandwidth table ({bw_units})</h4>
+			{bw_table}
+			</td>
+		  </tr>	  
+		  
 
 		  <tr>
 			<td><div id="epm_by_device_chart_div" style="height: 600px;"></td>
@@ -425,17 +514,48 @@ if __name__ == '__main__':
 			</td>
 			<td style="text-align: left;">
 				<h4>Change in Malicious Packets number by device this month compared to the previous month</h4>
-				{packets_by_device_trends_move_text}</td>
+				{packets_by_device_trends_move_text}
+			</td>
 			
 			<td style="text-align: left;">
 				<h4>Change in Malicious Traffic sum by device this month compared to the previous month</h4>
-				{bw_by_device_trends_move_text}</td>
+				{bw_by_device_trends_move_text}
+			</td>
 
 		  </tr>
 
+		  <tr>
+			<td colspan="3">
+			<h4>Security Events by device table</h4>
+			{events_by_device_table}
+			</td>
+		  </tr>
+		  
+
+		  <tr>
+			<td colspan="3">
+			<h4>Malicious packets by device table ({pkt_units})</h4>
+			{packets_by_device_table}
+			</td>
+		  </tr>
+			
+		  <tr>
+			<td colspan="3">
+			<h4>Malicious Bandwidth by device table ({bw_units})</h4>
+			{bw_by_device_table}
+			</td>
+		  </tr>
+
+		  
+		  
 		</tbody>
+
 	  </table>
+
+		  <p></p>
+
 	</body>
+
 	</html>
 	"""
 

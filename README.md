@@ -13,7 +13,12 @@ The script can be run either from Linux, WSL for Windows or Container
 V7.0.1 8/28/2023
 	- Trends analysis html - added 3 new charts - events, packets and bw per device trends
 
+V7.0.2 8/29/2023
+	- Trends analysis html - added 6 tables for  events, packets and bw trends and  events, packets and bw per device trends
 
+
+
+===========================================================================================================================
 Instructions how to deploy as a docker container (on Vision example):
  
 1. Login to the Vision server via SSH using root user.
