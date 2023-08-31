@@ -24,6 +24,7 @@ def convert_csv_to_list_of_lists(filename):
 		reader = csv.reader(file)
 		for row in reader:
 			data.append(row)
+
 	return convert_strings_to_numbers(data)
 
 def convert_strings_to_numbers(data):
@@ -32,17 +33,21 @@ def convert_strings_to_numbers(data):
 	for row in data:
 		converted_row = []
 		for value in row:
-			if value.replace(".", "").isdigit():  # Check if value is numeric
-				if value.endswith('.0'):
-					value = int(value.replace('.0', ''))
-					converted_row.append(value)  # Convert ".0" to integer
-				#check if value has decimal points
-				elif "." in value:
-					converted_row.append(float(value))
-				elif value.isdigit():
-					converted_row.append(int(value))  # Convert to integer
+			#check if not ipv4 address
+			if value.count('.') != 3:
+				if value.replace(".", "").isdigit():  # Check if value is numeric
+					if value.endswith('.0'):
+						value = int(value.replace('.0', ''))
+						converted_row.append(value)  # Convert ".0" to integer
+					#check if value has decimal points
+					elif "." in value:
+						converted_row.append(float(value))
+					elif value.isdigit():
+						converted_row.append(int(value))  # Convert to integer
+					else:
+						print('The value is not defined as integer or float')
 				else:
-					print('The value is not defined as integer or float')
+					converted_row.append(value)
 			else:
 				converted_row.append(value)
 		converted_data.append(converted_row)
@@ -227,7 +232,7 @@ if __name__ == '__main__':
 	bw_total_bar = convert_bw_units(bw_total_bar, bw_units)
 	bw_total_bar_move = trends_move_total(bw_total_bar, bw_units) 
 
-	# Events, packets and bandwidth trends by Attack Name
+	################################################# Events, packets and bandwidth trends by Attack name  ##########################################################
 	events_trends = convert_csv_to_list_of_lists(charts_tables_path + 'epm_chart_lm.csv')
 	events_trends_move = trends_move(events_trends, 'events')
 	events_trends_table = csv_to_html_table(charts_tables_path + 'epm_table_lm.csv')
@@ -238,13 +243,12 @@ if __name__ == '__main__':
 	packets_table = csv_to_html_table(charts_tables_path + 'ppm_table_lm.csv',bw_units=None, pkt_units='Millions')
 
 
-
 	bw_trends = convert_csv_to_list_of_lists(charts_tables_path + 'bpm_chart_lm.csv')
 	bw_trends = convert_bw_units(bw_trends, bw_units)
 	bw_trends_move = trends_move(bw_trends, bw_units)
 	bw_table = csv_to_html_table(charts_tables_path + 'bpm_table_lm.csv',bw_units)
 
-	# Events, packets and bandwidth trends by Attack Nam
+	################################################# Events, packets and bandwidth trends by Device  ##########################################################
 
 	events_by_device_trends_chart_data = convert_csv_to_list_of_lists(charts_tables_path + 'device_epm_chart_lm.csv')
 	events_by_device_trends_move_text = trends_move(events_by_device_trends_chart_data, 'events')
@@ -260,6 +264,22 @@ if __name__ == '__main__':
 	bw_by_device_trends_chart_data = convert_bw_units(bw_by_device_trends_chart_data, bw_units)
 	bw_by_device_trends_move_text = trends_move(bw_by_device_trends_chart_data, bw_units)
 	bw_by_device_table = csv_to_html_table(charts_tables_path + 'device_bpm_table_lm.csv',bw_units)
+
+	################################################# Top source IP(bw is Megabytes) ##########################################################		
+	sip_events_trends_chart = convert_csv_to_list_of_lists(charts_tables_path + 'sip_epm_chart_lm.csv')
+	sip_events_trends_move_text = trends_move(sip_events_trends_chart, 'events')
+	sip_events_trends_table = csv_to_html_table(charts_tables_path + 'sip_epm_table_lm.csv')
+
+	sip_packets_trends_chart = convert_csv_to_list_of_lists(charts_tables_path + 'sip_ppm_chart_lm.csv')
+	sip_packets_trends_chart = convert_packets_units(sip_packets_trends_chart, pkt_units)
+	sip_packets_trends_move_text = trends_move(sip_packets_trends_chart, ' packets(' + pkt_units + ')')
+	sip_packets_table = csv_to_html_table(charts_tables_path + 'sip_ppm_table_lm.csv',bw_units=None, pkt_units='Millions')
+
+
+	sip_bw_trends_chart = convert_csv_to_list_of_lists(charts_tables_path + 'sip_bpm_chart_lm.csv')
+	# sip_bw_trends_chart = convert_bw_units(sip_bw_trends_chart, sip_bw_units)
+	# sip_bw_trends_move_text = trends_move(sip_bw_trends_chart, sip_bw_units)
+	sip_bw_table = csv_to_html_table(charts_tables_path + 'sip_bpm_table_lm.csv')
 
 
 
@@ -288,6 +308,10 @@ if __name__ == '__main__':
 			var epm_by_device_data = google.visualization.arrayToDataTable({events_by_device_trends_chart_data});
 			var ppm_by_device_data = google.visualization.arrayToDataTable({packets_by_device_trends_chart_data});
 			var bpm_by_device_data = google.visualization.arrayToDataTable({bw_by_device_trends_chart_data});
+
+			var sip_epm_data = google.visualization.arrayToDataTable({sip_events_trends_chart});
+			var sip_ppm_data = google.visualization.arrayToDataTable({sip_packets_trends_chart});
+			var sip_bpm_data = google.visualization.arrayToDataTable({sip_bw_trends_chart});
 
 			var epm_total_options = {{
 			  title: 'Total Events trends',
@@ -359,6 +383,31 @@ if __name__ == '__main__':
 			}};
 
 
+			var sip_epm_options = {{
+			  title: 'Security Events trends by source IP',
+			  vAxis: {{minValue: 0}},
+			  isStacked: true,
+			  legend: {{position: 'top', maxLines: 5}},
+			  width: '100%'
+			}};
+
+			var sip_ppm_options = {{
+			  title: 'Malicious Packets trends ({pkt_units}) by source IP',
+			  vAxis: {{minValue: 0}},
+			  isStacked: true,
+			  legend: {{position: 'top', maxLines: 5}},
+			  width: '100%'
+			}};
+
+			var sip_bpm_options = {{
+			  title: 'Malicious Bandwidth trends (Megabytes) by source IP',
+			  vAxis: {{minValue: 0}},
+			  isStacked: true,
+			  legend: {{position: 'top', maxLines: 5}},
+			  width: '100%'
+			}};
+
+
 			var epm_total_chart = new google.visualization.ColumnChart(document.getElementById('epm_total_chart_div'));
 			var ppm_total_chart = new google.visualization.ColumnChart(document.getElementById('ppm_total_chart_div'));
 			var bpm_total_chart = new google.visualization.ColumnChart(document.getElementById('bpm_total_chart_div'));
@@ -371,6 +420,13 @@ if __name__ == '__main__':
 			var ppm_by_device_chart = new google.visualization.AreaChart(document.getElementById('ppm_by_device_chart_div'));
 			var bpm_by_device_chart = new google.visualization.AreaChart(document.getElementById('bpm_by_device_chart_div'));
 
+			var sip_epm_chart = new google.visualization.AreaChart(document.getElementById('sip_epm_chart_div'));
+			var sip_ppm_chart = new google.visualization.AreaChart(document.getElementById('sip_ppm_chart_div'));
+			var sip_bpm_chart = new google.visualization.AreaChart(document.getElementById('sip_bpm_chart_div'));		
+
+			
+
+
 			epm_total_chart.draw(epm_total_data, epm_total_options);
 			ppm_total_chart.draw(ppm_total_data, ppm_total_options);
 			bpm_total_chart.draw(bpm_total_data, bpm_total_options);
@@ -382,6 +438,10 @@ if __name__ == '__main__':
 			epm_by_device_chart.draw(epm_by_device_data, epm_by_device_options);
 			ppm_by_device_chart.draw(ppm_by_device_data, ppm_by_device_options);
 			bpm_by_device_chart.draw(bpm_by_device_data, bpm_by_device_options);
+
+			sip_epm_chart.draw(sip_epm_data, sip_epm_options);
+			sip_ppm_chart.draw(sip_ppm_data, sip_ppm_options);
+			sip_bpm_chart.draw(sip_bpm_data, sip_bpm_options);
 
 		  }}
 
@@ -448,6 +508,17 @@ if __name__ == '__main__':
 		height: 50vh;
 	  }}
 
+	  #sip_epm_chart_div {{
+		height: 50vh;
+	  }}
+
+	  #sip_ppm_chart_div {{
+		height: 50vh;
+	  }}
+
+	  #sip_bpm_chart_div {{
+		height: 50vh;
+	  }}
 
 	</style>
 	<title>Radware Monthly Reports</title>
@@ -552,7 +623,30 @@ if __name__ == '__main__':
 			</td>
 		  </tr>
 
-		  
+		  <tr>
+			<td><div id="sip_epm_chart_div" style="height: 600px;"></td>
+			<td><div id="sip_ppm_chart_div" style="height: 600px;"></td>
+			<td><div id="sip_bpm_chart_div" style="height: 600px;"></td>
+		  </tr>
+
+		  <tr>
+			<td colspan="3">
+			<h4>Security Events table by source IP</h4>
+			{sip_events_trends_table}
+			</td>
+		  </tr>
+		  <tr>
+			<td colspan="3">
+			<h4>Malicious packets table ({pkt_units}) by source IP</h4>
+			{sip_packets_table}
+			</td>
+		  </tr>
+		  <tr>
+			<td colspan="3">
+			<h4>Malicious bandwidth table (Megabytes) by source IP</h4>
+			{sip_bw_table}
+			</td>
+		  </tr>	  	  
 		  
 		</tbody>
 

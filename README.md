@@ -18,7 +18,9 @@ V7.0.2 8/29/2023
 		- added 6 tables for  events, packets and bw trends and  events, packets and bw per device trends
 		- added isStacked parameter for the area charts
 
-
+V7.0.3 8/31/2023	
+	- Trends analysis html
+		- added 3 charts and 3 tables for top source IP's
 
 ===========================================================================================================================
 Instructions how to deploy as a docker container (on Vision example):
