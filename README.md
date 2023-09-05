@@ -22,6 +22,13 @@ V7.0.3 8/31/2023
 	- Trends analysis html
 		- added 3 charts and 3 tables for top source IP's
 
+V7.0.4 9/5/2023	
+	- Trends analysis html
+		- added 3 charts and 3 tables for top policies
+	- Fixed "Malicious bandwidth by Policy Name trend" units in pdf report
+	- Fixed "Traffic in Megabits" units in pdf
+	- Fixed "Malicious bandwidth by Device trend" units in pdf report
+
 ===========================================================================================================================
 Instructions how to deploy as a docker container (on Vision example):
  

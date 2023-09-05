@@ -281,6 +281,21 @@ if __name__ == '__main__':
 	# sip_bw_trends_move_text = trends_move(sip_bw_trends_chart, sip_bw_units)
 	sip_bw_table = csv_to_html_table(charts_tables_path + 'sip_bpm_table_lm.csv')
 
+	################################################# Events, packets and bandwidth trends by Policy ##########################################################
+
+	policy_events_trends_chart = convert_csv_to_list_of_lists(charts_tables_path + 'policy_epm_chart_lm.csv')
+	policy_events_trends_move_text = trends_move(policy_events_trends_chart, 'events')
+	policy_events_trends_table = csv_to_html_table(charts_tables_path + 'policy_epm_table_lm.csv')
+
+	policy_packets_trends_chart = convert_csv_to_list_of_lists(charts_tables_path + 'policy_ppm_chart_lm.csv')
+	policy_packets_trends_chart = convert_packets_units(policy_packets_trends_chart, pkt_units)
+	policy_packets_trends_move_text = trends_move(policy_packets_trends_chart, ' packets(' + pkt_units + ')')
+	policy_packets_table = csv_to_html_table(charts_tables_path + 'policy_ppm_table_lm.csv',bw_units=None, pkt_units='Millions')
+
+	policy_bw_trends_chart = convert_csv_to_list_of_lists(charts_tables_path + 'policy_bpm_chart_lm.csv')
+	policy_bw_trends_chart = convert_bw_units(policy_bw_trends_chart, bw_units)
+	policy_bw_trends_move_text = trends_move(policy_bw_trends_chart, bw_units)
+	policy_bw_table = csv_to_html_table(charts_tables_path + 'policy_bpm_table_lm.csv',bw_units)
 
 
 	html_page = f"""
@@ -312,6 +327,11 @@ if __name__ == '__main__':
 			var sip_epm_data = google.visualization.arrayToDataTable({sip_events_trends_chart});
 			var sip_ppm_data = google.visualization.arrayToDataTable({sip_packets_trends_chart});
 			var sip_bpm_data = google.visualization.arrayToDataTable({sip_bw_trends_chart});
+
+			var policy_epm_data = google.visualization.arrayToDataTable({policy_events_trends_chart });
+			var policy_ppm_data = google.visualization.arrayToDataTable({policy_packets_trends_chart });
+			var policy_bpm_data = google.visualization.arrayToDataTable({policy_bw_trends_chart });
+
 
 			var epm_total_options = {{
 			  title: 'Total Events trends',
@@ -408,6 +428,31 @@ if __name__ == '__main__':
 			}};
 
 
+			var policy_epm_options = {{
+			  title: 'Security Events trends',
+			  vAxis: {{minValue: 0}},
+			  isStacked: true,
+			  legend: {{position: 'top', maxLines: 5}},
+			  width: '100%'
+			}};
+
+			var policy_ppm_options = {{
+			  title: 'Malicious Packets trends ({pkt_units})',
+			  vAxis: {{minValue: 0}},
+			  isStacked: true,
+			  legend: {{position: 'top', maxLines: 5}},
+			  width: '100%'
+			}};
+
+			var policy_bpm_options = {{
+			  title: 'Malicious Bandwidth trends ({bw_units})',
+			  vAxis: {{minValue: 0}},
+			  isStacked: true,
+			  legend: {{position: 'top', maxLines: 5}},
+			  width: '100%'
+			}};
+
+			
 			var epm_total_chart = new google.visualization.ColumnChart(document.getElementById('epm_total_chart_div'));
 			var ppm_total_chart = new google.visualization.ColumnChart(document.getElementById('ppm_total_chart_div'));
 			var bpm_total_chart = new google.visualization.ColumnChart(document.getElementById('bpm_total_chart_div'));
@@ -424,9 +469,10 @@ if __name__ == '__main__':
 			var sip_ppm_chart = new google.visualization.AreaChart(document.getElementById('sip_ppm_chart_div'));
 			var sip_bpm_chart = new google.visualization.AreaChart(document.getElementById('sip_bpm_chart_div'));		
 
+			var policy_epm_chart = new google.visualization.AreaChart(document.getElementById('policy_epm_chart_div'));
+			var policy_ppm_chart = new google.visualization.AreaChart(document.getElementById('policy_ppm_chart_div'));
+			var policy_bpm_chart = new google.visualization.AreaChart(document.getElementById('policy_bpm_chart_div'));
 			
-
-
 			epm_total_chart.draw(epm_total_data, epm_total_options);
 			ppm_total_chart.draw(ppm_total_data, ppm_total_options);
 			bpm_total_chart.draw(bpm_total_data, bpm_total_options);
@@ -442,6 +488,10 @@ if __name__ == '__main__':
 			sip_epm_chart.draw(sip_epm_data, sip_epm_options);
 			sip_ppm_chart.draw(sip_ppm_data, sip_ppm_options);
 			sip_bpm_chart.draw(sip_bpm_data, sip_bpm_options);
+
+			policy_epm_chart.draw(policy_epm_data, policy_epm_options);
+			policy_ppm_chart.draw(policy_ppm_data, policy_ppm_options);
+			policy_bpm_chart.draw(policy_bpm_data, policy_bpm_options);
 
 		  }}
 
@@ -517,6 +567,18 @@ if __name__ == '__main__':
 	  }}
 
 	  #sip_bpm_chart_div {{
+		height: 50vh;
+	  }}
+
+	  #policy_epm_chart_div {{
+		height: 50vh;
+	  }}
+
+	  #policy_ppm_chart_div {{
+		height: 50vh;
+	  }}
+
+	  #policy_bpm_chart_div {{
 		height: 50vh;
 	  }}
 
@@ -647,7 +709,35 @@ if __name__ == '__main__':
 			{sip_bw_table}
 			</td>
 		  </tr>	  	  
-		  
+
+---
+
+		  <tr>
+			<td><div id="policy_epm_chart_div" style="height: 600px;"></td>
+			<td><div id="policy_ppm_chart_div" style="height: 600px;"></td>
+			<td><div id="policy_bpm_chart_div" style="height: 600px;"></td>
+		  </tr>
+
+		  <tr>
+			<td colspan="3">
+			<h4>Security Events table by Policy</h4>
+			{policy_events_trends_table}
+			</td>
+		  </tr>
+		  <tr>
+			<td colspan="3">
+			<h4>Malicious packets table ({pkt_units}) by source IP</h4>
+			{policy_packets_table}
+			</td>
+		  </tr>
+		  <tr>
+			<td colspan="3">
+			<h4>Malicious bandwidth table (Megabytes) by source IP</h4>
+			{policy_bw_table}
+			</td>
+		  </tr>	  
+
+
 		</tbody>
 
 	  </table>
