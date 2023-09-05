@@ -429,7 +429,7 @@ if __name__ == '__main__':
 
 
 			var policy_epm_options = {{
-			  title: 'Security Events trends',
+			  title: 'Security Events trends by Policy',
 			  vAxis: {{minValue: 0}},
 			  isStacked: true,
 			  legend: {{position: 'top', maxLines: 5}},
@@ -437,7 +437,7 @@ if __name__ == '__main__':
 			}};
 
 			var policy_ppm_options = {{
-			  title: 'Malicious Packets trends ({pkt_units})',
+			  title: 'Malicious Packets trends ({pkt_units}) by Policy',
 			  vAxis: {{minValue: 0}},
 			  isStacked: true,
 			  legend: {{position: 'top', maxLines: 5}},
@@ -445,7 +445,7 @@ if __name__ == '__main__':
 			}};
 
 			var policy_bpm_options = {{
-			  title: 'Malicious Bandwidth trends ({bw_units})',
+			  title: 'Malicious Bandwidth trends ({bw_units}) by Policy',
 			  vAxis: {{minValue: 0}},
 			  isStacked: true,
 			  legend: {{position: 'top', maxLines: 5}},
