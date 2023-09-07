@@ -29,6 +29,8 @@ V7.0.4 9/5/2023
 	- Fixed "Traffic in Megabits" units in pdf
 	- Fixed "Malicious bandwidth by Device trend" units in pdf report
 
+V7.0.5 9/7/2023
+	- Skipped sending report html and report txt files in the email
 ===========================================================================================================================
 Instructions how to deploy as a docker container (on Vision example):
  

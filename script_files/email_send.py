@@ -646,14 +646,18 @@ def send_report(SMTP_AUTH,SMTP_SERVER,SMTP_SERVER_PORT,SMTP_SENDER,SMTP_PASSWORD
                                 try:
                                         if int(filename.split("_")[2]) == int(currentmonth) and int(filename.split("_")[3].split(".")[0]) == int(currentyear):
                                                 if os.stat(os.path.join(root, filename)).st_size < 5000000:
-                                                        # print(f'sending {os.path.join(root, filename)}')
-                                                        attachment = open(os.path.join(root, filename), "rb")
-                                                        p = MIMEBase('application', 'octet-stream')
-                                                        p.set_payload((attachment).read())
-                                                        encoders.encode_base64(p)
-                                                        p.add_header('Content-Disposition', "attachment; filename= %s" % filename)
-                                                        msg.attach(p)
-                                                        attachment.close()
+
+                                                        #add condition if filename is not report_USCC_08_2023.htm
+                                                        if filename !=f"report_{cust_id}_{currentmonth}_{currentyear}.htm" and filename !=f"report_{cust_id}_{currentmonth}_{currentyear}.txt":
+                                                                
+                                                                print(f'sending {os.path.join(root, filename)}')
+                                                                attachment = open(os.path.join(root, filename), "rb")
+                                                                p = MIMEBase('application', 'octet-stream')
+                                                                p.set_payload((attachment).read())
+                                                                encoders.encode_base64(p)
+                                                                p.add_header('Content-Disposition', "attachment; filename= %s" % filename)
+                                                                msg.attach(p)
+                                                                attachment.close()
                                 except:
                                         print(f"Skipping file {filename} from attaching to the email- not in the correct format")
                                         continue
