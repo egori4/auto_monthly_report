@@ -124,13 +124,18 @@ def trends_move(data, units="events"):
 		
 		difference = abs(int(count_last) - int(count_previous))
 
+		if count_previous == 0:
+			difference_percentage = 100
+		else:
+			difference_percentage = (difference / count_previous) * 100
+
 		#check if difference is float
 
 
 		if isinstance(difference, float):
 			difference = round(difference, 2)
 
-		change = f"by {difference} {units} - from {count_previous} to {count_last} {units} "
+		change = f"by {difference_percentage:.2f}% - from {count_previous} to {count_last} {units} by a total of {difference} {units}  "
 
 		analysis += f'<li><strong>{name}:</strong><ul><li> {trend} {change}</li></ul>'
 
@@ -146,11 +151,12 @@ def trends_move_total(data, units="events"):
 
 	trend = "increased" if last_total > prev_total else "decreased"
 	difference = abs(last_total - prev_total)
+	percentage_difference = (difference / float(prev_total)) * 100
 	
 	if isinstance(difference, float):
 		difference = round(difference, 2)
 
-	result = f"This month the total number of {units} {trend} by {difference} {units} - from {prev_total} to {last_total} {units}"
+	result = f"This month the total number of {units} {trend} by {percentage_difference:.2f}%- from {prev_total} to {last_total} {units} by a total of {difference} {units}"
 	return result
 
 

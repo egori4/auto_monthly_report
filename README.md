@@ -31,6 +31,13 @@ V7.0.4 9/5/2023
 
 V7.0.5 9/7/2023
 	- Skipped sending report html and report txt files in the email
+
+V7.0.6 9/20/2023
+	- analyze_trends.py
+		- added calculation of % in trends
+	- abuseipdb.py
+		- Updated healthcheck to https://api.abuseipdb.com/api/v2/check
+		
 ===========================================================================================================================
 Instructions how to deploy as a docker container (on Vision example):
  

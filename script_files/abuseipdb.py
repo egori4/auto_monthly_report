@@ -36,14 +36,13 @@ def internet_conn():
 	}
 
 	try:
-		response = requests.request(method='GET', url=url, headers=headers, params=querystring)
-
+		response = requests.request(method='GET', url=url, headers=headers, params=querystring, verify=False)
 		if response.status_code == 200:
 			print('Internet connection is available.')
 			return True
 		
 		else:
-			print('Healtcheck response is not 200 OK')
+			print(f'Healtcheck response is {response.status_code}')
 			return False
 	except:
 		print("No internet connection")
@@ -65,7 +64,7 @@ def abuseipdb_call(ipAddress, cust_id):
 		'Key': aipdb_key
 	}
 
-	response = requests.request(method='GET', url=url, headers=headers, params=querystring)
+	response = requests.request(method='GET', url=url, headers=headers, params=querystring, verify=False)
 
 	# Formatted output
 	decodedResponse = json.loads(response.text)
