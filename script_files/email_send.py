@@ -499,7 +499,7 @@ def email_body(cust_id):
                         <tr>
                         <td style="font-family: sans-serif; font-size: 14px; vertical-align: top;" valign="top">
                                 <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px;">Dear {cust_id} Team,</p>
-                                <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px;">This email is an automated reccurring monthly report.</p>
+                                <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px;">This email is an automated recurring monthly report.</p>
                                                         <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px;"><h4>High-Level summary:</h4></p>    
                                 <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px;">{html_summary}</p>
                                 <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px;">The most aggressive DDoS attack mitigated by Radware on-premises equipment was a {attack_cat_maxAttackRateBps} type {attack_name_maxAttackRateBps}. The attack occurred on {attack_start_maxAttackRateBps}(UTC) lasting {dur_maxAttackRateBps_min} min, directed at destination IP {dst_ip_maxAttackRateBps} at peak rate of {attack_maxbps_maxAttackRateBps_formatted} Gbps. The mitigation equipment dropped cumulatively {attack_pkt_maxAttackRateBps} packets for a total of {attack_bw_maxAttackRateBps_formatted} GB data during this attack.</p>
