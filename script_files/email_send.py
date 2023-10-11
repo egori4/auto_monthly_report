@@ -114,7 +114,7 @@ def email_body(cust_id):
 
         total_mal_bw = '{:.2f}'.format(float(data_month['packetBandwidth'].sum()/8000000000))
 
-        html_summary = f"{cust_id}’s on-premise Radware appliances scrubbed {total_mal_bw}TB of attack traffic to protect titles and services."
+        html_summary = f"{cust_id}’s on-premises Radware appliances scrubbed {total_mal_bw}TB of attack traffic to protect titles and services."
 
         ###########Setting variables for Top #1 by max Gbps#################
         device_maxAttackRateBps = data_month.sort_values(by=['maxAttackRateBps'], ascending=False).iloc[0]['deviceName']
@@ -155,7 +155,7 @@ def email_body(cust_id):
                         events_text = f'This month, the number of events has decreased from {total_events_prev} to {total_events} by a total of {events_delta} events compared to the previous month.'
 
                 if events_delta == 0:
-                        events_text = f'This month, the amount of events remained the same as a previous month - {total_events} events in total.'
+                        events_text = f'This month, the number of events remained the same as a previous month - {total_events} events in total.'
 
         else:
                 events_text = f'No data collected for the previous month.'
@@ -170,13 +170,13 @@ def email_body(cust_id):
                 pkts_delta = float(total_mal_pkts) - float(total_mal_pkts_prev)
 
                 if pkts_delta > 0:
-                        pkts_text = f'This month, amount of malicious packets has increased from {format(int(total_mal_pkts_prev), ",d")} Mil to {format(int(total_mal_pkts), ",d")} Mil by a total of {format(abs(int(pkts_delta)), ",d")} Mil, compared to the previous month.'
+                        pkts_text = f'This month, the number of malicious packets has increased from {format(int(total_mal_pkts_prev), ",d")} Mil to {format(int(total_mal_pkts), ",d")} Mil by a total of {format(abs(int(pkts_delta)), ",d")} Mil, compared to the previous month.'
 
                 if pkts_delta < 0:
-                        pkts_text = f'This month, amount of malicious packets has decreased from {format(int(total_mal_pkts_prev), ",d")} Mil to {format(int(total_mal_pkts), ",d")} Mil by a total of {format(abs(int(pkts_delta)), ",d")} Mil, compared to the previous month.'
+                        pkts_text = f'This month, the number of malicious packets has decreased from {format(int(total_mal_pkts_prev), ",d")} Mil to {format(int(total_mal_pkts), ",d")} Mil by a total of {format(abs(int(pkts_delta)), ",d")} Mil, compared to the previous month.'
 
                 if pkts_delta == 0:
-                        pkts_text = f'This month, amount of malicious packets remained the same as a previous month - {format(int(total_mal_pkts), ",d")} Mil malicious packets in total.'
+                        pkts_text = f'This month, the number of malicious packets remained the same as a previous month - {format(int(total_mal_pkts), ",d")} Mil malicious packets in total.'
 
         else:
                 pkts_text = f'No data collected for the previous month.'
@@ -191,13 +191,13 @@ def email_body(cust_id):
                 bw_delta = float(total_mal_bw) - float(total_mal_bw_prev)
 
                 if bw_delta > 0:
-                        bw_text = f'This month, amount of malicious bandwidth has increased from {"{:.2f}".format(abs(total_mal_bw_prev))} TB to {"{:.2f}".format(abs(total_mal_bw))} TB by a total of {"{:.2f}".format(abs(bw_delta))} TB, compared to the previous month.'
+                        bw_text = f'This month, the amount of malicious bandwidth has increased from {"{:.2f}".format(abs(total_mal_bw_prev))} TB to {"{:.2f}".format(abs(total_mal_bw))} TB by a total of {"{:.2f}".format(abs(bw_delta))} TB, compared to the previous month.'
 
                 if bw_delta < 0:
-                        bw_text = f'This month, amount of malicious bandwidth has decreased from {"{:.2f}".format(abs(total_mal_bw_prev))} TB to {"{:.2f}".format(abs(total_mal_bw))} TB by a total of {"{:.2f}".format(abs(bw_delta))} TB, compared to the previous month.'
+                        bw_text = f'This month, the amount of malicious bandwidth has decreased from {"{:.2f}".format(abs(total_mal_bw_prev))} TB to {"{:.2f}".format(abs(total_mal_bw))} TB by a total of {"{:.2f}".format(abs(bw_delta))} TB, compared to the previous month.'
 
                 if bw_delta == 0:
-                        bw_text = f'This month, amount of malicious bandwidth remained the same as a previous month - {"{:.2f}".format(abs(total_mal_bw))} TB of malicious bandwidth in total.'
+                        bw_text = f'This month, the amount of malicious bandwidth remained the same as a previous month - {"{:.2f}".format(abs(total_mal_bw))} TB of malicious bandwidth in total.'
 
         else:
                 bw_text = f'No data collected for the previous month.'
@@ -499,10 +499,10 @@ def email_body(cust_id):
                         <tr>
                         <td style="font-family: sans-serif; font-size: 14px; vertical-align: top;" valign="top">
                                 <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px;">Dear {cust_id} Team,</p>
-                                <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px;">This email is an automated reoccuring monthly report.</p>
+                                <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px;">This email is an automated reccurring monthly report.</p>
                                                         <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px;"><h4>High-Level summary:</h4></p>    
                                 <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px;">{html_summary}</p>
-                                <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px;">The most aggressive DDoS attack mitigated by Radware on-premise equipment was a {attack_cat_maxAttackRateBps} type {attack_name_maxAttackRateBps}. The attack occurred on {attack_start_maxAttackRateBps}(UTC) lasting {dur_maxAttackRateBps_min} min, directed at destination IP {dst_ip_maxAttackRateBps} at peak rate of {attack_maxbps_maxAttackRateBps_formatted} Gbps. The mitigation equipment dropped cumulatively {attack_pkt_maxAttackRateBps} packets for a total of {attack_bw_maxAttackRateBps_formatted} GB data during this attack.</p>
+                                <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px;">The most aggressive DDoS attack mitigated by Radware on-premises equipment was a {attack_cat_maxAttackRateBps} type {attack_name_maxAttackRateBps}. The attack occurred on {attack_start_maxAttackRateBps}(UTC) lasting {dur_maxAttackRateBps_min} min, directed at destination IP {dst_ip_maxAttackRateBps} at peak rate of {attack_maxbps_maxAttackRateBps_formatted} Gbps. The mitigation equipment dropped cumulatively {attack_pkt_maxAttackRateBps} packets for a total of {attack_bw_maxAttackRateBps_formatted} GB data during this attack.</p>
                                                         <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px;"><h4>Month to month trends</h4></p>    
                                 <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px;">{events_text}</p>
                                 <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px;">{pkts_text}</p>

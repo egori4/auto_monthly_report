@@ -125,7 +125,7 @@ def trends_move(data, units="events"):
 		difference = abs(int(count_last) - int(count_previous))
 
 		if count_previous == 0:
-			difference_percentage = 100
+			difference_percentage = "N/A"
 		else:
 			difference_percentage = (difference / count_previous) * 100
 
@@ -135,8 +135,11 @@ def trends_move(data, units="events"):
 		if isinstance(difference, float):
 			difference = round(difference, 2)
 
-		change = f"by {difference_percentage:.2f}% - from {count_previous} to {count_last} {units} by a total of {difference} {units}  "
-
+		if difference_percentage == "N/A":
+			change = f"by N/A %  - from {count_previous} to {count_last} {units} by a total of {difference} {units} "
+		else:
+			change = f"by {difference_percentage:.2f}% - from {count_previous} to {count_last} {units} by a total of {difference} {units} "
+	
 		analysis += f'<li><strong>{name}:</strong><ul><li> {trend} {change}</li></ul>'
 
 	analysis += '</ul>'
@@ -714,10 +717,7 @@ if __name__ == '__main__':
 			<h4>Malicious bandwidth table (Megabytes) by source IP</h4>
 			{sip_bw_table}
 			</td>
-		  </tr>	  	  
-
----
-
+		  </tr>
 		  <tr>
 			<td><div id="policy_epm_chart_div" style="height: 600px;"></td>
 			<td><div id="policy_ppm_chart_div" style="height: 600px;"></td>
@@ -732,13 +732,13 @@ if __name__ == '__main__':
 		  </tr>
 		  <tr>
 			<td colspan="3">
-			<h4>Malicious packets table ({pkt_units}) by source IP</h4>
+			<h4>Malicious packets table ({pkt_units}) by Policy</h4>
 			{policy_packets_table}
 			</td>
 		  </tr>
 		  <tr>
 			<td colspan="3">
-			<h4>Malicious bandwidth table (Megabytes) by source IP</h4>
+			<h4>Malicious bandwidth table (Megabytes) by Policy</h4>
 			{policy_bw_table}
 			</td>
 		  </tr>	  

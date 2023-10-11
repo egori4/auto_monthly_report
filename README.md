@@ -37,7 +37,9 @@ V7.0.6 9/20/2023
 		- added calculation of % in trends
 	- abuseipdb.py
 		- Updated healthcheck to https://api.abuseipdb.com/api/v2/check
-		
+
+v7.0.7 10/11/2023
+	- Fixed tables names, phrasing, grammar errors
 ===========================================================================================================================
 Instructions how to deploy as a docker container (on Vision example):
  
