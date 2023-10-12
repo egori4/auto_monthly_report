@@ -42,7 +42,7 @@ define('PASSWORD', 'mservices'); // Password for .ZIP files
 $globals->doPDF   = false;
 $globals->doPNG   = false;
 $globals->doEmail = false;
-$globals->doZip   = true;
+$globals->doZip   = false;
 $globals->timing  = false;
 $globals->path    = str_replace(DIRECTORY_SEPARATOR, '/', dirname(realpath($argv[0])));
 $globals->version = VERSION;
