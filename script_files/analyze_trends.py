@@ -15,7 +15,7 @@ reports_path = f"./report_files/{cust_id}/"
 
 #Units
 bw_units = "Gigabytes" #Can be configured "Gigabytes", "Terabytes" or "Megabytes"
-pkt_units = "Millions" #Can be configured "Millions" or "Billions"
+pkt_units = "Millions" #Can be configured "Millions" or "Billions" or "Thousands"
 
 def convert_csv_to_list_of_lists(filename):
 	# Open csv file and convert to list of lists function
@@ -64,6 +64,8 @@ def convert_packets_units(data, pkt_units):
 					value = value/1000000000
 				elif pkt_units == "Millions":
 					value = value/1000000
+				elif pkt_units == "Thousands":
+					value = value/1000
 				else:
 					print(f'Invalid packets unit is set under "pkt_units" variable in the script. Please set it to "Millions" or "Billions" ')
 				
@@ -154,7 +156,10 @@ def trends_move_total(data, units="events"):
 
 	trend = "increased" if last_total > prev_total else "decreased"
 	difference = abs(last_total - prev_total)
-	percentage_difference = (difference / float(prev_total)) * 100
+	if float(prev_total) == 0:
+		percentage_difference = "N/A"
+	else:
+		percentage_difference = (difference / float(prev_total)) * 100
 	
 	if isinstance(difference, float):
 		difference = round(difference, 2)
@@ -172,6 +177,8 @@ def format_numeric_value(value, bw_units=None, pkt_units=None):
 				value /= 1000000
 			elif pkt_units.lower() == 'billions':
 				value /= 1000000000
+			if pkt_units.lower() == 'thousands':
+				value /= 1000
 
 		if bw_units:
 			if bw_units.lower() == 'megabytes':

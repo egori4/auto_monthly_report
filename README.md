@@ -40,8 +40,13 @@ V7.0.6 9/20/2023
 
 v7.0.7 10/11/2023
 	- Fixed tables names, phrasing, grammar errors
-V7.0.8 10/12/223
+
+V7.0.8 10/12/2023
 	- Disabled zipping pdf in report.php
+
+V7.0.9 10/24/2023
+	- analyze_trends.py - added pkt_units "Thousands"
+
 ===========================================================================================================================
 Instructions how to deploy as a docker container (on Vision example):
  
