@@ -15,7 +15,7 @@ reports_path = f"./report_files/{cust_id}/"
 
 #Units
 bw_units = "Gigabytes" #Can be configured "Gigabytes", "Terabytes" or "Megabytes"
-pkt_units = "Millions" #Can be configured "Millions" or "Billions" or "Thousands"
+pkt_units = "Thousands" #Can be configured "Millions" or "Billions" or "Thousands"
 
 def convert_csv_to_list_of_lists(filename):
 	# Open csv file and convert to list of lists function
@@ -256,7 +256,7 @@ if __name__ == '__main__':
 	packets_trends_chart = convert_csv_to_list_of_lists(charts_tables_path + 'ppm_chart_lm.csv')
 	packets_trends_chart = convert_packets_units(packets_trends_chart, pkt_units)
 	packets_trends_move_text = trends_move(packets_trends_chart, ' packets(' + pkt_units + ')')
-	packets_table = csv_to_html_table(charts_tables_path + 'ppm_table_lm.csv',bw_units=None, pkt_units='Millions')
+	packets_table = csv_to_html_table(charts_tables_path + 'ppm_table_lm.csv',bw_units=None, pkt_units = "Thousands")
 
 
 	bw_trends = convert_csv_to_list_of_lists(charts_tables_path + 'bpm_chart_lm.csv')
@@ -273,7 +273,7 @@ if __name__ == '__main__':
 	packets_by_device_trends_chart_data = convert_csv_to_list_of_lists(charts_tables_path + 'device_ppm_chart_lm.csv')
 	packets_by_device_trends_chart_data = convert_packets_units(packets_by_device_trends_chart_data, pkt_units)
 	packets_by_device_trends_move_text = trends_move(packets_by_device_trends_chart_data, ' packets(' + pkt_units + ')')
-	packets_by_device_table = csv_to_html_table(charts_tables_path + 'device_ppm_table_lm.csv',bw_units=None, pkt_units='Millions')
+	packets_by_device_table = csv_to_html_table(charts_tables_path + 'device_ppm_table_lm.csv',bw_units=None, pkt_units = "Thousands")
 
 
 	bw_by_device_trends_chart_data = convert_csv_to_list_of_lists(charts_tables_path + 'device_bpm_chart_lm.csv')
@@ -289,7 +289,7 @@ if __name__ == '__main__':
 	sip_packets_trends_chart = convert_csv_to_list_of_lists(charts_tables_path + 'sip_ppm_chart_lm.csv')
 	sip_packets_trends_chart = convert_packets_units(sip_packets_trends_chart, pkt_units)
 	sip_packets_trends_move_text = trends_move(sip_packets_trends_chart, ' packets(' + pkt_units + ')')
-	sip_packets_table = csv_to_html_table(charts_tables_path + 'sip_ppm_table_lm.csv',bw_units=None, pkt_units='Millions')
+	sip_packets_table = csv_to_html_table(charts_tables_path + 'sip_ppm_table_lm.csv',bw_units=None, pkt_units = "Thousands")
 
 
 	sip_bw_trends_chart = convert_csv_to_list_of_lists(charts_tables_path + 'sip_bpm_chart_lm.csv')
@@ -306,7 +306,7 @@ if __name__ == '__main__':
 	policy_packets_trends_chart = convert_csv_to_list_of_lists(charts_tables_path + 'policy_ppm_chart_lm.csv')
 	policy_packets_trends_chart = convert_packets_units(policy_packets_trends_chart, pkt_units)
 	policy_packets_trends_move_text = trends_move(policy_packets_trends_chart, ' packets(' + pkt_units + ')')
-	policy_packets_table = csv_to_html_table(charts_tables_path + 'policy_ppm_table_lm.csv',bw_units=None, pkt_units='Millions')
+	policy_packets_table = csv_to_html_table(charts_tables_path + 'policy_ppm_table_lm.csv',bw_units=None, pkt_units = "Thousands")
 
 	policy_bw_trends_chart = convert_csv_to_list_of_lists(charts_tables_path + 'policy_bpm_chart_lm.csv')
 	policy_bw_trends_chart = convert_bw_units(policy_bw_trends_chart, bw_units)
