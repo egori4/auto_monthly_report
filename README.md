@@ -47,6 +47,11 @@ V7.0.8 10/12/2023
 V7.0.9 10/24/2023
 	- analyze_trends.py - added pkt_units "Thousands"
 
+V7.1 11/7/2023
+	- analyze_trends.py - added Title
+	- fixed pkt_units to be one variable
+	- added three charts - TopN all time high
+
 ===========================================================================================================================
 Instructions how to deploy as a docker container (on Vision example):
  

@@ -156,15 +156,21 @@ def trends_move_total(data, units="events"):
 
 	trend = "increased" if last_total > prev_total else "decreased"
 	difference = abs(last_total - prev_total)
-	if float(prev_total) == 0:
-		percentage_difference = "N/A"
-	else:
-		percentage_difference = (difference / float(prev_total)) * 100
-	
+
 	if isinstance(difference, float):
 		difference = round(difference, 2)
 
-	result = f"This month the total number of {units} {trend} by {percentage_difference:.2f}%- from {prev_total} to {last_total} {units} by a total of {difference} {units}"
+	if float(prev_total) == 0:
+		percentage_difference = "N/A"
+		result = f"This month the total number of {units} {trend} by {percentage_difference}%- from {prev_total} to {last_total} {units} by a total of {difference} {units}"
+
+	else:
+		percentage_difference = (difference / float(prev_total)) * 100
+		formatted_percentage_difference = f'{percentage_difference:.2f}%'
+		result = f"This month the total number of {units} {trend} by {formatted_percentage_difference}- from {prev_total} to {last_total} {units} by a total of {difference} {units}"
+
+	
+
 	return result
 
 
@@ -236,7 +242,7 @@ def write_html(html_page,month,year):
 
 if __name__ == '__main__':
 	
-	# Total events, packets and bandwidth trends
+	# Total events, packets and bandwidth trends (blue bars charts)
 	events_total_bar_chart = convert_csv_to_list_of_lists(charts_tables_path + 'epm_total_bar.csv')
 	events_total_bar_move_text = trends_move_total(events_total_bar_chart, 'events') 
 
@@ -248,7 +254,7 @@ if __name__ == '__main__':
 	bw_total_bar = convert_bw_units(bw_total_bar, bw_units)
 	bw_total_bar_move = trends_move_total(bw_total_bar, bw_units) 
 
-	################################################# Events, packets and bandwidth trends by Attack name  ##########################################################
+	################################################# Events, packets and bandwidth trends by Attack name sorted by the last month ##########################################################
 	events_trends = convert_csv_to_list_of_lists(charts_tables_path + 'epm_chart_lm.csv')
 	events_trends_move = trends_move(events_trends, 'events')
 	events_trends_table = csv_to_html_table(charts_tables_path + 'epm_table_lm.csv')
@@ -256,13 +262,46 @@ if __name__ == '__main__':
 	packets_trends_chart = convert_csv_to_list_of_lists(charts_tables_path + 'ppm_chart_lm.csv')
 	packets_trends_chart = convert_packets_units(packets_trends_chart, pkt_units)
 	packets_trends_move_text = trends_move(packets_trends_chart, ' packets(' + pkt_units + ')')
-	packets_table = csv_to_html_table(charts_tables_path + 'ppm_table_lm.csv',bw_units=None, pkt_units = "Thousands")
+	packets_table = csv_to_html_table(charts_tables_path + 'ppm_table_lm.csv',bw_units=None, pkt_units=pkt_units)
 
 
 	bw_trends = convert_csv_to_list_of_lists(charts_tables_path + 'bpm_chart_lm.csv')
 	bw_trends = convert_bw_units(bw_trends, bw_units)
 	bw_trends_move = trends_move(bw_trends, bw_units)
 	bw_table = csv_to_html_table(charts_tables_path + 'bpm_table_lm.csv',bw_units)
+
+
+
+
+	#!!!!!!!!!!!!!!!!!!
+	################################################# Events, packets and bandwidth trends by Attack name sorted by the overall sum of all months together ##########################################################
+
+
+	events_trends_alltimehigh = convert_csv_to_list_of_lists(charts_tables_path + 'epm_chart_alltimehigh.csv')
+	events_trends_move_alltimehigh = trends_move(events_trends_alltimehigh, 'events')
+	events_trends_table_alltimehigh = csv_to_html_table(charts_tables_path + 'epm_table_alltimehigh.csv')
+
+	packets_trends_chart_alltimehigh = convert_csv_to_list_of_lists(charts_tables_path + 'ppm_chart_alltimehigh.csv')
+	packets_trends_chart_alltimehigh = convert_packets_units(packets_trends_chart_alltimehigh, pkt_units)
+	packets_trends_move_text_alltimehigh = trends_move(packets_trends_chart_alltimehigh, ' packets(' + pkt_units + ')')
+	packets_table_alltimehigh = csv_to_html_table(charts_tables_path + 'ppm_table_alltimehigh.csv',bw_units=None, pkt_units=pkt_units)
+
+
+	bw_trends_alltimehigh = convert_csv_to_list_of_lists(charts_tables_path + 'bpm_chart_alltimehigh.csv')
+	bw_trends_alltimehigh = convert_bw_units(bw_trends_alltimehigh, bw_units)
+	bw_trends_move_alltimehigh = trends_move(bw_trends_alltimehigh, bw_units)
+	bw_table_alltimehigh = csv_to_html_table(charts_tables_path + 'bpm_table_alltimehigh.csv',bw_units)
+
+	#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+
+
+
+
+
+
+
 
 	################################################# Events, packets and bandwidth trends by Device  ##########################################################
 
@@ -273,7 +312,7 @@ if __name__ == '__main__':
 	packets_by_device_trends_chart_data = convert_csv_to_list_of_lists(charts_tables_path + 'device_ppm_chart_lm.csv')
 	packets_by_device_trends_chart_data = convert_packets_units(packets_by_device_trends_chart_data, pkt_units)
 	packets_by_device_trends_move_text = trends_move(packets_by_device_trends_chart_data, ' packets(' + pkt_units + ')')
-	packets_by_device_table = csv_to_html_table(charts_tables_path + 'device_ppm_table_lm.csv',bw_units=None, pkt_units = "Thousands")
+	packets_by_device_table = csv_to_html_table(charts_tables_path + 'device_ppm_table_lm.csv',bw_units=None, pkt_units=pkt_units)
 
 
 	bw_by_device_trends_chart_data = convert_csv_to_list_of_lists(charts_tables_path + 'device_bpm_chart_lm.csv')
@@ -289,7 +328,7 @@ if __name__ == '__main__':
 	sip_packets_trends_chart = convert_csv_to_list_of_lists(charts_tables_path + 'sip_ppm_chart_lm.csv')
 	sip_packets_trends_chart = convert_packets_units(sip_packets_trends_chart, pkt_units)
 	sip_packets_trends_move_text = trends_move(sip_packets_trends_chart, ' packets(' + pkt_units + ')')
-	sip_packets_table = csv_to_html_table(charts_tables_path + 'sip_ppm_table_lm.csv',bw_units=None, pkt_units = "Thousands")
+	sip_packets_table = csv_to_html_table(charts_tables_path + 'sip_ppm_table_lm.csv',bw_units=None, pkt_units=pkt_units)
 
 
 	sip_bw_trends_chart = convert_csv_to_list_of_lists(charts_tables_path + 'sip_bpm_chart_lm.csv')
@@ -306,7 +345,7 @@ if __name__ == '__main__':
 	policy_packets_trends_chart = convert_csv_to_list_of_lists(charts_tables_path + 'policy_ppm_chart_lm.csv')
 	policy_packets_trends_chart = convert_packets_units(policy_packets_trends_chart, pkt_units)
 	policy_packets_trends_move_text = trends_move(policy_packets_trends_chart, ' packets(' + pkt_units + ')')
-	policy_packets_table = csv_to_html_table(charts_tables_path + 'policy_ppm_table_lm.csv',bw_units=None, pkt_units = "Thousands")
+	policy_packets_table = csv_to_html_table(charts_tables_path + 'policy_ppm_table_lm.csv',bw_units=None, pkt_units=pkt_units)
 
 	policy_bw_trends_chart = convert_csv_to_list_of_lists(charts_tables_path + 'policy_bpm_chart_lm.csv')
 	policy_bw_trends_chart = convert_bw_units(policy_bw_trends_chart, bw_units)
@@ -335,6 +374,10 @@ if __name__ == '__main__':
 			var epm_data = google.visualization.arrayToDataTable({events_trends});
 			var ppm_data = google.visualization.arrayToDataTable({packets_trends_chart});
 			var bpm_data = google.visualization.arrayToDataTable({bw_trends});
+
+			var epm_data_alltimehigh = google.visualization.arrayToDataTable({events_trends_alltimehigh});
+			var ppm_data_alltimehigh = google.visualization.arrayToDataTable({packets_trends_chart_alltimehigh});
+			var bpm_data_alltimehigh = google.visualization.arrayToDataTable({bw_trends_alltimehigh});
 
 			var epm_by_device_data = google.visualization.arrayToDataTable({events_by_device_trends_chart_data});
 			var ppm_by_device_data = google.visualization.arrayToDataTable({packets_by_device_trends_chart_data});
@@ -371,7 +414,7 @@ if __name__ == '__main__':
 			}};
 
 			var epm_options = {{
-			  title: 'Security Events trends',
+			  title: 'Security Events trends - TopN by last month',
 			  vAxis: {{minValue: 0}},
 			  isStacked: true,
 			  legend: {{position: 'top', maxLines: 5}},
@@ -379,7 +422,7 @@ if __name__ == '__main__':
 			}};
 
 			var ppm_options = {{
-			  title: 'Malicious Packets trends ({pkt_units})',
+			  title: 'Malicious Packets trends ({pkt_units}) - TopN by last month',
 			  vAxis: {{minValue: 0}},
 			  isStacked: true,
 			  legend: {{position: 'top', maxLines: 5}},
@@ -387,12 +430,41 @@ if __name__ == '__main__':
 			}};
 
 			var bpm_options = {{
-			  title: 'Malicious Bandwidth trends ({bw_units})',
+			  title: 'Malicious Bandwidth trends ({bw_units}) - TopN by last month',
 			  vAxis: {{minValue: 0}},
 			  isStacked: true,
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
 			}};
+
+
+			
+			var epm_options_alltimehigh = {{
+			  title: 'Security Events trends - TopN all time high',
+			  vAxis: {{minValue: 0}},
+			  isStacked: true,
+			  legend: {{position: 'top', maxLines: 5}},
+			  width: '100%'
+			}};
+
+			
+			var ppm_options_alltimehigh = {{
+			  title: 'Malicious Packets trends ({pkt_units}) - TopN all time high',
+			  vAxis: {{minValue: 0}},
+			  isStacked: true,
+			  legend: {{position: 'top', maxLines: 5}},
+			  width: '100%'
+			}};
+
+			var bpm_options_alltimehigh = {{
+			  title: 'Malicious Bandwidth trends ({bw_units}) - TopN all time high',
+			  vAxis: {{minValue: 0}},
+			  isStacked: true,
+			  legend: {{position: 'top', maxLines: 5}},
+			  width: '100%'
+			}};
+
+
 
 			var epm_by_device_options = {{
 			  title: 'Events by device trends',
@@ -477,6 +549,12 @@ if __name__ == '__main__':
 			var ppm_chart = new google.visualization.AreaChart(document.getElementById('ppm_chart_div'));
 			var bpm_chart = new google.visualization.AreaChart(document.getElementById('bpm_chart_div'));
 
+			
+			var epm_chart_alltimehigh = new google.visualization.AreaChart(document.getElementById('epm_chart_div_alltimehigh'));
+			var ppm_chart_alltimehigh = new google.visualization.AreaChart(document.getElementById('ppm_chart_div_alltimehigh'));
+			var bpm_chart_alltimehigh = new google.visualization.AreaChart(document.getElementById('bpm_chart_div_alltimehigh'));
+
+			
 			var epm_by_device_chart = new google.visualization.AreaChart(document.getElementById('epm_by_device_chart_div'));
 			var ppm_by_device_chart = new google.visualization.AreaChart(document.getElementById('ppm_by_device_chart_div'));
 			var bpm_by_device_chart = new google.visualization.AreaChart(document.getElementById('bpm_by_device_chart_div'));
@@ -489,6 +567,9 @@ if __name__ == '__main__':
 			var policy_ppm_chart = new google.visualization.AreaChart(document.getElementById('policy_ppm_chart_div'));
 			var policy_bpm_chart = new google.visualization.AreaChart(document.getElementById('policy_bpm_chart_div'));
 			
+
+
+
 			epm_total_chart.draw(epm_total_data, epm_total_options);
 			ppm_total_chart.draw(ppm_total_data, ppm_total_options);
 			bpm_total_chart.draw(bpm_total_data, bpm_total_options);
@@ -496,6 +577,12 @@ if __name__ == '__main__':
 			epm_chart.draw(epm_data, epm_options);
 			ppm_chart.draw(ppm_data, ppm_options);
 			bpm_chart.draw(bpm_data, bpm_options);
+
+			
+			epm_chart_alltimehigh.draw(epm_data_alltimehigh, epm_options_alltimehigh);
+			ppm_chart_alltimehigh.draw(ppm_data_alltimehigh, ppm_options_alltimehigh);
+			bpm_chart_alltimehigh.draw(bpm_data_alltimehigh, bpm_options_alltimehigh);
+
 
 			epm_by_device_chart.draw(epm_by_device_data, epm_by_device_options);
 			ppm_by_device_chart.draw(ppm_by_device_data, ppm_by_device_options);
@@ -562,6 +649,20 @@ if __name__ == '__main__':
 		height: 50vh;
 	  }}
 
+
+	  #epm_chart_div_alltimehigh {{
+		height: 50vh;
+	  }}
+
+	  #ppm_chart_div_alltimehigh {{
+		height: 50vh;
+	  }}
+
+	  #bpm_chart_div_alltimehigh {{
+		height: 50vh;
+	  }}
+	  
+
 	  #epm_by_device_chart_div {{
 		height: 50vh;
 	  }}
@@ -602,8 +703,16 @@ if __name__ == '__main__':
 	<title>Radware Monthly Reports</title>
 	</head>
 	<body>
+
 	  <table>
 		<thead>
+
+		  <tr>
+			<td colspan="3">
+			<h1>Radware Monthly report - {cust_id}</h1>
+			</td>
+		  </tr>
+
 		  <tr>
 			<th>Month to month trends by Security Events count</th>
 			<th>Month to month trends by Malicious Packets(cumulative)</th>
@@ -617,6 +726,13 @@ if __name__ == '__main__':
 			<td><div id="bpm_total_chart_div"></td>
 		  </tr>
 
+		  <tr>
+			<td><div id="epm_chart_div_alltimehigh" style="height: 600px;"></td>
+			<td><div id="ppm_chart_div_alltimehigh" style="height: 600px;"></td>
+			<td><div id="bpm_chart_div_alltimehigh" style="height: 600px;"></td>
+		  </tr>
+
+		  
 		  <tr>
 			<td><div id="epm_chart_div" style="height: 600px;"></td>
 			<td><div id="ppm_chart_div" style="height: 600px;"></td>
