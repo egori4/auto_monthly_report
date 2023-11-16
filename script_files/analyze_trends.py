@@ -269,6 +269,10 @@ def epm_html(epm):
 	series_epm = data_month_epm.groupby(['name','deviceName','ruleName']).size().sort_values(ascending=False).apply(format_with_commas).head(10)
 	epm_html = series_epm.to_frame('Count')
 	epm_html=epm_html.to_html()
+
+	for device_ip, device_name in defensepros.items():
+		epm_html=epm_html.replace(device_ip, device_name)
+
 	return epm_html
 
 def ppm_html(ppm):
@@ -276,6 +280,10 @@ def ppm_html(ppm):
 	series_ppm = data_month_ppm.groupby(['name','deviceName','ruleName']).sum()['packetCount'].sort_values(ascending=False).apply(format_with_commas).head(10)
 	ppm_html = series_ppm.to_frame('Malicious Packets')
 	ppm_html=ppm_html.to_html()
+
+	for device_ip, device_name in defensepros.items():
+		ppm_html=ppm_html.replace(device_ip, device_name)
+
 	return ppm_html
 
 def bpm_html(bpm):
@@ -283,6 +291,10 @@ def bpm_html(bpm):
 	series_bpm = data_month_bpm.groupby(['name','deviceName','ruleName']).sum()['packetBandwidth'].sort_values(ascending=False).apply(format_with_commas).head(10)
 	df_bpm_html = series_bpm.to_frame('Malicious Bandwidth')
 	df_bpm_html=df_bpm_html.to_html()
+
+	for device_ip, device_name in defensepros.items():
+		df_bpm_html=df_bpm_html.replace(device_ip, device_name)
+
 	return df_bpm_html
 
 
