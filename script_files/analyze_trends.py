@@ -1,17 +1,27 @@
-
-
+import pandas as pd
+import sqlite3
 import csv
 import sys
 import pandas as pd
+import json
 
 cust_id = sys.argv[1]
 month = sys.argv[2]
 year = sys.argv[3]
 
 
+
+customers_json = json.loads(open("./config_files/customers.json", "r").read())
+
+for cust_config_block in customers_json:
+	if cust_config_block['id'].lower() == cust_id.lower():
+		defensepros = cust_config_block['defensepros']
+
+
 # Paths
 charts_tables_path = f"./tmp_files/{cust_id}/"
 reports_path = f"./report_files/{cust_id}/"
+db_path = f'./database_files/{cust_id}/'
 
 #Units
 bw_units = "Gigabytes" #Can be configured "Gigabytes", "Terabytes" or "Megabytes"
@@ -219,7 +229,7 @@ def csv_to_html_table(filename, bw_units=None, pkt_units=None):
 	df = pd.read_csv(filename)
 
 	# Apply formatting to numeric columns
-	if bw_units or pkt_units:
+	if bw_units or pkt_units and filename!=charts_tables_path + 'sip_ppm_table_lm.csv':
 		formatted_df = df.applymap(lambda x: format_numeric_value(x, bw_units, pkt_units))
 	
 	else:
@@ -239,6 +249,155 @@ def write_html(html_page,month,year):
 		f.write(html_page)
 
 
+def extract_values_from_csv(csv_file):
+    values = []
+
+    with open(charts_tables_path + csv_file, 'r') as csv_file:
+        csv_reader = csv.reader(csv_file)
+        
+        # Skip the header row
+        next(csv_reader)
+
+        # Extract values from the first column
+        for row in csv_reader:
+            values.append(row[0])
+
+    return values
+
+def epm_html(epm):
+	data_month_epm = data_month[data_month['name'] == epm]
+	series_epm = data_month_epm.groupby(['name','deviceName','ruleName']).size().sort_values(ascending=False).apply(format_with_commas).head(10)
+	epm_html = series_epm.to_frame('Count')
+	epm_html=epm_html.to_html()
+	return epm_html
+
+def ppm_html(ppm):
+	data_month_ppm = data_month[data_month['name'] == ppm]
+	series_ppm = data_month_ppm.groupby(['name','deviceName','ruleName']).sum()['packetCount'].sort_values(ascending=False).apply(format_with_commas).head(10)
+	ppm_html = series_ppm.to_frame('Malicious Packets')
+	ppm_html=ppm_html.to_html()
+	return ppm_html
+
+def bpm_html(bpm):
+	data_month_bpm = data_month[data_month['name'] == bpm]
+	series_bpm = data_month_bpm.groupby(['name','deviceName','ruleName']).sum()['packetBandwidth'].sort_values(ascending=False).apply(format_with_commas).head(10)
+	df_bpm_html = series_bpm.to_frame('Malicious Bandwidth')
+	df_bpm_html=df_bpm_html.to_html()
+	return df_bpm_html
+
+
+
+def device_epm_html(device_epm):
+
+	for device_ip, device_name in defensepros.items():
+		if device_name == device_epm:
+
+			data_month_epm = data_month[data_month['deviceName'] == device_ip]
+			device_series_epm = data_month_epm.groupby(['deviceName','name','ruleName']).size().sort_values(ascending=False).apply(format_with_commas).head(10)
+			device_epm_html = device_series_epm.to_frame('Count')
+			device_epm_html=device_epm_html.to_html().replace(device_ip, device_name)
+			
+	return device_epm_html
+
+def device_ppm_html(device_ppm):
+	for device_ip, device_name in defensepros.items():
+		if device_name == device_ppm:
+			data_month_ppm = data_month[data_month['deviceName'] == device_ip]
+			device_series_ppm = data_month_ppm.groupby(['deviceName','name','ruleName']).sum()['packetCount'].sort_values(ascending=False).apply(format_with_commas).head(10)
+			device_ppm_html = device_series_ppm.to_frame('Malicious Packets')
+			device_ppm_html=device_ppm_html.to_html().replace(device_ip, device_name)
+	
+	return device_ppm_html
+
+def device_bpm_html(device_bpm):
+
+	for device_ip, device_name in defensepros.items():
+		if device_name == device_bpm:
+			data_month_bpm = data_month[data_month['deviceName'] == device_ip]
+			device_series_bpm = data_month_bpm.groupby(['deviceName','name','ruleName']).sum()['packetBandwidth'].sort_values(ascending=False).apply(format_with_commas).head(10)
+			device_df_bpm_html = device_series_bpm.to_frame('Malicious Bandwidth')
+			device_df_bpm_html= device_df_bpm_html.to_html().replace(device_ip, device_name)
+
+
+	return device_df_bpm_html
+
+
+def policy_epm_html(policy_epm):
+
+	data_month_epm = data_month[data_month['ruleName'] == policy_epm]
+	series_epm = data_month_epm.groupby(['ruleName','name','deviceName']).size().sort_values(ascending=False).apply(format_with_commas).head(10)
+	epm_html = series_epm.to_frame('Count')
+	epm_html=epm_html.to_html()
+
+	for device_ip, device_name in defensepros.items():
+		epm_html=epm_html.replace(device_ip, device_name)
+		
+	return epm_html
+
+def policy_ppm_html(policy_ppm):
+	data_month_ppm = data_month[data_month['ruleName'] == policy_ppm]
+	series_ppm = data_month_ppm.groupby(['ruleName','name','deviceName']).sum()['packetCount'].sort_values(ascending=False).apply(format_with_commas).head(10)
+	ppm_html = series_ppm.to_frame('Malicious Packets')
+	ppm_html=ppm_html.to_html()
+	
+	for device_ip, device_name in defensepros.items():
+		ppm_html=ppm_html.replace(device_ip, device_name)
+	
+	return ppm_html
+
+def policy_bpm_html(policy_bpm):
+	data_month_bpm = data_month[data_month['ruleName'] == policy_bpm]
+	series_bpm = data_month_bpm.groupby(['ruleName','name','deviceName']).sum()['packetBandwidth'].sort_values(ascending=False).apply(format_with_commas).head(10)
+	df_bpm_html = series_bpm.to_frame('Malicious Bandwidth')
+	df_bpm_html=df_bpm_html.to_html()
+
+	for device_ip, device_name in defensepros.items():
+		df_bpm_html=df_bpm_html.replace(device_ip, device_name)
+	
+	return df_bpm_html
+
+
+def sip_epm_html(sip_epm):
+
+	data_month_epm = data_month[data_month['sourceAddress'] == sip_epm]
+	series_epm = data_month_epm.groupby(['sourceAddress','name','deviceName','ruleName']).size().sort_values(ascending=False).apply(format_with_commas).head(10)
+	epm_html = series_epm.to_frame('Count')
+	epm_html=epm_html.to_html()
+
+	for device_ip, device_name in defensepros.items():
+		epm_html=epm_html.replace(device_ip, device_name)
+		
+	return epm_html
+
+
+def sip_ppm_html(sip_ppm):
+	data_month_ppm = data_month[data_month['sourceAddress'] == sip_ppm]
+	series_ppm = data_month_ppm.groupby(['sourceAddress','name','deviceName','ruleName']).sum()['packetCount'].sort_values(ascending=False).apply(format_with_commas).head(10)
+	ppm_html = series_ppm.to_frame('Malicious Packets')
+	ppm_html=ppm_html.to_html()
+	
+	for device_ip, device_name in defensepros.items():
+		ppm_html=ppm_html.replace(device_ip, device_name)
+	
+	return ppm_html
+
+def sip_bpm_html(sip_bpm):
+	data_month_bpm = data_month[data_month['sourceAddress'] == sip_bpm]
+	series_bpm = data_month_bpm.groupby(['sourceAddress','name','deviceName','ruleName']).sum()['packetBandwidth'].sort_values(ascending=False).apply(format_with_commas).head(10)
+	df_bpm_html = series_bpm.to_frame('Malicious Bandwidth')
+	df_bpm_html=df_bpm_html.to_html()
+
+	for device_ip, device_name in defensepros.items():
+		df_bpm_html=df_bpm_html.replace(device_ip, device_name)
+	
+	return df_bpm_html
+
+
+
+
+
+def format_with_commas(value):
+    return '{:,}'.format(value)
 
 if __name__ == '__main__':
 	
@@ -270,10 +429,103 @@ if __name__ == '__main__':
 	bw_trends_move = trends_move(bw_trends, bw_units)
 	bw_table = csv_to_html_table(charts_tables_path + 'bpm_table_lm.csv',bw_units)
 
+	################################################# Analyze deeper top category ##########################################################
+
+	#1 Create a data frame
+	con = sqlite3.connect(db_path + 'database_'+cust_id+'_'+str(month)+'.sqlite')
+	# data = pd.read_sql_query("SELECT * from attacks", con)
+	data_month = pd.read_sql_query(f"SELECT deviceName,month,year,packetBandwidth,name,packetCount,ruleName,category,sourceAddress,destAddress,startTime,endTime,startDate,attackIpsId,actionType,maxAttackPacketRatePps,maxAttackRateBps,destPort,protocol,geoLocation,durationRange,startDayOfMonth from attacks", con)
+	con.close()
+
+	#2 Extract Top Attacks list
+
+	epm_top_list=extract_values_from_csv('epm_table_lm.csv')
+	ppm_top_list=extract_values_from_csv('ppm_table_lm.csv')
+	bpm_top_list=extract_values_from_csv('bpm_table_lm.csv')
+
+	device_epm_top_list=extract_values_from_csv('device_epm_table_lm.csv')
+	device_ppm_top_list=extract_values_from_csv('device_ppm_table_lm.csv')
+	device_bpm_top_list=extract_values_from_csv('device_bpm_table_lm.csv')
+
+	policy_epm_top_list=extract_values_from_csv('policy_epm_table_lm.csv')
+	policy_ppm_top_list=extract_values_from_csv('policy_ppm_table_lm.csv')
+	policy_bpm_top_list=extract_values_from_csv('policy_bpm_table_lm.csv')
+
+	sip_epm_top_list=extract_values_from_csv('sip_epm_table_lm.csv')
+	sip_ppm_top_list=extract_values_from_csv('sip_ppm_table_lm.csv')
+	sip_bpm_top_list=extract_values_from_csv('sip_bpm_table_lm.csv')
+
+	#3 Create empty html table
+	epm_html_final = ''
+	ppm_html_final = ''
+	bpm_html_final = ''
+
+	device_epm_html_final = ''
+	device_ppm_html_final = ''
+	device_bpm_html_final = ''
+
+	policy_epm_html_final = ''
+	policy_ppm_html_final = ''
+	policy_bpm_html_final = ''
+
+	sip_epm_html_final = ''
+	sip_ppm_html_final = ''
+	sip_bpm_html_final = ''
+
+	#4 Iterate through each Device and popluate the html table
+
+	for index, value in enumerate(epm_top_list):
+		epm_html_final+=f'<h4>{value} distribution across devices and policies</h4>'
+		epm_html_final+= epm_html(epm_top_list[index])
+
+	for index, value in enumerate(ppm_top_list):
+		ppm_html_final+=f'<h4>{value} distribution across devices and policies</h4>'
+		ppm_html_final+= ppm_html(ppm_top_list[index])
+		
+	for index, value in enumerate(bpm_top_list):
+		bpm_html_final+=f'<h4>{value} distribution across devices and policies</h4>'
+		bpm_html_final+= bpm_html(bpm_top_list[index])
 
 
 
-	#!!!!!!!!!!!!!!!!!!
+	for index, value in enumerate(device_epm_top_list):
+		device_epm_html_final+=f'<h4>Top Attacks and policies for device {value}</h4>'
+		device_epm_html_final+= device_epm_html(device_epm_top_list[index])
+
+	for index, value in enumerate(device_ppm_top_list):
+		device_ppm_html_final+=f'<h4>Top Attacks and policies for device {value}</h4>'
+		device_ppm_html_final+= device_ppm_html(device_ppm_top_list[index])
+
+	for index, value in enumerate(device_bpm_top_list):
+		device_bpm_html_final+=f'<h4>Top Attacks and policies for device {value}</h4>'
+		device_bpm_html_final+= device_bpm_html(device_ppm_top_list[index])
+
+
+	for index, value in enumerate(policy_epm_top_list):
+		policy_epm_html_final+=f'<h4>Distribution of attacks and devices for policy {value}</h4>'
+		policy_epm_html_final+= policy_epm_html(policy_epm_top_list[index])
+
+	for index, value in enumerate(policy_ppm_top_list):
+		policy_ppm_html_final+=f'<h4>Distribution of attacks and devices for policy {value}</h4>'
+		policy_ppm_html_final+= policy_ppm_html(policy_ppm_top_list[index])
+		
+	for index, value in enumerate(policy_bpm_top_list):
+		policy_bpm_html_final+=f'<h4>Distribution of attacks and devices for policy {value}</h4>'
+		policy_bpm_html_final+= policy_bpm_html(policy_bpm_top_list[index])
+
+
+	for index, value in enumerate(sip_epm_top_list):
+		sip_epm_html_final+=f'<h4>Distribution of attacks and devices for Source IP {value}</h4>'
+		sip_epm_html_final+= sip_epm_html(sip_epm_top_list[index])
+
+	for index, value in enumerate(sip_ppm_top_list):
+		sip_ppm_html_final+=f'<h4>Distribution of attacks and devices for Source IP {value}</h4>'
+		sip_ppm_html_final+= sip_ppm_html(sip_ppm_top_list[index])
+		
+	for index, value in enumerate(sip_bpm_top_list):
+		sip_bpm_html_final+=f'<h4>Distribution of attacks and devices for Source IP {value}</h4>'
+		sip_bpm_html_final+= sip_bpm_html(sip_bpm_top_list[index])
+
 	################################################# Events, packets and bandwidth trends by Attack name sorted by the overall sum of all months together ##########################################################
 
 
@@ -291,16 +543,6 @@ if __name__ == '__main__':
 	bw_trends_alltimehigh = convert_bw_units(bw_trends_alltimehigh, bw_units)
 	bw_trends_move_alltimehigh = trends_move(bw_trends_alltimehigh, bw_units)
 	bw_table_alltimehigh = csv_to_html_table(charts_tables_path + 'bpm_table_alltimehigh.csv',bw_units)
-
-	#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-
-
-
-
-
-
-
 
 
 	################################################# Events, packets and bandwidth trends by Device  ##########################################################
@@ -732,12 +974,14 @@ if __name__ == '__main__':
 			<td><div id="bpm_chart_div_alltimehigh" style="height: 600px;"></td>
 		  </tr>
 
-		  
+
+
 		  <tr>
 			<td><div id="epm_chart_div" style="height: 600px;"></td>
 			<td><div id="ppm_chart_div" style="height: 600px;"></td>
 			<td><div id="bpm_chart_div" style="height: 600px;"></td>
 		  </tr>
+
 		  <tr>
 			<td style="text-align: left;">
 				<h4>Change in Security Events number by attack name this month compared to the previous month</h4>
@@ -751,6 +995,7 @@ if __name__ == '__main__':
 				{bw_total_bar_move}{bw_trends_move}</td>
 		  </tr>
 
+		  
 		  <tr>
 			<td colspan="3">
 			<h4>Security Events table</h4>
@@ -770,6 +1015,20 @@ if __name__ == '__main__':
 			</td>
 		  </tr>	  
 		  
+		  <tr>
+		 	<td>
+				{epm_html_final}
+			</td>
+		 	<td>
+				{ppm_html_final} 
+			</td>
+		 	<td>
+				{bpm_html_final}
+			</td>
+		  </tr>
+
+
+
 
 		  <tr>
 			<td><div id="epm_by_device_chart_div" style="height: 600px;"></td>
@@ -794,7 +1053,6 @@ if __name__ == '__main__':
 			</td>
 
 		  </tr>
-
 		  <tr>
 			<td colspan="3">
 			<h4>Security Events by device table</h4>
@@ -817,30 +1075,21 @@ if __name__ == '__main__':
 			</td>
 		  </tr>
 
-		  <tr>
-			<td><div id="sip_epm_chart_div" style="height: 600px;"></td>
-			<td><div id="sip_ppm_chart_div" style="height: 600px;"></td>
-			<td><div id="sip_bpm_chart_div" style="height: 600px;"></td>
-		  </tr>
 
 		  <tr>
-			<td colspan="3">
-			<h4>Security Events table by source IP</h4>
-			{sip_events_trends_table}
+		 	<td>
+				{device_epm_html_final}
+			</td>
+		 	<td>
+				{device_ppm_html_final}
+			</td>
+		 	<td>
+				{device_bpm_html_final}			
 			</td>
 		  </tr>
-		  <tr>
-			<td colspan="3">
-			<h4>Malicious packets table ({pkt_units}) by source IP</h4>
-			{sip_packets_table}
-			</td>
-		  </tr>
-		  <tr>
-			<td colspan="3">
-			<h4>Malicious bandwidth table (Megabytes) by source IP</h4>
-			{sip_bw_table}
-			</td>
-		  </tr>
+
+
+
 		  <tr>
 			<td><div id="policy_epm_chart_div" style="height: 600px;"></td>
 			<td><div id="policy_ppm_chart_div" style="height: 600px;"></td>
@@ -866,6 +1115,58 @@ if __name__ == '__main__':
 			</td>
 		  </tr>	  
 
+		  <tr>
+		 	<td>
+				{policy_epm_html_final}
+			</td>
+		 	<td>
+				{policy_ppm_html_final} 
+			</td>
+		 	<td>
+				{policy_bpm_html_final}
+			</td>
+		  </tr>
+
+
+
+		  <tr>
+			<td><div id="sip_epm_chart_div" style="height: 600px;"></td>
+			<td><div id="sip_ppm_chart_div" style="height: 600px;"></td>
+			<td><div id="sip_bpm_chart_div" style="height: 600px;"></td>
+		  </tr>
+
+		  
+
+		  <tr>
+			<td colspan="3">
+			<h4>Security Events table by source IP</h4>
+			{sip_events_trends_table}
+			</td>
+		  </tr>
+		  <tr>
+			<td colspan="3">
+			<h4>Malicious packets table ({pkt_units}) by source IP</h4>
+			{sip_packets_table}
+			</td>
+		  </tr>
+		  <tr>
+			<td colspan="3">
+			<h4>Malicious bandwidth table (Megabytes) by source IP</h4>
+			{sip_bw_table}
+			</td>
+		  </tr>
+
+		  <tr>
+		 	<td>
+				{sip_epm_html_final}
+			</td>
+		 	<td>
+				{sip_ppm_html_final} 
+			</td>
+		 	<td>
+				{sip_bpm_html_final}
+			</td>
+		  </tr>
 
 		</tbody>
 

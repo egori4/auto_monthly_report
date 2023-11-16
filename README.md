@@ -52,6 +52,9 @@ V7.1 11/7/2023
 	- fixed pkt_units to be one variable
 	- added three charts - TopN all time high
 
+V7.2 (11/16/2023)
+	- Fix Top Source IP by packet count division by packets and making Abuse score 0
+	- Added new feature- added additional tables of drilldown the charts further
 ===========================================================================================================================
 Instructions how to deploy as a docker container (on Vision example):
  

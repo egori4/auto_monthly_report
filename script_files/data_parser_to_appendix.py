@@ -30,7 +30,7 @@ path_r = f'./report_files/{cust_id}/'
 con = sqlite3.connect(path_d + 'database_'+cust_id+'_'+str(month)+'.sqlite')
 
 # data = pd.read_sql_query("SELECT * from attacks", con)
-data_month = pd.read_sql_query(f"SELECT deviceName,month,year,packetBandwidth,name,packetCount,ruleName,category,sourceAddress,destAddress,startTime,endTime,startDate,attackIpsId,actionType,maxAttackPacketRatePps,maxAttackRateBps,destPort,protocol,geoLocation,durationRange,startDayOfMonth from attacks where month={month}", con)
+data_month = pd.read_sql_query(f"SELECT deviceName,month,year,packetBandwidth,name,packetCount,ruleName,category,sourceAddress,destAddress,startTime,endTime,startDate,attackIpsId,actionType,maxAttackPacketRatePps,maxAttackRateBps,destPort,protocol,geoLocation,durationRange,startDayOfMonth from attacks", con)
 
 
 con.close()
