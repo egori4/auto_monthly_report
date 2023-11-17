@@ -8,8 +8,8 @@ import json
 cust_id = sys.argv[1]
 month = sys.argv[2]
 year = sys.argv[3]
-
-
+bw_units = sys.argv[4]
+pkt_units = sys.argv[5]
 
 customers_json = json.loads(open("./config_files/customers.json", "r").read())
 
@@ -23,9 +23,6 @@ charts_tables_path = f"./tmp_files/{cust_id}/"
 reports_path = f"./report_files/{cust_id}/"
 db_path = f'./database_files/{cust_id}/'
 
-#Units
-bw_units = "Gigabytes" #Can be configured "Gigabytes", "Terabytes" or "Megabytes"
-pkt_units = "Thousands" #Can be configured "Millions" or "Billions" or "Thousands"
 
 def convert_csv_to_list_of_lists(filename):
 	# Open csv file and convert to list of lists function
