@@ -409,7 +409,14 @@ def format_with_commas(value):
     return '{:,}'.format(value)
 
 if __name__ == '__main__':
+
+
+	# Traffic utilization
+	traffic_trends = convert_csv_to_list_of_lists(charts_tables_path + 'traffic.csv')
 	
+
+
+
 	# Total events, packets and bandwidth trends (blue bars charts)
 	events_total_bar_chart = convert_csv_to_list_of_lists(charts_tables_path + 'epm_total_bar.csv')
 	events_total_bar_move_text = trends_move_total(events_total_bar_chart, 'events') 
@@ -618,6 +625,8 @@ if __name__ == '__main__':
 
 		  function drawChart() {{
 		  
+			var traffic_data = google.visualization.arrayToDataTable({traffic_trends});
+		  
 			var epm_total_data = google.visualization.arrayToDataTable({events_total_bar_chart});
 			var ppm_total_data = google.visualization.arrayToDataTable({packets_total_bar});
 			var bpm_total_data = google.visualization.arrayToDataTable({bw_total_bar});
@@ -642,6 +651,16 @@ if __name__ == '__main__':
 			var policy_ppm_data = google.visualization.arrayToDataTable({policy_packets_trends_chart });
 			var policy_bpm_data = google.visualization.arrayToDataTable({policy_bw_trends_chart });
 
+			
+			var traffic_options = {{
+			  title: 'Traffic utilization last month',
+			  vAxis: {{minValue: 0}},
+			  isStacked: false,
+			  legend: {{position: 'top', maxLines: 5}},
+			  width: '100%'
+			}};
+
+			
 
 			var epm_total_options = {{
 			  title: 'Total Events trends',
@@ -791,7 +810,8 @@ if __name__ == '__main__':
 			  width: '100%'
 			}};
 
-			
+			var traffic_chart = new google.visualization.AreaChart(document.getElementById('traffic_chart_div'));
+		
 			var epm_total_chart = new google.visualization.ColumnChart(document.getElementById('epm_total_chart_div'));
 			var ppm_total_chart = new google.visualization.ColumnChart(document.getElementById('ppm_total_chart_div'));
 			var bpm_total_chart = new google.visualization.ColumnChart(document.getElementById('bpm_total_chart_div'));
@@ -820,6 +840,7 @@ if __name__ == '__main__':
 			
 
 
+			traffic_chart.draw(traffic_data, traffic_options);
 
 			epm_total_chart.draw(epm_total_data, epm_total_options);
 			ppm_total_chart.draw(ppm_total_data, ppm_total_options);
@@ -875,6 +896,12 @@ if __name__ == '__main__':
 		border: 1px solid black;
 		padding: 10px;
 	  }}
+
+	  
+	  #traffic_chart_div {{
+		height: 50vh;
+	  }}
+
 
 	  #epm_total_chart_div {{
 		height: 50vh;
@@ -962,6 +989,14 @@ if __name__ == '__main__':
 			<td colspan="3">
 			<h1>Radware Monthly report - {cust_id}</h1>
 			</td>
+		  </tr>
+
+		  <tr>
+		  	<td colspan="3">
+			<div id="traffic_chart_div">
+			
+			</td>
+
 		  </tr>
 
 		  <tr>

@@ -11,11 +11,12 @@ import abuseipdb as aidb
 import json
 import urllib.request
 import json
-
-
+import csv
+from datetime import datetime
 
 start_time = time.time()
 cust_id = sys.argv[1]
+last_month = sys.argv[2]
 db_path = f'./database_files/'+cust_id+'/'
 tmp_path = f'./tmp_files/'+cust_id+'/'
 run_file = 'run.sh'
@@ -103,6 +104,7 @@ def gen_charts_data(db_path):
 	srcip_bandwidth_sum_list = []
 
 	#create events per month csv file
+
 	with open(tmp_path + 'epm_total_bar.csv', 'w') as f:
 		f.write('Month, Total Events')
 
@@ -127,8 +129,36 @@ def gen_charts_data(db_path):
 			cur = con.cursor()
 			cur.execute("SELECT DISTINCT month FROM attacks")
 			month_num = cur.fetchall()[0][0]
+
 			# convert numeric month to month name
 			month_name = time.strftime('%B', time.strptime(str(month_num), '%m'))
+
+
+			########Get traffic utilization and write to csv#########
+			
+			if int(last_month) == int(month_num):
+
+				cur.execute("SELECT dateTime, trafficValue, discards, excluded FROM traffic")
+				
+				new_column_names = ['Date', 'Traffic Utilization(Mbps)', 'Blocked traffic', 'Excluded traffic']
+
+				data = cur.fetchall()
+				formatted_data = [(datetime.strptime(row[0], '%Y-%m-%d %H:%M:%S').strftime('%m/%d'),) + tuple(value / 2000 if isinstance(value, (int, float)) else value for value in row[1:]) for row in data]
+	
+				# Write to CSV with renamed columns
+				with open(tmp_path + 'traffic.csv', 'w', newline='') as csv_file:
+					csv_writer = csv.writer(csv_file)
+
+					# Write the new header
+					csv_writer.writerow(new_column_names)
+
+					# Write data
+					csv_writer.writerows(formatted_data)
+				csv_file.close
+				###################################################################
+
+
+
 			########Get total events count this month and write to csv#########
 			cur.execute("select month as Month,count(1) as \'Total Events\' from attacks")
 			total_events_this_month = cur.fetchall()[0][1]

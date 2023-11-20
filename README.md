@@ -59,8 +59,11 @@ V7.2 (11/16/2023)
 V7.2.1 (11/17/2023)
 	- Moved pkt_units and bw_units variables from analyzed_trends.py to run.sh
 	- updated run.sh
-		!!! Must update from run.sh example
+		!!! Must update run.sh from run.sh example
  
+ V7.3 (11/20/2023)
+	- New feature- added new graph - Traffic utilization last month
+	  !!!!!! Must update run.sh from run.sh example
 ===========================================================================================================================
 Instructions how to deploy as a docker container (on Vision example):
  

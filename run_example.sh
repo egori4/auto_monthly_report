@@ -131,7 +131,7 @@ for cust_id in "${cust_list[@]}"
 do
 
 	if [ $gen_python_csv_data == "true" ]; then
-		python3 script_files/charts_and_tables.py $cust_id #Delete old files
+		python3 script_files/charts_and_tables.py $cust_id $prev_month #Delete old files
 		echo "Python csv data generated"
 	fi
 
