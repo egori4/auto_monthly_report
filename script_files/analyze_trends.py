@@ -261,6 +261,51 @@ def extract_values_from_csv(csv_file):
 
     return values
 
+
+def events_per_day_html():
+
+	# Group by day_of_month, name, deviceName, ruleName and aggregate sum of packetCount
+	events_per_day = data_month.groupby(['startDayOfMonth', 'name', 'deviceName', 'ruleName']).size()
+
+	# Get the top 5 events with the highest sum of packet counts for each day
+	events_per_day_top5 = events_per_day.groupby(level=['startDayOfMonth'], group_keys=False).nlargest(5).apply(format_with_commas).to_frame('Security Events Count')
+	events_per_day_top5 = events_per_day_top5.to_html()
+
+	for device_ip, device_name in defensepros.items():
+		events_per_day_top5=events_per_day_top5.replace(device_ip, device_name)
+
+	return events_per_day_top5
+
+
+def bandwidth_per_day_html():
+	# Group by day_of_month, name, deviceName, ruleName and aggregate sum of packetCount
+	bandwidth_per_day = data_month.groupby(['startDayOfMonth', 'name', 'deviceName', 'ruleName'])['packetBandwidth'].sum()
+
+	# Get the top 5 events with the highest sum of packet counts for each day
+	bandwidth_per_day_top5 = bandwidth_per_day.groupby(level=['startDayOfMonth'], group_keys=False).nlargest(5).apply(format_with_commas).to_frame('Malicious bandwidth sum')
+	bandwidth_per_day_top5 = bandwidth_per_day_top5.to_html()
+
+	for device_ip, device_name in defensepros.items():
+		bandwidth_per_day_top5=bandwidth_per_day_top5.replace(device_ip, device_name)
+
+	return bandwidth_per_day_top5
+
+
+def packets_per_day_html():
+
+	# Group by day_of_month, name, deviceName, ruleName and aggregate sum of packetCount
+	packets_per_day = data_month.groupby(['startDayOfMonth', 'name', 'deviceName', 'ruleName'])['packetCount'].sum()
+
+	# Get the top 5 events with the highest sum of packet counts for each day
+	packets_per_day_top5 = packets_per_day.groupby(level=['startDayOfMonth'], group_keys=False).nlargest(5).apply(format_with_commas).to_frame('Malicious Packets sum')
+	packets_per_day_top5 = packets_per_day_top5.to_html()
+
+	for device_ip, device_name in defensepros.items():
+		packets_per_day_top5=packets_per_day_top5.replace(device_ip, device_name)
+
+	return packets_per_day_top5
+
+
 def epm_html(epm):
 	data_month_epm = data_month[data_month['name'] == epm]
 	series_epm = data_month_epm.groupby(['name','deviceName','ruleName']).size().sort_values(ascending=False).apply(format_with_commas).head(10)
@@ -413,8 +458,15 @@ if __name__ == '__main__':
 
 	# Traffic utilization
 	traffic_trends = convert_csv_to_list_of_lists(charts_tables_path + 'traffic.csv')
-	
 
+	# Events per day count
+	events_per_day_trends = convert_csv_to_list_of_lists(charts_tables_path + 'events_per_day_last_month.csv')
+	
+	# Malicious bandwidth per day
+	bandwidth_per_day_trends = convert_csv_to_list_of_lists(charts_tables_path + 'bandwidth_per_day_last_month.csv')
+
+	# Malicious bandwidth per day
+	packets_per_day_trends = convert_csv_to_list_of_lists(charts_tables_path + 'packets_per_day_last_month.csv')
 
 
 	# Total events, packets and bandwidth trends (blue bars charts)
@@ -423,7 +475,7 @@ if __name__ == '__main__':
 
 	packets_total_bar = convert_csv_to_list_of_lists(charts_tables_path + 'ppm_total_bar.csv')
 	packets_total_bar = convert_packets_units(packets_total_bar, pkt_units)
-	pakets_total_bar_move = trends_move_total(packets_total_bar, ' packets(' + pkt_units + ')') 
+	pakets_total_bar_move = trends_move_total(packets_total_bar, ' packets(' + pkt_units + ')')
 
 	bw_total_bar = convert_csv_to_list_of_lists(charts_tables_path + 'bpm_total_bar.csv')
 	bw_total_bar = convert_bw_units(bw_total_bar, bw_units)
@@ -490,6 +542,8 @@ if __name__ == '__main__':
 
 	#4 Iterate through each Device and popluate the html table
 
+
+
 	for index, value in enumerate(epm_top_list):
 		epm_html_final+=f'<h4>{value} distribution across devices and policies</h4>'
 		epm_html_final+= epm_html(epm_top_list[index])
@@ -542,6 +596,12 @@ if __name__ == '__main__':
 		sip_bpm_html_final+=f'<h4>Distribution of attacks and devices for Source IP {value}</h4>'
 		sip_bpm_html_final+= sip_bpm_html(sip_bpm_top_list[index])
 
+
+	#5 Generate html for the last month
+
+	events_per_day_table = events_per_day_html()
+	bandwidth_per_day_table = bandwidth_per_day_html()
+	packets_per_day_table = packets_per_day_html()
 	################################################# Events, packets and bandwidth trends by Attack name sorted by the overall sum of all months together ##########################################################
 
 
@@ -626,7 +686,11 @@ if __name__ == '__main__':
 		  function drawChart() {{
 		  
 			var traffic_data = google.visualization.arrayToDataTable({traffic_trends});
-		  
+
+			var events_per_day_data = google.visualization.arrayToDataTable({events_per_day_trends});
+			var bandwidth_per_day_data = google.visualization.arrayToDataTable({bandwidth_per_day_trends});
+			var packets_per_day_data = google.visualization.arrayToDataTable({packets_per_day_trends});
+  
 			var epm_total_data = google.visualization.arrayToDataTable({events_total_bar_chart});
 			var ppm_total_data = google.visualization.arrayToDataTable({packets_total_bar});
 			var bpm_total_data = google.visualization.arrayToDataTable({bw_total_bar});
@@ -652,8 +716,10 @@ if __name__ == '__main__':
 			var policy_bpm_data = google.visualization.arrayToDataTable({policy_bw_trends_chart });
 
 			
+
+			
 			var traffic_options = {{
-			  title: 'Traffic utilization last month',
+			  title: 'Traffic utilization, last month',
 			  vAxis: {{minValue: 0}},
 			  isStacked: false,
 			  legend: {{position: 'top', maxLines: 5}},
@@ -661,6 +727,32 @@ if __name__ == '__main__':
 			}};
 
 			
+			var events_per_day_options = {{
+			  title: 'Events per day, last month',
+			  vAxis: {{minValue: 0}},
+			  hAxis: {{ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
+			  isStacked: false,
+			  legend: {{position: 'top', maxLines: 5}},
+			  width: '100%'
+			}};
+
+			var bandwidth_per_day_options = {{
+			  title: 'Malicious bandwidth per day, last month ({bw_units})',
+			  vAxis: {{minValue: 0}},
+			  hAxis: {{ticks: bandwidth_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
+			  isStacked: false,
+			  legend: {{position: 'top', maxLines: 5}},
+			  width: '100%'
+			}};
+
+			var packets_per_day_options = {{
+			  title: 'Malicious packets per day, last month ({pkt_units})',
+			  vAxis: {{minValue: 0}},
+			  hAxis: {{ticks: packets_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
+			  isStacked: false,
+			  legend: {{position: 'top', maxLines: 5}},
+			  width: '100%'
+			}};
 
 			var epm_total_options = {{
 			  title: 'Total Events trends',
@@ -707,8 +799,6 @@ if __name__ == '__main__':
 			  width: '100%'
 			}};
 
-
-			
 			var epm_options_alltimehigh = {{
 			  title: 'Security Events trends - TopN all time high',
 			  vAxis: {{minValue: 0}},
@@ -717,7 +807,6 @@ if __name__ == '__main__':
 			  width: '100%'
 			}};
 
-			
 			var ppm_options_alltimehigh = {{
 			  title: 'Malicious Packets trends ({pkt_units}) - TopN all time high',
 			  vAxis: {{minValue: 0}},
@@ -733,8 +822,6 @@ if __name__ == '__main__':
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
 			}};
-
-
 
 			var epm_by_device_options = {{
 			  title: 'Events by device trends',
@@ -760,7 +847,6 @@ if __name__ == '__main__':
 			  width: '100%'
 			}};
 
-
 			var sip_epm_options = {{
 			  title: 'Security Events trends by source IP',
 			  vAxis: {{minValue: 0}},
@@ -784,7 +870,6 @@ if __name__ == '__main__':
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
 			}};
-
 
 			var policy_epm_options = {{
 			  title: 'Security Events trends by Policy',
@@ -810,8 +895,14 @@ if __name__ == '__main__':
 			  width: '100%'
 			}};
 
+
+
 			var traffic_chart = new google.visualization.AreaChart(document.getElementById('traffic_chart_div'));
-		
+
+			var events_per_day_chart = new google.visualization.AreaChart(document.getElementById('events_per_day_chart_div'));
+			var bandwidth_per_day_chart = new google.visualization.AreaChart(document.getElementById('bandwidth_per_day_chart_div'));
+			var packets_per_day_chart = new google.visualization.AreaChart(document.getElementById('packets_per_day_chart_div'));
+
 			var epm_total_chart = new google.visualization.ColumnChart(document.getElementById('epm_total_chart_div'));
 			var ppm_total_chart = new google.visualization.ColumnChart(document.getElementById('ppm_total_chart_div'));
 			var bpm_total_chart = new google.visualization.ColumnChart(document.getElementById('bpm_total_chart_div'));
@@ -820,12 +911,10 @@ if __name__ == '__main__':
 			var ppm_chart = new google.visualization.AreaChart(document.getElementById('ppm_chart_div'));
 			var bpm_chart = new google.visualization.AreaChart(document.getElementById('bpm_chart_div'));
 
-			
 			var epm_chart_alltimehigh = new google.visualization.AreaChart(document.getElementById('epm_chart_div_alltimehigh'));
 			var ppm_chart_alltimehigh = new google.visualization.AreaChart(document.getElementById('ppm_chart_div_alltimehigh'));
 			var bpm_chart_alltimehigh = new google.visualization.AreaChart(document.getElementById('bpm_chart_div_alltimehigh'));
 
-			
 			var epm_by_device_chart = new google.visualization.AreaChart(document.getElementById('epm_by_device_chart_div'));
 			var ppm_by_device_chart = new google.visualization.AreaChart(document.getElementById('ppm_by_device_chart_div'));
 			var bpm_by_device_chart = new google.visualization.AreaChart(document.getElementById('bpm_by_device_chart_div'));
@@ -842,6 +931,10 @@ if __name__ == '__main__':
 
 			traffic_chart.draw(traffic_data, traffic_options);
 
+			events_per_day_chart.draw(events_per_day_data, events_per_day_options);
+			bandwidth_per_day_chart.draw(bandwidth_per_day_data, bandwidth_per_day_options);
+			packets_per_day_chart.draw(packets_per_day_data, packets_per_day_options);
+
 			epm_total_chart.draw(epm_total_data, epm_total_options);
 			ppm_total_chart.draw(ppm_total_data, ppm_total_options);
 			bpm_total_chart.draw(bpm_total_data, bpm_total_options);
@@ -850,11 +943,9 @@ if __name__ == '__main__':
 			ppm_chart.draw(ppm_data, ppm_options);
 			bpm_chart.draw(bpm_data, bpm_options);
 
-			
 			epm_chart_alltimehigh.draw(epm_data_alltimehigh, epm_options_alltimehigh);
 			ppm_chart_alltimehigh.draw(ppm_data_alltimehigh, ppm_options_alltimehigh);
 			bpm_chart_alltimehigh.draw(bpm_data_alltimehigh, bpm_options_alltimehigh);
-
 
 			epm_by_device_chart.draw(epm_by_device_data, epm_by_device_options);
 			ppm_by_device_chart.draw(ppm_by_device_data, ppm_by_device_options);
@@ -899,9 +990,20 @@ if __name__ == '__main__':
 
 	  
 	  #traffic_chart_div {{
-		height: 50vh;
+		height: 40vh;
 	  }}
 
+	  #events_per_day_chart_div {{
+		height: 20vh;
+	  }}
+
+	  #bandwidth_per_day_chart_div {{
+		height: 20vh;
+	  }}
+
+	  #packets_per_day_chart_div {{
+		height: 20vh;
+	  }}
 
 	  #epm_total_chart_div {{
 		height: 50vh;
@@ -987,16 +1089,46 @@ if __name__ == '__main__':
 
 		  <tr>
 			<td colspan="3">
-			<h1>Radware Monthly report - {cust_id}</h1>
+			<h1>Radware Monthly report {month},{year} - {cust_id}</h1>
 			</td>
 		  </tr>
 
 		  <tr>
 		  	<td colspan="3">
 			<div id="traffic_chart_div">
-			
 			</td>
 
+		  </tr>
+
+		  <tr>
+		  	<td colspan="3">
+			<div id="events_per_day_chart_div">
+			</td>
+		  </tr>
+
+		  <tr>
+		  	<td colspan="3">
+			<div id="packets_per_day_chart_div">
+			</td>
+		  </tr>
+
+		  <tr>
+		  	<td colspan="3">
+			<div id="bandwidth_per_day_chart_div">
+			</td>
+		  </tr>
+
+		  <tr>
+			<th>Security Events count by day</th>
+			<th>Malicious Packets(cumulative) by day</th>
+			<th>Malicious Bandwidth sum(cumulative) by day</th>
+		  </tr>
+		</thead>
+		<tbody>
+		  <tr>
+			<td valign="top">{events_per_day_table}</td>
+			<td valign="top"> {packets_per_day_table}</td>
+			<td valign="top">{bandwidth_per_day_table}</td>
 		  </tr>
 
 		  <tr>
@@ -1004,13 +1136,13 @@ if __name__ == '__main__':
 			<th>Month to month trends by Malicious Packets(cumulative)</th>
 			<th>Month to month trends by Malicious Bandwidth sum(cumulative)</th>
 		  </tr>
-		</thead>
-		<tbody>
+
 		  <tr>
 			<td><div id="epm_total_chart_div"></td>
 			<td><div id="ppm_total_chart_div"></td>
 			<td><div id="bpm_total_chart_div"></td>
 		  </tr>
+
 
 		  <tr>
 			<td><div id="epm_chart_div_alltimehigh" style="height: 600px;"></td>
@@ -1121,13 +1253,13 @@ if __name__ == '__main__':
 
 
 		  <tr>
-		 	<td>
+		 	<td valign="top">
 				{device_epm_html_final}
 			</td>
-		 	<td>
+		 	<td valign="top">
 				{device_ppm_html_final}
 			</td>
-		 	<td>
+		 	<td valign="top">
 				{device_bpm_html_final}			
 			</td>
 		  </tr>
@@ -1160,13 +1292,13 @@ if __name__ == '__main__':
 		  </tr>	  
 
 		  <tr>
-		 	<td>
+		 	<td valign="top">
 				{policy_epm_html_final}
 			</td>
-		 	<td>
+		 	<td valign="top">
 				{policy_ppm_html_final} 
 			</td>
-		 	<td>
+		 	<td valign="top">
 				{policy_bpm_html_final}
 			</td>
 		  </tr>
@@ -1201,13 +1333,13 @@ if __name__ == '__main__':
 		  </tr>
 
 		  <tr>
-		 	<td>
+		 	<td valign="top">
 				{sip_epm_html_final}
 			</td>
-		 	<td>
+		 	<td valign="top">
 				{sip_ppm_html_final} 
 			</td>
-		 	<td>
+		 	<td valign="top">
 				{sip_bpm_html_final}
 			</td>
 		  </tr>

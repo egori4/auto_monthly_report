@@ -62,8 +62,19 @@ V7.2.1 (11/17/2023)
 		!!! Must update run.sh from run.sh example
  
  V7.3 (11/20/2023)
-	- New feature- added new graph - Traffic utilization last month
+	- New feature- added new chart - Traffic utilization last month
 	  !!!!!! Must update run.sh from run.sh example
+
+ V7.3.1 (11/21/2023)
+	- New features
+		- Added new chart and table - Events per day last month
+		- Added new chart and table - Malicious bandwidth per day, last month
+		- Added new chart and table - Malicious packets per day, last month 
+
+	- Modified Traffic utilization last month - added hour and minute to the scale
+	- Added month and year to the Headline
+
+
 ===========================================================================================================================
 Instructions how to deploy as a docker container (on Vision example):
  

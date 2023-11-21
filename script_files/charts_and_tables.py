@@ -17,6 +17,7 @@ from datetime import datetime
 start_time = time.time()
 cust_id = sys.argv[1]
 last_month = sys.argv[2]
+
 db_path = f'./database_files/'+cust_id+'/'
 tmp_path = f'./tmp_files/'+cust_id+'/'
 run_file = 'run.sh'
@@ -26,11 +27,16 @@ with open (run_file) as f:
 	#find line starting with top_n
 		if line.startswith('top_n'):
 			#print value after = sign
-			
 			top_n = int(line.split('=')[1].replace('\n',''))
-
 			continue
 
+		if line.startswith('bw_units'):
+			bw_units = str(line.split('=')[1].replace('\n','').replace('"',''))
+			continue
+
+		if line.startswith('pkt_units'):
+			pkt_units = str(line.split('=')[1].replace('\n','')).replace('"','')
+			continue
 
 ########DefensePro IP to Name translation########
 
@@ -134,7 +140,12 @@ def gen_charts_data(db_path):
 			month_name = time.strftime('%B', time.strptime(str(month_num), '%m'))
 
 
-			########Get traffic utilization and write to csv#########
+
+
+
+
+
+			########Get traffic utilization from the last month and write to csv#########
 			
 			if int(last_month) == int(month_num):
 
@@ -143,7 +154,8 @@ def gen_charts_data(db_path):
 				new_column_names = ['Date', 'Traffic Utilization(Mbps)', 'Blocked traffic', 'Excluded traffic']
 
 				data = cur.fetchall()
-				formatted_data = [(datetime.strptime(row[0], '%Y-%m-%d %H:%M:%S').strftime('%m/%d'),) + tuple(value / 2000 if isinstance(value, (int, float)) else value for value in row[1:]) for row in data]
+
+				formatted_data = [(datetime.strptime(row[0], '%Y-%m-%d %H:%M:%S').strftime('%m/%d %H:%M'),) + tuple(value / 2000 if isinstance(value, (int, float)) else value for value in row[1:]) for row in data]
 	
 				# Write to CSV with renamed columns
 				with open(tmp_path + 'traffic.csv', 'w', newline='') as csv_file:
@@ -157,6 +169,85 @@ def gen_charts_data(db_path):
 				csv_file.close
 				###################################################################
 
+
+				####Get security events count by day from the last month and write to csv########
+
+				cur.execute("SELECT startDayOfMonth, COUNT(*) FROM attacks GROUP BY startDayOfMonth")
+				
+				new_column_names = ['Day of the month', 'Security Events count']
+
+				data = cur.fetchall()
+	
+				# Write to CSV with renamed columns
+				with open(tmp_path + 'events_per_day_last_month.csv', 'w', newline='') as csv_file:
+					csv_writer = csv.writer(csv_file)
+
+					# Write the new header
+					csv_writer.writerow(new_column_names)
+
+					# Write data
+					csv_writer.writerows(data)
+
+				csv_file.close
+				###################################################################
+
+
+
+				####Get malicious bandwidth by day from the last month and write to csv########
+				if bw_units.lower() == 'megabytes':					
+					cur.execute("SELECT startDayOfMonth, SUM(packetBandwidth)/8000 FROM attacks GROUP BY startDayOfMonth")
+
+				if bw_units.lower()=='gigabytes':
+					cur.execute("SELECT startDayOfMonth, SUM(packetBandwidth)/8000000 FROM attacks GROUP BY startDayOfMonth")
+
+				if bw_units.lower()=='terabytes':
+					cur.execute("SELECT startDayOfMonth, SUM(packetBandwidth)/8000000000 FROM attacks GROUP BY startDayOfMonth")
+							
+				new_column_names = ['Day of the month', 'Malicious Bandwidth']
+
+				data = cur.fetchall()
+	
+				# Write to CSV with renamed columns
+				with open(tmp_path + 'bandwidth_per_day_last_month.csv', 'w', newline='') as csv_file:
+					csv_writer = csv.writer(csv_file)
+
+					# Write the new header
+					csv_writer.writerow(new_column_names)
+
+					# Write data
+					csv_writer.writerows(data)
+
+				csv_file.close
+				###################################################################
+
+
+				####Get malicious packets by day from the last month and write to csv########
+
+				if pkt_units.lower() == 'thousands':					
+					cur.execute("SELECT startDayOfMonth, SUM(packetCount)/1000 FROM attacks GROUP BY startDayOfMonth")
+
+				if pkt_units.lower() == 'millions':
+					cur.execute("SELECT startDayOfMonth, SUM(packetCount)/1000000 FROM attacks GROUP BY startDayOfMonth")
+
+				if pkt_units.lower() == 'billions':
+					cur.execute("SELECT startDayOfMonth, SUM(packetCount)/1000000000 FROM attacks GROUP BY startDayOfMonth")
+							
+				new_column_names = ['Day of the month', 'Malicious Packets']
+
+				data = cur.fetchall()
+	
+				# Write to CSV with renamed columns
+				with open(tmp_path + 'packets_per_day_last_month.csv', 'w', newline='') as csv_file:
+					csv_writer = csv.writer(csv_file)
+
+					# Write the new header
+					csv_writer.writerow(new_column_names)
+
+					# Write data
+					csv_writer.writerows(data)
+
+				csv_file.close
+				###################################################################
 
 
 			########Get total events count this month and write to csv#########
