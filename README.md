@@ -61,11 +61,11 @@ V7.2.1 (11/17/2023)
 	- updated run.sh
 		!!! Must update run.sh from run.sh example
  
- V7.3 (11/20/2023)
+V7.3 (11/20/2023)
 	- New feature- added new chart - Traffic utilization last month
 	  !!!!!! Must update run.sh from run.sh example
 
- V7.3.1 (11/21/2023)
+V7.3.1 (11/21/2023)
 	- New features
 		- Added new chart and table - Events per day last month
 		- Added new chart and table - Malicious bandwidth per day, last month
@@ -74,6 +74,8 @@ V7.2.1 (11/17/2023)
 	- Modified Traffic utilization last month - added hour and minute to the scale
 	- Added month and year to the Headline
 
+V7.3.2 (12/1/2023)
+	- CollectAll.php - Added creation of directories source_files and database_files if does not exist
 
 ===========================================================================================================================
 Instructions how to deploy as a docker container (on Vision example):

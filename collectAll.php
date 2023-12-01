@@ -117,6 +117,30 @@ if ($globals->debug > 2)
 if ($globals->debug > 3)
 	exit(1);
 
+
+
+$sourceDirectory = 'source_files';
+
+// Check if the directory doesn't exist
+if (!is_dir($sourceDirectory)) {
+    // Create the directory
+    mkdir($sourceDirectory);
+    echo "Directory '$sourceDirectory' created successfully.";
+} else {
+    echo "Directory '$sourceDirectory' already exists.";
+}
+
+// Check if the directory doesn't exist
+$databaseDirectory = 'database_files';
+
+if (!is_dir($databaseDirectory)) {
+    // Create the directory
+    mkdir($databaseDirectory);
+    echo "Directory '$databaseDirectory' created successfully.";
+} else {
+    echo "Directory '$databaseDirectory' already exists.";
+}
+
 // Scan customers
 foreach ($globals->customers as $key => $customer) {
 	if (isset($globals->id) and $customer->id != $globals->id)
