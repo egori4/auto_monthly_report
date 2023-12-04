@@ -74,7 +74,24 @@ V7.2.1 (11/17/2023)
 	- Modified Traffic utilization last month - added hour and minute to the scale
 	- Added month and year to the Headline
 
+V8.0 (12/4/2023)
+	- New feature - creating sqlite db file from forensics
+		!!! Requires updating run.sh
 
+	- email_send.py
+		- Added EA case
+
+	- analyze_trends.py
+		- Added case when previous month data is not available not to calculate it
+
+	- charts_and_tables.py
+		- Added case to skip traffic stats if unavailable (if sqlite was created from forensics)
+
+In progress
+	- New feature - daily collection
+	Script will collect and append data for every day into the monthly db
+	schedule script daily pass var to run.sh daily
+	schedule script monthly
 ===========================================================================================================================
 Instructions how to deploy as a docker container (on Vision example):
  
@@ -291,3 +308,18 @@ To Run from WSL
 2. From the ./app directory, execute ./run.sh
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+Instructions how to convert forensics file
+
+1. Put forensics file under /database_files/<customer>/ directory
+1. Set the variable in run.sh file
+
+convert_forensics_to_sqlite=true
+forensics_file_cust_id="USCC"
+forensics_file_name="1_week_2023-11-27_15-53-20.csv"
+converted_sqlite_file_name="database_CUSTID_10.sqlite"
+
+Run run.sh
+
+This will take forensics file (example 1_week_2023-11-27_15-53-20.csv) and convert to database_CUSTID_10.sqlite

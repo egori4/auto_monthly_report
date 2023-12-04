@@ -124,36 +124,41 @@ def trends_move(data, units="events"):
 	attack_counts_previous = data[-2][1:]
 	attack_counts_last = data[-1][1:]
 
-	# Calculate and print the trends
-	for name, count_previous, count_last in zip(attack_names, attack_counts_previous, attack_counts_last):
-		if int(count_last) < int(count_previous):
-			trend = "Decrease"
-		else:
-			trend = "Increase"
+	if isinstance(attack_counts_previous, list) and all(isinstance(item, str) for item in attack_counts_previous):
+		analysis = f"Can not calculate trends - no previous month data"
+		return analysis
+
+	else:
+		# Calculate and print the trends
+		for name, count_previous, count_last in zip(attack_names, attack_counts_previous, attack_counts_last):
+			if int(count_last) < int(count_previous):
+				trend = "Decrease"
+			else:
+				trend = "Increase"
+			
+			difference = abs(int(count_last) - int(count_previous))
+
+			if count_previous == 0:
+				difference_percentage = "N/A"
+			else:
+				difference_percentage = (difference / count_previous) * 100
+
+			#check if difference is float
+
+
+			if isinstance(difference, float):
+				difference = round(difference, 2)
+
+			if difference_percentage == "N/A":
+				change = f"by N/A %  - from {count_previous} to {count_last} {units} by a total of {difference} {units} "
+			else:
+				change = f"by {difference_percentage:.2f}% - from {count_previous} to {count_last} {units} by a total of {difference} {units} "
 		
-		difference = abs(int(count_last) - int(count_previous))
+			analysis += f'<li><strong>{name}:</strong><ul><li> {trend} {change}</li></ul>'
 
-		if count_previous == 0:
-			difference_percentage = "N/A"
-		else:
-			difference_percentage = (difference / count_previous) * 100
+		analysis += '</ul>'
 
-		#check if difference is float
-
-
-		if isinstance(difference, float):
-			difference = round(difference, 2)
-
-		if difference_percentage == "N/A":
-			change = f"by N/A %  - from {count_previous} to {count_last} {units} by a total of {difference} {units} "
-		else:
-			change = f"by {difference_percentage:.2f}% - from {count_previous} to {count_last} {units} by a total of {difference} {units} "
-	
-		analysis += f'<li><strong>{name}:</strong><ul><li> {trend} {change}</li></ul>'
-
-	analysis += '</ul>'
-
-	return analysis
+		return analysis
 
 
 def trends_move_total(data, units="events"):
@@ -161,24 +166,27 @@ def trends_move_total(data, units="events"):
 	prev_total = data[-2][1]
 	last_total = data[-1][1]
 
-	trend = "increased" if last_total > prev_total else "decreased"
-	difference = abs(last_total - prev_total)
-
-	if isinstance(difference, float):
-		difference = round(difference, 2)
-
-	if float(prev_total) == 0:
-		percentage_difference = "N/A"
-		result = f"This month the total number of {units} {trend} by {percentage_difference}%- from {prev_total} to {last_total} {units} by a total of {difference} {units}"
-
-	else:
-		percentage_difference = (difference / float(prev_total)) * 100
-		formatted_percentage_difference = f'{percentage_difference:.2f}%'
-		result = f"This month the total number of {units} {trend} by {formatted_percentage_difference}- from {prev_total} to {last_total} {units} by a total of {difference} {units}"
-
+	if isinstance(prev_total, str):
+		result = f"Can not calculate trends - no previous month data"
+		return result
 	
+	else:
+		trend = "increased" if last_total > prev_total else "decreased"
+		difference = abs(last_total - prev_total)
 
-	return result
+		if isinstance(difference, float):
+			difference = round(difference, 2)
+
+		if float(prev_total) == 0:
+			percentage_difference = "N/A"
+			result = f"This month the total number of {units} {trend} by {percentage_difference}%- from {prev_total} to {last_total} {units} by a total of {difference} {units}"
+
+		else:
+			percentage_difference = (difference / float(prev_total)) * 100
+			formatted_percentage_difference = f'{percentage_difference:.2f}%'
+			result = f"This month the total number of {units} {trend} by {formatted_percentage_difference}- from {prev_total} to {last_total} {units} by a total of {difference} {units}"
+
+		return result
 
 
 def format_numeric_value(value, bw_units=None, pkt_units=None):

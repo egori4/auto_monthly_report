@@ -42,13 +42,21 @@ top_n=7
 #Number of top N items to be displayed in the report. For example if set to 10, the script will display top 10 items in the report.
 
 
-bw_units="Gigabytes" #Can be configured "Gigabytes", "Terabytes" or "Megabytes"
-pkt_units="Thousands" #Can be configured "Millions" or "Billions" or "Thousands"
+bw_units="Gigabytes"
+#Can be configured "Gigabytes", "Terabytes" or "Megabytes"
+
+pkt_units="Millions"
+#Can be configured "Millions" or "Billions" or "Thousands"
+
 ####################################################################################################
 
 #######################Action variables switch on/off(optional)####################################################
+convert_forensics_to_sqlite=true
+forensics_file_cust_id="USCC"
+forensics_file_name="1_week_2023-11-27_15-53-20.csv"
+converted_sqlite_file_name="database_CUSTID_10.sqlite"
+
 collect_data=true
-del_old_files=true
 gen_python_csv_data=true #generate csv data using python scripts
 generate_report=true
 generate_appendix=true
@@ -99,16 +107,24 @@ fi
 cd app 
 
 
-
-
-
+################# Convert forensics to sqlite database #########################
+if [ $convert_forensics_to_sqlite == "true" ]; then
+	echo "Converting Forensics file to sqlite database"
+	python3 script_files/forensics_to_sqlite.py $forensics_file_cust_id
+fi
 ################# Collect data from Vision ############################
 
 for cust_id in "${cust_list[@]}"
 do
 
 	if [ $collect_data == "true" ]; then
-		php collectAll.php -- -upper=01.$cur_month.$cur_year -range="$report_range" -id="$cust_id"
+		if [ "$report_range" == "-1 day" ]; then
+			php collectAll.php -- -upper=$cur_day.$cur_month.$cur_year -range="$report_range" -id="$cust_id"
+		fi
+
+		if [ "$report_range" == "-1 month" ]; then
+			php collectAll.php -- -upper=01.$cur_month.$cur_year -range="$report_range" -id="$cust_id"
+		fi
 	fi
 done
 
@@ -130,9 +146,27 @@ fi
 for cust_id in "${cust_list[@]}"
 do
 
+	####################### Generate CSV Data #################################
+
 	if [ $gen_python_csv_data == "true" ]; then
-		python3 script_files/charts_and_tables.py $cust_id $prev_month #Delete old files
-		echo "Python csv data generated"
+
+		if [ "$report_range" == "-1 day" ]; then
+
+			if [ "$cur_day" == 1 ] || [ "$cur_day" == 01 ]; then
+				python3 script_files/charts_and_tables.py $cust_id $prev_month
+				echo "Python  csv data generated"
+
+			else
+				python3 script_files/charts_and_tables.py $cust_id $cur_month
+				echo "Python  csv data generated"
+			fi
+		fi
+
+		if [ "$report_range" == "-1 month" ]; then
+
+			python3 script_files/charts_and_tables.py $cust_id $prev_month 
+			echo "Python  csv data generated"
+		fi
 	fi
 
 	if [ $generate_report == "true" ]; then
@@ -166,16 +200,30 @@ do
 		fi
 	fi
 
+	######################### Analyze Trends ######################
+
 	if [[ "$analyze_trends" == "true" ]]; then
 
-		if [[ "$cur_month" != 01 ]] || [ "$cur_month" != 1 ]; then
-			echo "Analyzing trends for $prev_month $cur_year"
-			python3 script_files/analyze_trends.py $cust_id $prev_month $cur_year $bw_units $pkt_units #this will generate appendix for the previouis month
-		else
-			echo "Analyzing trends for $prev_month $prev_year"
-			python3 script_files/analyze_trends.py $cust_id $prev_month $prev_year $bw_units $pkt_units #this will generate appendix for the previouis month
-		fi
+		if [ "$report_range" == "-1 day" ]; then
 
+			if [ "$cur_day" == 1 ] || [ "$cur_day" == 01 ]; then		
+				echo "Analyzing daily trends for $prev_month $cur_year"
+				python3 script_files/analyze_trends.py $cust_id $prev_month $cur_year $bw_units $pkt_units #this will generate appendix for the previouis month
+			
+			else
+				echo "Analyzing daily trends for $cur_month $cur_year"
+				python3 script_files/analyze_trends.py $cust_id $cur_month $cur_year $bw_units $pkt_units #this will generate appendix for the previouis month
+			fi
+		else # if range is 1 month
+
+			if [[ "$cur_month" != 01 ]] || [ "$cur_month" != 1 ]; then
+				echo "Analyzing trends for $prev_month $cur_year"
+				python3 script_files/analyze_trends.py $cust_id $prev_month $cur_year $bw_units $pkt_units #this will generate appendix for the previouis month
+			else
+				echo "Analyzing trends for $prev_month $prev_year"
+				python3 script_files/analyze_trends.py $cust_id $prev_month $prev_year $bw_units $pkt_units #this will generate appendix for the previouis month
+			fi
+		fi
 	fi
 
 done

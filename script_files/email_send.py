@@ -112,9 +112,25 @@ def email_body(cust_id):
 
         email_body = f'\r\n\r\nHigh Level Management summary:'
 
-        total_mal_bw = '{:.2f}'.format(float(data_month['packetBandwidth'].sum()/8000000000))
+        if cust_id == 'EA':
+                total_mal_bw = '{:.2f}'.format(float(data_month['packetBandwidth'].sum()/8000000))
 
-        html_summary = f"{cust_id}’s on-premises Radware appliances scrubbed {total_mal_bw}TB of attack traffic to protect titles and services."
+                #print(f'total ma bw is {total_mal_bw}')
+                total_mal_bw_iad1 = '{:.2f}'.format(float(data_month[(data_month.deviceName == "10.76.4.241")]['packetBandwidth'].sum()/8000000))
+                        
+                total_mal_bw_catchall = '{:.2f}'.format(float(data_month[(data_month.name == "catchall-PPS")]['packetBandwidth'].sum()/8000000))
+                #print(total_mal_bw_catchall)
+                #print(f'total mal bw iad is {total_mal_bw_iad1}')
+                total_mal_bw_no_iad1 = float(total_mal_bw) - float(total_mal_bw_iad1) - float(total_mal_bw_catchall)
+                total_mal_bw_no_iad1_tb = '{:.2f}'.format(total_mal_bw_no_iad1/1000)
+                #print(f'total mal bw no iad is {total_mal_bw_no_iad1}')
+                        
+                html_summary = f"EA’s on-premise Radware appliances scrubbed {total_mal_bw_no_iad1_tb}TB of attack traffic to protect titles and services. This left {total_mal_bw_iad1}GB of detected attack traffic unmitigated and was absorbed by the infrastructure."
+             
+        else:
+                total_mal_bw = '{:.2f}'.format(float(data_month['packetBandwidth'].sum()/8000000000))
+
+                html_summary = f"{cust_id}’s on-premises Radware appliances scrubbed {total_mal_bw}TB of attack traffic to protect titles and services."
 
         ###########Setting variables for Top #1 by max Gbps#################
         device_maxAttackRateBps = data_month.sort_values(by=['maxAttackRateBps'], ascending=False).iloc[0]['deviceName']

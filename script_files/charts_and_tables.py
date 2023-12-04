@@ -148,25 +148,31 @@ def gen_charts_data(db_path):
 			########Get traffic utilization from the last month and write to csv#########
 			
 			if int(last_month) == int(month_num):
-
-				cur.execute("SELECT dateTime, trafficValue, discards, excluded FROM traffic")
 				
-				new_column_names = ['Date', 'Traffic Utilization(Mbps)', 'Blocked traffic', 'Excluded traffic']
+				try:
 
-				data = cur.fetchall()
+					cur.execute("SELECT dateTime, trafficValue, discards, excluded FROM traffic")
 
-				formatted_data = [(datetime.strptime(row[0], '%Y-%m-%d %H:%M:%S').strftime('%m/%d %H:%M'),) + tuple(value / 2000 if isinstance(value, (int, float)) else value for value in row[1:]) for row in data]
-	
-				# Write to CSV with renamed columns
-				with open(tmp_path + 'traffic.csv', 'w', newline='') as csv_file:
-					csv_writer = csv.writer(csv_file)
 
-					# Write the new header
-					csv_writer.writerow(new_column_names)
+					
+					new_column_names = ['Date', 'Traffic Utilization(Mbps)', 'Blocked traffic', 'Excluded traffic']
 
-					# Write data
-					csv_writer.writerows(formatted_data)
-				csv_file.close
+					data = cur.fetchall()
+
+					formatted_data = [(datetime.strptime(row[0], '%Y-%m-%d %H:%M:%S').strftime('%m/%d %H:%M'),) + tuple(value / 2000 if isinstance(value, (int, float)) else value for value in row[1:]) for row in data]
+		
+					# Write to CSV with renamed columns
+					with open(tmp_path + 'traffic.csv', 'w', newline='') as csv_file:
+						csv_writer = csv.writer(csv_file)
+
+						# Write the new header
+						csv_writer.writerow(new_column_names)
+
+						# Write data
+						csv_writer.writerows(formatted_data)
+					csv_file.close
+				except:
+					pass
 				###################################################################
 
 
