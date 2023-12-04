@@ -61,11 +61,11 @@ V7.2.1 (11/17/2023)
 	- updated run.sh
 		!!! Must update run.sh from run.sh example
  
- V7.3 (11/20/2023)
+V7.3 (11/20/2023)
 	- New feature- added new chart - Traffic utilization last month
 	  !!!!!! Must update run.sh from run.sh example
 
- V7.3.1 (11/21/2023)
+V7.3.1 (11/21/2023)
 	- New features
 		- Added new chart and table - Events per day last month
 		- Added new chart and table - Malicious bandwidth per day, last month
@@ -86,6 +86,8 @@ V8.0 (12/4/2023)
 
 	- charts_and_tables.py
 		- Added case to skip traffic stats if unavailable (if sqlite was created from forensics)
+		
+	- CollectAll.php - Added creation of directories source_files and database_files if does not exist
 
 In progress
 	- New feature - daily collection
