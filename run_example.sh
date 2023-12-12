@@ -11,7 +11,7 @@ cust_list=(Customer_name)	#space separated list of customer IDs
 ####################################################################################################
 
 ##################### Report Range #################################################################
-report_range="-1 month" # set to "-1 month"
+report_range="-1 month" # set to "-1 month" or "-1 day"
 
 cur_day=$(date +'%d')
 #cur_day="25"
@@ -56,6 +56,7 @@ forensics_file_cust_id="USCC"
 forensics_file_name="1_week_2023-11-27_15-53-20.csv"
 converted_sqlite_file_name="database_CUSTID_10.sqlite"
 
+del_old_files=true
 collect_data=true
 gen_python_csv_data=true #generate csv data using python scripts
 generate_report=true
@@ -146,6 +147,13 @@ fi
 for cust_id in "${cust_list[@]}"
 do
 
+	####################### Delete old files #################################
+
+	if [[ "$del_old_files" == "true" ]]; then
+		echo "Deleting old files"
+		python3 script_files/del_old_files.py $cust_id #Delete old files
+	fi
+
 	####################### Generate CSV Data #################################
 
 	if [ $gen_python_csv_data == "true" ]; then
@@ -153,11 +161,11 @@ do
 		if [ "$report_range" == "-1 day" ]; then
 
 			if [ "$cur_day" == 1 ] || [ "$cur_day" == 01 ]; then
-				python3 script_files/charts_and_tables.py $cust_id $prev_month
+				python3 script_files/charts_and_tables_daily.py $cust_id $prev_month
 				echo "Python  csv data generated"
 
 			else
-				python3 script_files/charts_and_tables.py $cust_id $cur_month
+				python3 script_files/charts_and_tables_daily.py $cust_id $cur_month
 				echo "Python  csv data generated"
 			fi
 		fi
@@ -168,6 +176,8 @@ do
 			echo "Python  csv data generated"
 		fi
 	fi
+
+	####################### Generate Report PDF #################################
 
 	if [ $generate_report == "true" ]; then
 
@@ -181,10 +191,7 @@ do
 	fi
 
 
-	if [[ "$del_old_files" == "true" ]]; then
-		echo "Deleting old files"
-		python3 script_files/del_old_files.py $cust_id #Delete old files
-	fi
+	####################### Generate Appendix #################################
 
 	if [[ "$cur_month" != 01 ]] || [ "$cur_month" != 1 ]; then
 
@@ -208,11 +215,11 @@ do
 
 			if [ "$cur_day" == 1 ] || [ "$cur_day" == 01 ]; then		
 				echo "Analyzing daily trends for $prev_month $cur_year"
-				python3 script_files/analyze_trends.py $cust_id $prev_month $cur_year $bw_units $pkt_units #this will generate appendix for the previouis month
+				python3 script_files/analyze_trends_daily.py $cust_id $prev_month $cur_year $bw_units $pkt_units #this will generate appendix for the previouis month
 			
-			else
+			else # if day is not 1
 				echo "Analyzing daily trends for $cur_month $cur_year"
-				python3 script_files/analyze_trends.py $cust_id $cur_month $cur_year $bw_units $pkt_units #this will generate appendix for the previouis month
+				python3 script_files/analyze_trends_daily.py $cust_id $cur_month $cur_year $bw_units $pkt_units #this will generate appendix for the previouis month
 			fi
 		else # if range is 1 month
 

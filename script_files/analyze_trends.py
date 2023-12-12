@@ -511,6 +511,11 @@ if __name__ == '__main__':
 	con = sqlite3.connect(db_path + 'database_'+cust_id+'_'+str(month)+'.sqlite')
 	# data = pd.read_sql_query("SELECT * from attacks", con)
 	data_month = pd.read_sql_query(f"SELECT deviceName,month,year,packetBandwidth,name,packetCount,ruleName,category,sourceAddress,destAddress,startTime,endTime,startDate,attackIpsId,actionType,maxAttackPacketRatePps,maxAttackRateBps,destPort,protocol,geoLocation,durationRange,startDayOfMonth from attacks", con)
+
+	#export data to csv
+	data_month.to_csv(reports_path +'database_'+cust_id+'_'+str(month)+'_'+str(year)+'.csv', encoding='utf-8', index=False)
+
+
 	con.close()
 
 	#2 Extract Top Attacks list

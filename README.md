@@ -89,11 +89,15 @@ V8.0 (12/4/2023)
 		
 	- CollectAll.php - Added creation of directories source_files and database_files if does not exist
 
-In progress
-	- New feature - daily collection
-	Script will collect and append data for every day into the monthly db
-	schedule script daily pass var to run.sh daily
-	schedule script monthly
+V9.0 (12/12/2023)
+
+	- New feature - daily collection and reporting
+		Script can collect and append data for every day into the monthly db
+		!!! Requires updating run.sh from run_example.sh
+	- analyze_trends_daily.py and analyze_trends.py
+		Added exporting the data to csv
+	- email_send.py
+		Enhancment - added case not to archive the file if was already archived (case if the large file was already archived)
 ===========================================================================================================================
 Instructions how to deploy as a docker container (on Vision example):
  

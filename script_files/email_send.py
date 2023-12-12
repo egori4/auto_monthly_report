@@ -647,10 +647,11 @@ def send_report(SMTP_AUTH,SMTP_SERVER,SMTP_SERVER_PORT,SMTP_SENDER,SMTP_PASSWORD
                                 try:
                                         if int(filename.split("_")[2]) == int(currentmonth) and int(filename.split("_")[3].split(".")[0]) == int(currentyear):
                                                 if os.stat(os.path.join(root, filename)).st_size > 5000000: #if filesize > 5MB
-                                                        # print(f'archiving {os.path.join(root, filename)}')
-                                                        arcfile = os.path.join(root, filename) + '.tar.gz'
-                                                        with tarfile.open(arcfile, "w:gz") as tar:
-                                                                tar.add(os.path.join(root, filename), arcname=os.path.basename(os.path.join(root, filename)))
+                                                        if not filename.endswith(".tar.gz"):
+                                                                # print(f'archiving {os.path.join(root, filename)}')
+                                                                arcfile = os.path.join(root, filename) + '.tar.gz'
+                                                                with tarfile.open(arcfile, "w:gz") as tar:
+                                                                        tar.add(os.path.join(root, filename), arcname=os.path.basename(os.path.join(root, filename)))
                                 except:
                                         print(f"Skipping file {filename} for archiving - not in the correct format")
                                         continue
