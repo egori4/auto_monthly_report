@@ -47,6 +47,20 @@ smtp_list = sys.argv[10:] # Email address/address list recepient/s(comma separat
 smtp_subject_prefix = sys.argv[9] # Email Subject
 
 
+
+##### Extract variables from run.sh ##############
+run_file = 'run.sh'
+with open (run_file) as f:
+	for line in f:
+	#find line starting with top_n
+
+
+		if line.startswith('report_range'):
+			report_range = str(line.split('=')[1].replace('\n','').replace('"',''))
+			continue
+
+
+
 path_r = f'./report_files/{cust_id}/'
 path_d = f'./database_files/{cust_id}/'
 
@@ -625,21 +639,8 @@ def email_body(cust_id):
         # print(html)
         return html
 
+def archive_files(currentmonth):
 
-def send_report(SMTP_AUTH,SMTP_SERVER,SMTP_SERVER_PORT,SMTP_SENDER,SMTP_PASSWORD,SMTP_LIST,SMTP_SUBJECT_PREFIX):
-
-        msg = MIMEMultipart()
-
-        if currentmonth != 1:
-                msg["Subject"] = SMTP_SUBJECT_PREFIX + f" Monthly report  - {currentmonth}, {currentyear}"
-        else:
-                msg["Subject"] = SMTP_SUBJECT_PREFIX + f" Monthly report  - 12, {prevyear}"
-
-        msg["From"] = SMTP_SENDER
-        msg["To"] = ', '.join(SMTP_LIST)
-
-        
-        #################################################### Archive files greater than 5MB ####################################################
         for root, dirs, files in os.walk(path_r):
                 if root.split("/")[2] == cust_id:
                         for filename in files:
@@ -655,9 +656,10 @@ def send_report(SMTP_AUTH,SMTP_SERVER,SMTP_SERVER_PORT,SMTP_SENDER,SMTP_PASSWORD
                                 except:
                                         print(f"Skipping file {filename} for archiving - not in the correct format")
                                         continue
-        
-        #################################################### Attach files to the email ########################################################
-        for root, dirs, files in os.walk(path_r):
+
+
+def send_files(currentmonth,msg):
+      for root, dirs, files in os.walk(path_r):
                 if root.split("/")[2] == cust_id:
                         for filename in files:
                                 try:
@@ -678,6 +680,31 @@ def send_report(SMTP_AUTH,SMTP_SERVER,SMTP_SERVER_PORT,SMTP_SENDER,SMTP_PASSWORD
                                 except:
                                         print(f"Skipping file {filename} from attaching to the email- not in the correct format")
                                         continue
+
+def send_report(SMTP_AUTH,SMTP_SERVER,SMTP_SERVER_PORT,SMTP_SENDER,SMTP_PASSWORD,SMTP_LIST,SMTP_SUBJECT_PREFIX):
+
+        msg = MIMEMultipart()
+        msg["From"] = SMTP_SENDER
+        msg["To"] = ', '.join(SMTP_LIST)
+
+        #################################################### Attach files to the email ########################################################
+        if report_range == "-1 day":
+
+                msg["Subject"] = SMTP_SUBJECT_PREFIX + f" Monthly report  - {currentmonth +1}, {currentyear}"
+
+                archive_files(currentmonth + 1)
+                send_files(currentmonth + 1,msg)
+
+        elif report_range == "-1 month":
+                if currentmonth != 1:
+                        msg["Subject"] = SMTP_SUBJECT_PREFIX + f" Monthly report  - {currentmonth}, {currentyear}"
+                else:
+                        msg["Subject"] = SMTP_SUBJECT_PREFIX + f" Monthly report  - 12, {prevyear}"
+
+                archive_files(currentmonth)
+                send_files(currentmonth,msg)
+
+        #######################################################################################################################################
  
         body = email_body(cust_id)
         msg.attach(MIMEText(body, 'html'))

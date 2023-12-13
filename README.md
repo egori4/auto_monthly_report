@@ -98,6 +98,10 @@ V9.0 (12/12/2023)
 		Added exporting the data to csv
 	- email_send.py
 		Enhancment - added case not to archive the file if was already archived (case if the large file was already archived)
+
+V9.1 (12/13/2023)
+	- email_send.py
+		Fixed case if set to run daily, to send files from the current month, not the previous month
 ===========================================================================================================================
 Instructions how to deploy as a docker container (on Vision example):
  
