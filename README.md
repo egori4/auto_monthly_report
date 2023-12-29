@@ -102,6 +102,22 @@ V9.0 (12/12/2023)
 V9.1 (12/13/2023)
 	- email_send.py
 		Fixed case if set to run daily, to send files from the current month, not the previous month
+
+V9.2 (12/29/2023)
+	- /script_files/abuseipdb.py
+		Disabled InsecureRequestWarning
+	- /script_files/analyze_trends.py
+		Cosmetics - added tables alignment to the top of the cell
+	- /script_files/analyze_trends_daily.py
+		fixed path to run file from run.sh to run_daily.sh
+	- /script_files/email_send.py
+		removed -1 day range section
+	- /script_files/email_send_daily.py
+		added new file
+	- script_files/delete_column_csv.py
+		new feature to delete specific data from csv
+		
+		
 ===========================================================================================================================
 Instructions how to deploy as a docker container (on Vision example):
  

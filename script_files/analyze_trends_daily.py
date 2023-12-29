@@ -18,7 +18,7 @@ for cust_config_block in customers_json:
 
 
 ##### Extract variables from run.sh ##############
-run_file = 'run.sh'
+run_file = 'run_daily.sh'
 with open (run_file) as f:
 	for line in f:
 	#find line starting with top_n

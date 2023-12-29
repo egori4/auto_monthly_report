@@ -1,4 +1,5 @@
 import requests
+from urllib3.exceptions import InsecureRequestWarning
 import json
 import os
 
@@ -34,6 +35,9 @@ def internet_conn():
 		'Accept': 'application/json',
 		'Key': aipdb_key
 	}
+	
+	# Disable only the InsecureRequestWarning
+	requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 	try:
 		response = requests.request(method='GET', url=url, headers=headers, params=querystring, verify=False)

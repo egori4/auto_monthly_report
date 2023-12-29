@@ -1172,14 +1172,14 @@ if __name__ == '__main__':
 		  </tr>
 
 		  <tr>
-			<td style="text-align: left;">
+			<td valign="top" style="text-align: left;">
 				<h4>Change in Security Events number by attack name this month compared to the previous month</h4>
 				{events_total_bar_move_text}{events_trends_move}</td>
-			<td style="text-align: left;">
+			<td valign="top" style="text-align: left;">
 				<h4>Change in Malicious Packets number by attack name this month compared to the previous month</h4>
 				{pakets_total_bar_move}{packets_trends_move_text}</td>
 
-			<td style="text-align: left;">
+			<td valign="top" style="text-align: left;">
 				<h4>Change in Malicious Traffic sum by attack name this month compared to the previous month</h4>
 				{bw_total_bar_move}{bw_trends_move}</td>
 		  </tr>
@@ -1205,13 +1205,13 @@ if __name__ == '__main__':
 		  </tr>	  
 		  
 		  <tr>
-		 	<td>
+		 	<td  valign="top">
 				{epm_html_final}
 			</td>
-		 	<td>
+		 	<td  valign="top">
 				{ppm_html_final} 
 			</td>
-		 	<td>
+		 	<td  valign="top">
 				{bpm_html_final}
 			</td>
 		  </tr>
@@ -1227,16 +1227,16 @@ if __name__ == '__main__':
 
 		  <tr>
 
-			<td style="text-align: left;">
+			<td valign="top" style="text-align: left;">
 				<h4>Change in Security Events number by device this month compared to the previous month</h4>
 				{events_by_device_trends_move_text}
 			</td>
-			<td style="text-align: left;">
+			<td valign="top" style="text-align: left;">
 				<h4>Change in Malicious Packets number by device this month compared to the previous month</h4>
 				{packets_by_device_trends_move_text}
 			</td>
 			
-			<td style="text-align: left;">
+			<td valign="top" style="text-align: left;">
 				<h4>Change in Malicious Traffic sum by device this month compared to the previous month</h4>
 				{bw_by_device_trends_move_text}
 			</td>

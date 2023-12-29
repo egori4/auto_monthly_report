@@ -24,5 +24,8 @@ json_files/MonthlyReport_EA.json
 fil-result/
 tmp_files/
 run.sh
+run.sh.*
+run_daily.sh
 database_previous
 json_files/MonthlyReport.json
+radware_report_daily_cron.log

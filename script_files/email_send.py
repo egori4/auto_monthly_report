@@ -47,20 +47,6 @@ smtp_list = sys.argv[10:] # Email address/address list recepient/s(comma separat
 smtp_subject_prefix = sys.argv[9] # Email Subject
 
 
-
-##### Extract variables from run.sh ##############
-run_file = 'run.sh'
-with open (run_file) as f:
-	for line in f:
-	#find line starting with top_n
-
-
-		if line.startswith('report_range'):
-			report_range = str(line.split('=')[1].replace('\n','').replace('"',''))
-			continue
-
-
-
 path_r = f'./report_files/{cust_id}/'
 path_d = f'./database_files/{cust_id}/'
 
@@ -82,8 +68,8 @@ if currentmonth != 1:
         
 if currentmonth == 1:
 
-	currentmonth = f'0{currentmonth}'
-	prevmonth = 12
+    currentmonth = f'0{currentmonth}'
+    prevmonth = 12
 
 prevyear = int(currentyear) - 1
 
@@ -688,21 +674,14 @@ def send_report(SMTP_AUTH,SMTP_SERVER,SMTP_SERVER_PORT,SMTP_SENDER,SMTP_PASSWORD
         msg["To"] = ', '.join(SMTP_LIST)
 
         #################################################### Attach files to the email ########################################################
-        if report_range == "-1 day":
 
-                msg["Subject"] = SMTP_SUBJECT_PREFIX + f" Monthly report  - {currentmonth +1}, {currentyear}"
+        if currentmonth != 1:
+                msg["Subject"] = SMTP_SUBJECT_PREFIX + f" Monthly report  - {currentmonth}, {currentyear}"
+        else:
+                msg["Subject"] = SMTP_SUBJECT_PREFIX + f" Monthly report  - 12, {prevyear}"
 
-                archive_files(currentmonth + 1)
-                send_files(currentmonth + 1,msg)
-
-        elif report_range == "-1 month":
-                if currentmonth != 1:
-                        msg["Subject"] = SMTP_SUBJECT_PREFIX + f" Monthly report  - {currentmonth}, {currentyear}"
-                else:
-                        msg["Subject"] = SMTP_SUBJECT_PREFIX + f" Monthly report  - 12, {prevyear}"
-
-                archive_files(currentmonth)
-                send_files(currentmonth,msg)
+        archive_files(currentmonth)
+        send_files(currentmonth,msg)
 
         #######################################################################################################################################
  

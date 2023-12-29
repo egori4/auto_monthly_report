@@ -20,7 +20,7 @@ last_month = sys.argv[2] #if day is 1st this will be this month, if it is 1st da
 
 db_path = f'./database_files/'+cust_id+'/'
 tmp_path = f'./tmp_files/'+cust_id+'/'
-run_file = 'run.sh'
+run_file = 'run_daily.sh'
 
 internet_conn = True
 
