@@ -169,35 +169,9 @@ do
 		echo "csv data modified"
 	fi
 
-	####################### Generate Report PDF #################################
-
-	if [ $generate_report == "true" ]; then
-
-		if [[ "$cur_month" != 01 ]] || [ "$cur_month" != 1 ]; then
-			echo "Generating report for $prev_month $cur_year"
-			php reportAll.php -- -month="$prev_month" -year="$cur_year" -id="$cust_id" #Generate and compile report to pdf
-		else
-			echo "Generating report for $prev_month $prev_year"
-			php reportAll.php -- -month="$prev_month" -year="$prev_year" -id="$cust_id" #Generate and compile report to pdf
-		fi
-	fi
+	
 
 
-	####################### Generate Appendix #################################
-
-	if [[ "$cur_month" != 01 ]] || [ "$cur_month" != 1 ]; then
-
-		if [ $generate_appendix == "true" ]; then
-			echo "Generating appendix for $prev_month $cur_year"
-			python3 script_files/data_parser_to_appendix.py $cust_id $prev_month $cur_year #this will generate appendix for the previouis month
-		fi
-
-	else
-		if [ $generate_appendix == "true" ]; then
-			echo "Generating appendix for $prev_month $prev_year"
-			python3 script_files/data_parser_to_appendix.py $cust_id $prev_month $prev_year #this will generate appendix for the previouis month
-		fi
-	fi
 
 	######################### Analyze Trends ######################
 
@@ -233,22 +207,35 @@ if [ $email_send == "true" ]; then
 	for cust_id in "${cust_list[@]}"
 		do
 			smtp_subject_prefix="$cust_id" # Email Subject
-			
-			if [[ "$cur_month" != 01 ]] && [ "$cur_month" != 1 ]; then
-				# Case for current month except January
-				
-				echo "Sending email - non January case"
+
+			if [[ "$cur_day" != 1 ]] && [ "$cur_day" != 01 ]; then
+				echo "Sending email - non 1st of the month case - all months"
 				python3 script_files/email_send_daily.py $cust_id $cur_month $cur_year $smtp_auth $smtp_server $smtp_server_port $smtp_sender $smtp_password $smtp_subject_prefix ${smtp_list[@]}
-
-
-			else
-				# Case for current month January
-
-				# if variable is_proxy_for_email is set to true, then proxy will be set for email sending
-				echo "Sending email - January case"
-				python3 script_files/email_send_daily.py $cust_id $prev_month $prev_year $smtp_auth $smtp_server $smtp_server_port $smtp_sender $smtp_password $smtp_subject_prefix ${smtp_list[@]}
+		
 			
+			else # 1st of the month
+			
+				if [[ "$cur_month" != 01 ]] && [ "$cur_month" != 1 ]; then
+					# Case for 1st of the month for all months except January
+				
+					echo "Sending email - 1st of the month non January case"
+
+
+					python3 script_files/email_send_daily.py $cust_id $prev_month $cur_year $smtp_auth $smtp_server $smtp_server_port $smtp_sender $smtp_password $smtp_subject_prefix ${smtp_list[@]}
+
+
+				else # 1st of the month, January
+					echo "Sending email - 1st of the month January case"
+					python3 script_files/email_send_daily.py $cust_id $prev_month $prev_year $smtp_auth $smtp_server $smtp_server_port $smtp_sender $smtp_password $smtp_subject_prefix ${smtp_list[@]}
+				
+				fi
+
+
+
+
+
 			fi
+
 		done
 fi
 #######################################################################################################

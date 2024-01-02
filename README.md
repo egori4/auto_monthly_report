@@ -117,7 +117,9 @@ V9.2 (12/29/2023)
 	- script_files/delete_column_csv.py
 		new feature to delete specific data from csv
 		
-		
+V9.2.1 (1/2/2023)
+	- run_daily_example.sh
+		fixed bug sending daily email for January
 ===========================================================================================================================
 Instructions how to deploy as a docker container (on Vision example):
  
