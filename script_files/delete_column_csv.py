@@ -36,7 +36,7 @@ def remove_column(csv_file_path, column_name):
 
 def process_files_in_directory(directory_path, column_name):
     for filename in os.listdir(directory_path):
-        if filename.endswith('.csv') and (filename == 'epm_chart_alltimehigh.csv' or filename == 'epm_chart_lm.csv'):
+        if filename.endswith('.csv') and (filename == 'epm_chart_alltimehigh.csv' or filename == 'epm_chart_lm.csv' or filename == 'events_per_day_chart_alltimehigh.csv'):
             file_path = os.path.join(directory_path, filename)
             remove_column(file_path, column_name)
 

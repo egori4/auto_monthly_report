@@ -117,9 +117,15 @@ V9.2 (12/29/2023)
 	- script_files/delete_column_csv.py
 		new feature to delete specific data from csv
 		
-V9.2.1 (1/2/2023)
+V9.2.1 (1/17/2023)
 	- run_daily_example.sh
 		fixed bug sending daily email for January
+	- script_files/analyze_trends.py and script_files/analyze_trends_daily.py
+		fixed top source IP by packets flat chart
+	- /script_files/charts_and_tables_daily.py
+		fixed calculating "Total" column for events column to include the first collected day column (bug)
+	- script_files/delete_column_csv.py
+		added removing prevailing topmost attack which skews the stats also from filename == 'events_per_day_chart_alltimehigh.csv'
 ===========================================================================================================================
 Instructions how to deploy as a docker container (on Vision example):
  

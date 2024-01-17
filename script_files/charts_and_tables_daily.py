@@ -280,14 +280,16 @@ def gen_charts_data(db_path):
 
 	##############################################################################
 	# 1 ###############Attack Name Events Count trends all time high################
-
 	events_count_trend_chart_all_times = pd.concat(events_count_list,axis=1).fillna(0)#.sort_values(by=day, ascending=False)
-	
+
 	# Create a new column with the absolute sum of values across columns
-	events_count_trend_chart_all_times['Total'] = events_count_trend_chart_all_times.iloc[:, 1:].abs().sum(axis=1)
+	# events_count_trend_chart_all_times['Total'] = events_count_trend_chart_all_times.iloc[:, 1:].abs().sum(axis=1)
+
+	events_count_trend_chart_all_times['Total'] = events_count_trend_chart_all_times.abs().sum(axis=1)
 
 	# Sort the DataFrame by the absolute sum column in descending order
 	events_count_trend_chart_all_times_alltimehigh = events_count_trend_chart_all_times.sort_values(by='Total', ascending=False)
+
 	events_count_trend_chart_all_times_alltimehigh.head(top_n)       .to_csv(tmp_path + 'events_per_day_table_alltimehigh.csv') #save events count table (all time high sum) to csv file
 
 	# Drop the temporary column used for sorting
@@ -357,7 +359,7 @@ def gen_charts_data(db_path):
 
 	device_events_count_trend_chart_all_times = pd.concat(device_events_count_list,axis=1).fillna(0)#.sort_values(by=[str(day)], ascending=False)
 
-	device_events_count_trend_chart_all_times['Total'] = device_events_count_trend_chart_all_times.iloc[:, 1:].abs().sum(axis=1)
+	device_events_count_trend_chart_all_times['Total'] = device_events_count_trend_chart_all_times.abs().sum(axis=1)
 
 	# Sort the DataFrame by the absolute sum column in descending order
 	device_events_count_trend_chart_all_times = device_events_count_trend_chart_all_times.sort_values(by='Total', ascending=False)
@@ -429,7 +431,7 @@ def gen_charts_data(db_path):
 	
 	df_policy_events_count_trend_chart_all_times = pd.concat(policy_events_count_list,axis=1).fillna(0)
 
-	df_policy_events_count_trend_chart_all_times['Total'] = df_policy_events_count_trend_chart_all_times.iloc[:, 1:].abs().sum(axis=1)
+	df_policy_events_count_trend_chart_all_times['Total'] = df_policy_events_count_trend_chart_all_times.abs().sum(axis=1)
 
 	# Sort the DataFrame by the absolute sum column in descending order
 	df_policy_events_count_trend_chart_all_times = df_policy_events_count_trend_chart_all_times.sort_values(by='Total', ascending=False)
@@ -538,7 +540,7 @@ def gen_charts_data(db_path):
 	# ###############Top 10 source IP by events count by last month################
 
 	srcip_events_trend_chart_alltimehigh = pd.concat(srcip_events_count_list,axis=1).fillna(0)#.sort_values(by=[str(day)], ascending=False)
-	srcip_events_trend_chart_alltimehigh['Total'] = srcip_events_trend_chart_alltimehigh.iloc[:, 1:].abs().sum(axis=1)
+	srcip_events_trend_chart_alltimehigh['Total'] = srcip_events_trend_chart_alltimehigh.abs().sum(axis=1)
 	srcip_events_trend_chart_alltimehigh = srcip_events_trend_chart_alltimehigh.sort_values(by='Total', ascending=False)
 
 
@@ -631,7 +633,7 @@ def gen_charts_data(db_path):
 	# ###############Top 10 source IP by packets count alltimehigh################
 
 	srcip_packets_trend_chart_alltimehigh = pd.concat(srcip_packets_count_list,axis=1).fillna(0)
-	srcip_packets_trend_chart_alltimehigh['Total'] = srcip_packets_trend_chart_alltimehigh.iloc[:, 1:].abs().sum(axis=1)
+	srcip_packets_trend_chart_alltimehigh['Total'] = srcip_packets_trend_chart_alltimehigh.abs().sum(axis=1)
 	srcip_packets_trend_chart_alltimehigh = srcip_packets_trend_chart_alltimehigh.sort_values(by='Total', ascending=False)
 
 
@@ -722,7 +724,7 @@ def gen_charts_data(db_path):
 
 
 	srcip_bandwidth_trend_chart_alltimehigh = pd.concat(srcip_bandwidth_sum_list,axis=1).fillna(0)
-	srcip_bandwidth_trend_chart_alltimehigh['Total'] = srcip_bandwidth_trend_chart_alltimehigh.iloc[:, 1:].abs().sum(axis=1)
+	srcip_bandwidth_trend_chart_alltimehigh['Total'] = srcip_bandwidth_trend_chart_alltimehigh.abs().sum(axis=1)
 	srcip_bandwidth_trend_chart_alltimehigh = srcip_bandwidth_trend_chart_alltimehigh.sort_values(by='Total', ascending=False)
 
 

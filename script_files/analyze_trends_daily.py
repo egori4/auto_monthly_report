@@ -729,13 +729,8 @@ if __name__ == '__main__':
 	sip_packets_trends_chart = convert_csv_to_list_of_lists(charts_tables_path + 'sip_packets_per_day_chart_alltimehigh.csv')
 	sip_packets_trends_chart = convert_packets_units(sip_packets_trends_chart, pkt_units)
 
-
-	if pkt_units is not None:
-		sip_packets_trends_move_text = trends_move(sip_packets_trends_chart, ' packets(' + pkt_units + ')')
-		sip_packets_table = csv_to_html_table(charts_tables_path + 'sip_packets_per_day_table_alltimehigh.csv',bw_units=None, pkt_units=pkt_units)
-	else:
-		sip_packets_trends_move_text = trends_move(sip_packets_trends_chart, ' packets')
-		sip_packets_table = csv_to_html_table(charts_tables_path + 'sip_packets_per_day_table_alltimehigh.csv',bw_units=None, pkt_units=None)
+	sip_packets_trends_move_text = trends_move(sip_packets_trends_chart, ' packets')
+	sip_packets_table = csv_to_html_table(charts_tables_path + 'sip_packets_per_day_table_alltimehigh.csv',bw_units=None, pkt_units=None)
 
 
 
