@@ -126,6 +126,15 @@ V9.2.1 (1/17/2023)
 		fixed calculating "Total" column for events column to include the first collected day column (bug)
 	- script_files/delete_column_csv.py
 		added removing prevailing topmost attack which skews the stats also from filename == 'events_per_day_chart_alltimehigh.csv'
+
+V9.2.2 (1/25/2023)
+	- run_daily_example.sh and run_example.sh
+		bugfixes
+	- abuseipdb.py
+		added printing error in event of communcation error with abuseipdb
+	- analyze_trends_daily.py
+		realigned charts to the whole page width insted of inside the cells
+		Cosmetics - renamed column names
 ===========================================================================================================================
 Instructions how to deploy as a docker container (on Vision example):
  
