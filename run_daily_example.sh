@@ -35,6 +35,18 @@ else
     prev_month=12
 fi
 
+if (( "$cur_month" >= 1 && "$cur_month" <= 9 )); then
+    # Add a leading zero if the number is between 1 and 9
+    cur_month=$(printf "%02d" "$cur_month")
+    echo "Formatted current month: $cur_month"
+fi
+
+if (( "$prev_month" >= 1 && "$prev_month" <= 9 )); then
+    # Add a leading zero if the number is between 1 and 9
+    prev_month=$(printf "%02d" "$prev_month")
+    echo "Formatted current month: $prev_month"
+fi
+
 
 abuseipdb_key="xxx"
 #This variable is needed to fetch the information about top 10 malicious IP addresses from abuseipdb.com.
@@ -77,8 +89,8 @@ smtp_list=(user@radware.com user2@radware.com)
 ### cd app
 
 #######################Proxy variables##############################################################
-is_http_proxy=true
-is_https_proxy=true
+is_http_proxy=false
+is_https_proxy=false
 
 is_proxy_for_email=false
 
@@ -163,8 +175,9 @@ do
 	
 	####################### Modify CSV Data #################################
 	
-	echo "Modifying csv data"
+
 	if [ $modify_csv == "true" ]; then
+		echo "Modifying csv data"
 		python3 script_files/delete_column_csv.py $cust_id
 		echo "csv data modified"
 	fi
