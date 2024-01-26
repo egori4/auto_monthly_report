@@ -596,55 +596,55 @@ if __name__ == '__main__':
 	#4 Iterate through each Device and popluate the html table
 
 	for index, value in enumerate(events_per_day_top_list):
-		events_per_day_html_final+=f'<h4>{value} distribution across devices and policies</h4>'
+		events_per_day_html_final+=f'<h4>Distribution of topmost Security Events for attack "{value}" across devices and policies</h4>'
 		events_per_day_html_final+= events_per_day_html(events_per_day_top_list[index])
 
 	for index, value in enumerate(packets_per_day_top_list):
-		packets_per_day_html_final+=f'<h4>{value} distribution across devices and policies</h4>'
+		packets_per_day_html_final+=f'<h4>Distribution of topmost Malicious packets for attack "{value}" across devices and policies</h4>'
 		packets_per_day_html_final+= packets_per_day_html(packets_per_day_top_list[index])
 		
 	for index, value in enumerate(bandwidth_per_day_top_list):
-		bandwidth_per_day_html_final+=f'<h4>{value} distribution across devices and policies</h4>'
+		bandwidth_per_day_html_final+=f'<h4>Distribution of topmost Malicious Bandwidth for attack "{value}" across devices and policies</h4>'
 		bandwidth_per_day_html_final+= bandwidth_per_day_html(bandwidth_per_day_top_list[index])
 
 
 
 	for index, value in enumerate(device_events_per_day_top_list):
-		device_events_per_day_html_final+=f'<h4>Top Attacks and policies for device {value}</h4>'
+		device_events_per_day_html_final+=f'<h4>Distribution of topmost Security events for device "{value}" across policies</h4>'
 		device_events_per_day_html_final+= device_events_per_day_html(device_events_per_day_top_list[index])
 
 	for index, value in enumerate(device_packets_per_day_top_list):
-		device_packets_per_day_html_final+=f'<h4>Top Attacks and policies for device {value}</h4>'
+		device_packets_per_day_html_final+=f'<h4>Distribution of topmost malicious packets for device "{value}" across policies</h4>'
 		device_packets_per_day_html_final+= device_packets_per_day_html(device_packets_per_day_top_list[index])
 
 	for index, value in enumerate(device_bandwidth_per_day_top_list):
-		device_bandwidth_per_day_html_final+=f'<h4>Top Attacks and policies for device {value}</h4>'
+		device_bandwidth_per_day_html_final+=f'<h4>Distribution of topmost malicious bandwidth for device "{value}" across policies</h4>'
 		device_bandwidth_per_day_html_final+= device_bandwidth_per_day_html(device_packets_per_day_top_list[index])
 
 
 	for index, value in enumerate(policy_events_per_day_top_list):
-		policy_events_per_day_html_final+=f'<h4>Distribution of attacks and devices for policy {value}</h4>'
+		policy_events_per_day_html_final+=f'<h4>Distribution of topmost Security events for policy "{value}" across devices</h4>'
 		policy_events_per_day_html_final+= policy_events_per_day_html(policy_events_per_day_top_list[index])
 
 	for index, value in enumerate(policy_packets_per_day_top_list):
-		policy_packets_per_day_html_final+=f'<h4>Distribution of attacks and devices for policy {value}</h4>'
+		policy_packets_per_day_html_final+=f'<h4>Distribution of topmost Malicious packets for policy "{value}" across devices</h4>'
 		policy_packets_per_day_html_final+= policy_packets_per_day_html(policy_packets_per_day_top_list[index])
 		
 	for index, value in enumerate(policy_bandwidth_per_day_top_list):
-		policy_bandwidth_per_day_html_final+=f'<h4>Distribution of attacks and devices for policy {value}</h4>'
+		policy_bandwidth_per_day_html_final+=f'<h4>Distribution of topmost Malicious bandwidth for policy "{value}" across devices</h4>'
 		policy_bandwidth_per_day_html_final+= policy_bandwidth_per_day_html(policy_bandwidth_per_day_top_list[index])
 
 
 	for index, value in enumerate(sip_events_per_day_top_list):
-		sip_events_per_day_html_final+=f'<h4>Distribution of attacks and devices for Source IP {value}</h4>'
+		sip_events_per_day_html_final+=f'<h4>Distribution of topmost Security events for Source IP {value}</h4>'
 		sip_events_per_day_html_final+= sip_events_per_day_html(sip_events_per_day_top_list[index])
 
 	for index, value in enumerate(sip_packets_per_day_top_list):
-		sip_packets_per_day_html_final+=f'<h4>Distribution of attacks and devices for Source IP {value}</h4>'
+		sip_packets_per_day_html_final+=f'<h4>Distribution of topmost malicious packets for Source IP {value}</h4>'
 		sip_packets_per_day_html_final+= sip_packets_per_day_html(sip_packets_per_day_top_list[index])
 		
 	for index, value in enumerate(sip_bandwidth_per_day_top_list):
-		sip_bandwidth_per_day_html_final+=f'<h4>Distribution of attacks and devices for Source IP {value}</h4>'
+		sip_bandwidth_per_day_html_final+=f'<h4>Distribution of topmost malicious bandwidth for Source IP {value}</h4>'
 		sip_bandwidth_per_day_html_final+= sip_bandwidth_per_day_html(sip_bandwidth_per_day_top_list[index])
 
 
@@ -1290,13 +1290,13 @@ if __name__ == '__main__':
 		  </tr>
 		  <tr>
 			<td colspan="3" class="fit-text">
-			<h4>Malicious packets table (units {pkt_units}) by Policy Name</h4>
+			<h4>Malicious packets table by Policy Name (units {pkt_units})</h4>
 			{policy_packets_table}
 			</td>
 		  </tr>
 		  <tr>
 			<td colspan="3" class="fit-text">
-			<h4>Malicious bandwidth table (Megabytes) by Policy Name</h4>
+			<h4>Malicious bandwidth table by Policy Name (units Megabytes)</h4>
 			{policy_bw_table}
 			</td>
 		  </tr>	  

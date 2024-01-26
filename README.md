@@ -135,6 +135,9 @@ V9.2.2 (1/25/2023)
 	- analyze_trends_daily.py
 		realigned charts to the whole page width insted of inside the cells
 		Cosmetics - renamed column names
+9.2.3 (1/26/2023)
+	- analyze_trends_daily.py
+		cosmetics - phrasing, naming enhancments
 ===========================================================================================================================
 Instructions how to deploy as a docker container (on Vision example):
  
