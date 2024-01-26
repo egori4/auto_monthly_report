@@ -138,6 +138,20 @@ V9.2.2 (1/25/2023)
 9.2.3 (1/26/2023)
 	- analyze_trends_daily.py
 		cosmetics - phrasing, naming enhancments
+
+9.3 (1/26/2023)
+	- analyze_trends.py , charts_and_tables.py, analyze_trends_daily.py , charts_and_tables_daily.py , run_daily_example.sh, run_example.sh
+
+		Changed units per customer. Configurable under "./config_files/customers.json"
+		
+		pktUnit="Gigabytes"
+		#Can be configured "Gigabytes", "Terabytes" or "Megabytes
+
+		bwUnit="Millions"
+		#Can be configured "Millions" or "Billions" or "Thousands"
+
+
+	!!! Must update run.sh, run_example.sh, ./config_files/customers.json
 ===========================================================================================================================
 Instructions how to deploy as a docker container (on Vision example):
  

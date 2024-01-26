@@ -53,10 +53,6 @@ top_n=7
 #Number of top N items to be displayed in the report. For example if set to 10, the script will display top 10 items in the report.
 
 
-bw_units="Gigabytes"
-#Can be configured "Gigabytes", "Terabytes" or "Megabytes"
-pkt_units="Millions"
-#Can be configured "Millions" or "Billions" or "Thousands"
 ####################################################################################################
 
 ######################## Convert Forensics(optional) ############################################################
@@ -125,16 +121,16 @@ if [ $convert_forensics_to_sqlite == "true" ]; then
 	echo "Converting Forensics file to sqlite database"
 	python3 script_files/forensics_to_sqlite.py $forensics_file_cust_id
 fi
-################# Collect data from Vision ############################
 
+################# Collect data from Vision (must be here before setting proxy) ############################
 for cust_id in "${cust_list[@]}"
 do
-
 	if [ $collect_data == "true" ]; then
 		echo "Collecting Data from Vision"
 		php collectAll.php -- -upper=01.$cur_month.$cur_year -range="-1 month" -id="$cust_id"
 	fi
 done
+
 
 ################# Set Proxy ##########################################################################
 
@@ -171,8 +167,9 @@ do
 	fi
 	####################### Modify CSV Data #################################
 	
-	echo "Modifying csv data"
+	
 	if [ $modify_csv == "true" ]; then
+		echo "Modifying csv data"
 		python3 script_files/delete_column_csv.py $cust_id 
 		echo "csv data modified"
 	fi
@@ -212,10 +209,10 @@ do
 
 		if [[ "$cur_month" != 01 ]] && [ "$cur_month" != 1 ]; then
 			echo "Analyzing trends for $prev_month $cur_year"
-			python3 script_files/analyze_trends.py $cust_id $prev_month $cur_year $bw_units $pkt_units #this will generate appendix for the previouis month
+			python3 script_files/analyze_trends.py $cust_id $prev_month $cur_year #this will generate appendix for the previouis month
 		else
 			echo "Analyzing trends for $prev_month $prev_year"
-			python3 script_files/analyze_trends.py $cust_id $prev_month $prev_year $bw_units $pkt_units #this will generate appendix for the previouis month
+			python3 script_files/analyze_trends.py $cust_id $prev_month $prev_year #this will generate appendix for the previouis month
 		fi
 		
 	fi

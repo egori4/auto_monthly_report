@@ -14,9 +14,6 @@ cust_list=(Customer-Name)	#space separated list of customer IDs, do not use unde
 ####################################################################################################
 
 ##################### Report Range #################################################################
-#report_range="-1 month" # set to "-1 month"
-report_range="-1 day"
-echo "$report_range"
 
 cur_day=$(date +'%d')
 #cur_day=1
@@ -38,13 +35,13 @@ fi
 if (( "$cur_month" >= 1 && "$cur_month" <= 9 )); then
     # Add a leading zero if the number is between 1 and 9
     cur_month=$(printf "%02d" "$cur_month")
-    echo "Formatted current month: $cur_month"
+    #echo "Formatted current month: $cur_month"
 fi
 
 if (( "$prev_month" >= 1 && "$prev_month" <= 9 )); then
     # Add a leading zero if the number is between 1 and 9
     prev_month=$(printf "%02d" "$prev_month")
-    echo "Formatted current month: $prev_month"
+    #echo "Formatted prev month: $prev_month"
 fi
 
 
@@ -59,11 +56,7 @@ top_n=7
 #Number of top N items to be displayed in the report. For example if set to 10, the script will display top 10 items in the report.
 
 
-bw_units="Megabytes"
-#Can be configured "Gigabytes", "Terabytes" or "Megabytes"
-pkt_units="As is"
-echo "$pkt_units"
-#Can be configured "Millions" or "Billions" or "Thousands"
+
 ####################################################################################################
 
 #######################Action variables switch on/off(optional)####################################################
@@ -128,7 +121,7 @@ do
 
 	if [ $collect_data == "true" ]; then
 		
-		php collectAll.php -- -upper=$cur_day.$cur_month.$cur_year -range="$report_range" -id="$cust_id"	
+		php collectAll.php -- -upper=$cur_day.$cur_month.$cur_year -range="-1 day" -id="$cust_id"	
 
 	fi
 done
@@ -193,15 +186,15 @@ do
 		if [[ "$cur_day" == 1 ]] || [ "$cur_day" == 01 ]; then
 			if [[ "$cur_month" == 1 ]] || [ "$cur_month" == 01 ]; then # 1st of the month and January
 				echo "Analyzing daily trends for $prev_month $prev_year"
-				python3 script_files/analyze_trends_daily.py $cust_id $prev_month $prev_year $bw_units $pkt_units #this will generate appendix for the previouis month
+				python3 script_files/analyze_trends_daily.py $cust_id $prev_month $prev_year #this will generate appendix for the previouis month
 			else
 				# 1st of the month not January
 				echo "Analyzing daily trends for $prev_month $cur_year"
-				python3 script_files/analyze_trends_daily.py $cust_id $prev_month $cur_year $bw_units $pkt_units #this will generate appendix for the previouis month
+				python3 script_files/analyze_trends_daily.py $cust_id $prev_month $cur_year #this will generate appendix for the previouis month
 			fi	
 		else # if day is not 1
 			echo "Analyzing daily trends for $cur_month $cur_year"
-			python3 script_files/analyze_trends_daily.py $cust_id $cur_month $cur_year $bw_units $pkt_units #this will generate appendix for the previouis month
+			python3 script_files/analyze_trends_daily.py $cust_id $cur_month $cur_year #this will generate appendix for the previouis month
 		fi
 
 	fi

@@ -30,13 +30,6 @@ with open (run_file) as f:
 			top_n = int(line.split('=')[1].replace('\n',''))
 			continue
 
-		if line.startswith('bw_units'):
-			bw_units = str(line.split('=')[1].replace('\n','').replace('"',''))
-			continue
-
-		if line.startswith('pkt_units'):
-			pkt_units = str(line.split('=')[1].replace('\n','')).replace('"','')
-			continue
 
 ########DefensePro IP to Name translation########
 
@@ -45,6 +38,13 @@ customers_json = json.loads(open("./config_files/customers.json", "r").read())
 for cust_config_block in customers_json:
 	if cust_config_block['id'] == cust_id:
 		defensepros = cust_config_block['defensepros']
+
+######## Get Units ###############################
+		bw_units = cust_config_block['variables']['bwUnit']
+		#Can be configured "Gigabytes", "Terabytes" or "Megabytes"
+		
+		pkt_units = cust_config_block['variables']['pktUnit']
+		#Can be configured "Millions" or "Billions" or "Thousands"
 
 #################################################
 

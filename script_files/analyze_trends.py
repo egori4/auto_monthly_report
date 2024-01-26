@@ -8,15 +8,18 @@ import json
 cust_id = sys.argv[1]
 month = sys.argv[2]
 year = sys.argv[3]
-bw_units = sys.argv[4]
-pkt_units = sys.argv[5]
+
 
 customers_json = json.loads(open("./config_files/customers.json", "r").read())
 
 for cust_config_block in customers_json:
 	if cust_config_block['id'].lower() == cust_id.lower():
 		defensepros = cust_config_block['defensepros']
-
+		bw_units = cust_config_block['variables']['bwUnit']
+		#Can be configured "Gigabytes", "Terabytes" or "Megabytes"
+		
+		pkt_units = cust_config_block['variables']['pktUnit']
+		#Can be configured "Millions" or "Billions" or "Thousands"
 
 # Paths
 charts_tables_path = f"./tmp_files/{cust_id}/"
