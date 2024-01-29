@@ -15,9 +15,11 @@
 		},
 		"variables": {
 			"pktDivisor": 1000000,
-			"pktUnit": "Million Packets",
+			"pktUnit": "Millions",
+			"pktUnitDaily": "Thousands",
 			"bwDivisor": 8000000,
 			"bwUnit": "GigaBytes",
+			"bwUnitDaily": "MegaBytes",
 			"decimals": 2,
 			"pktDecimals": 2,
 			"bwDecimals": 2
