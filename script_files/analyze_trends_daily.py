@@ -15,11 +15,11 @@ customers_json = json.loads(open("./config_files/customers.json", "r").read())
 for cust_config_block in customers_json:
 	if cust_config_block['id'].lower() == cust_id.lower():
 		defensepros = cust_config_block['defensepros']
-		
-		bw_units = cust_config_block['variables']['bwUnit']
+
+		bw_units = cust_config_block['variables']['bwUnitDaily']
 		#Can be configured "Gigabytes", "Terabytes" or "Megabytes"
 		
-		pkt_units = cust_config_block['variables']['pktUnit']
+		pkt_units = cust_config_block['variables']['pktUnitDaily']
 		#Can be configured "Millions" or "Billions" or "Thousands"
 
 ##### Extract variables from run.sh ##############
