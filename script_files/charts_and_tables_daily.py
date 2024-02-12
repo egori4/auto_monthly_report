@@ -20,6 +20,7 @@ last_month = sys.argv[2] #if day is 1st this will be this month, if it is 1st da
 
 db_path = f'./database_files/'+cust_id+'/'
 tmp_path = f'./tmp_files/'+cust_id+'/'
+reports_path = f'./report_files/'+cust_id+'/'
 run_file = 'run_daily.sh'
 
 internet_conn = True
@@ -57,6 +58,8 @@ if not os.path.exists('./tmp_files'):
 if not os.path.exists(tmp_path):
 	os.mkdir(tmp_path)
 
+if not os.path.exists(reports_path):
+	os.mkdir(reports_path)
 
 #delete files inside tmp_files directory
 for file in os.listdir(tmp_path):

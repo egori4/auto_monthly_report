@@ -20,6 +20,7 @@ last_month = sys.argv[2]
 
 db_path = f'./database_files/'+cust_id+'/'
 tmp_path = f'./tmp_files/'+cust_id+'/'
+reports_path = f'./report_files/'+cust_id+'/'
 run_file = 'run.sh'
 
 with open (run_file) as f:
@@ -55,6 +56,10 @@ if not os.path.exists('./tmp_files'):
 if not os.path.exists(tmp_path):
 	os.mkdir(tmp_path)
 
+# check if report_files directory exists and create it if it doesn't
+
+if not os.path.exists(reports_path):
+	os.mkdir(reports_path)
 
 #delete files inside tmp_files directory
 for file in os.listdir(tmp_path):

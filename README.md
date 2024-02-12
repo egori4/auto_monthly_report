@@ -156,7 +156,21 @@ V9.2.2 (1/25/2024)
 		Introduced new ./config_files/customers.json variables "bwUnitDaily" and "pktUnitDaily"
 	
 	!!! Must add and set "bwUnitDaily" and "pktUnitDaily" to ./config_files/customers.json
+		"bwUnitDaily" #Can be configured "Gigabytes", "Terabytes" or "Megabytes
+		"pktUnitDaily" #Can be configured "Millions", "Billions", "Thousands" or "As is"
 
+9.3.2 (2/12/24)
+	- charts_and_tables.py and charts_and_tables_daily.py
+		bugfix(enhancment) - if /report_files/<cust_id> does not exist, precreate it so the script won't fail
+	- analyze_trends.py for monthly reports
+		Cosmetics improvements
+			changed 'Count' to "Security Events'
+			changed 'deviceName' to 'Device Name'
+			changed 'ruleName' to 'Policy Name'
+			changed 'name' to 'Attack Name'
+			changed sourceAddress to 'Source IP'
+			changed 'startDayOfMonth' to 'Day of the Month'
+			added units {pkt_units} and units {bw_units}
 
 ===========================================================================================================================
 Instructions how to deploy as a docker container (on Vision example):
