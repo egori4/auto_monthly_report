@@ -172,6 +172,10 @@ V9.2.2 (1/25/2024)
 			changed 'startDayOfMonth' to 'Day of the Month'
 			added units {pkt_units} and units {bw_units}
 
+9.3.3 (2/12/24 commit name "Feb 12 - Added monthly and daily" by Jesus)
+	- analyze_trends_daily.py and analyze_trends.py
+		modification of the trends_CUSTOMER_MONTH_YEAR.html to trends-daily_CUSTOMER_MONTH_YEAR.html and trends-monthly_CUSTOMER_MONTH_YEAR.html
+
 ===========================================================================================================================
 Instructions how to deploy as a docker container (on Vision example):
  
