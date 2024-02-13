@@ -253,7 +253,7 @@ def csv_to_html_table(filename, bw_units=None, pkt_units=None):
 def write_html(html_page,month,year):
 	# write html_page to file function
 
-	with open(reports_path + f'trends_{cust_id}_{month}_{year}.html', 'w') as f:
+	with open(reports_path + f'trends_monthly_{cust_id}_{month}_{year}.html', 'w') as f:
 		f.write(html_page)
 
 
