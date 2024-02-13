@@ -58,6 +58,9 @@ if not os.path.exists(tmp_path):
 
 # check if report_files directory exists and create it if it doesn't
 
+if not os.path.exists('./report_files'):
+	os.mkdir('./report_files')
+	
 if not os.path.exists(reports_path):
 	os.mkdir(reports_path)
 

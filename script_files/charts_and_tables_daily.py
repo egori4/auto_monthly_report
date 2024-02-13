@@ -58,6 +58,10 @@ if not os.path.exists('./tmp_files'):
 if not os.path.exists(tmp_path):
 	os.mkdir(tmp_path)
 
+
+if not os.path.exists('./report_files'):
+	os.mkdir('./report_files')
+
 if not os.path.exists(reports_path):
 	os.mkdir(reports_path)
 

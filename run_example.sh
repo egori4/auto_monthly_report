@@ -32,13 +32,13 @@ fi
 if (( "$cur_month" >= 1 && "$cur_month" <= 9 )); then
     # Add a leading zero if the number is between 1 and 9
     cur_month=$(printf "%02d" "$cur_month")
-    echo "Formatted current month: $cur_month"
+    #echo "Formatted current month: $cur_month"
 fi
 
 if (( "$prev_month" >= 1 && "$prev_month" <= 9 )); then
     # Add a leading zero if the number is between 1 and 9
     prev_month=$(printf "%02d" "$prev_month")
-    echo "Formatted current month: $prev_month"
+    #echo "Formatted current month: $prev_month"
 fi
 
 
