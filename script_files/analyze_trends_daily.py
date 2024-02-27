@@ -55,27 +55,31 @@ def convert_csv_to_list_of_lists(filename):
 def convert_strings_to_numbers(data):
   # Check values float, integer or string function
 	converted_data = []
-	for row in data:
-		converted_row = []
-		for value in row:
-			#check if not ipv4 address
-			if value.count('.') != 3:
-				if value.replace(".", "").isdigit():  # Check if value is numeric
-					if value.endswith('.0'):
-						value = int(value.replace('.0', ''))
-						converted_row.append(value)  # Convert ".0" to integer
-					#check if value has decimal points
-					elif "." in value:
-						converted_row.append(float(value))
-					elif value.isdigit():
-						converted_row.append(int(value))  # Convert to integer
+	
+	for sublist_index, sublist in enumerate(data):
+		if sublist_index == 0: # do not convert the strings to numbers for the first headline row (policy names might be numbers corner case)
+			converted_data.append(sublist)
+		else:
+			converted_row = []
+			for value in sublist:
+				#check if not ipv4 address
+				if value.count('.') != 3:
+					if value.replace(".", "").isdigit():  # Check if value is numeric
+						if value.endswith('.0'):
+							value = int(value.replace('.0', ''))
+							converted_row.append(value)  # Convert ".0" to integer
+						#check if value has decimal points
+						elif "." in value:
+							converted_row.append(float(value))
+						elif value.isdigit():
+							converted_row.append(int(value))  # Convert to integer
+						else:
+							print('The value is not defined as integer or float')
 					else:
-						print('The value is not defined as integer or float')
+						converted_row.append(value)
 				else:
 					converted_row.append(value)
-			else:
-				converted_row.append(value)
-		converted_data.append(converted_row)
+			converted_data.append(converted_row)
 	return converted_data
 
 def convert_packets_units(data, pkt_units):

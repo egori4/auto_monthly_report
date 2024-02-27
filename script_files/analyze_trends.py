@@ -40,27 +40,31 @@ def convert_csv_to_list_of_lists(filename):
 def convert_strings_to_numbers(data):
   # Check values float, integer or string function
 	converted_data = []
-	for row in data:
-		converted_row = []
-		for value in row:
-			#check if not ipv4 address
-			if value.count('.') != 3:
-				if value.replace(".", "").isdigit():  # Check if value is numeric
-					if value.endswith('.0'):
-						value = int(value.replace('.0', ''))
-						converted_row.append(value)  # Convert ".0" to integer
-					#check if value has decimal points
-					elif "." in value:
-						converted_row.append(float(value))
-					elif value.isdigit():
-						converted_row.append(int(value))  # Convert to integer
+	
+	for sublist_index, sublist in enumerate(data):
+		if sublist_index == 0: # do not convert the strings to numbers for the first headline row (policy names might be numbers corner case)
+			converted_data.append(sublist)
+		else:
+			converted_row = []
+			for value in sublist:
+				#check if not ipv4 address
+				if value.count('.') != 3:
+					if value.replace(".", "").isdigit():  # Check if value is numeric
+						if value.endswith('.0'):
+							value = int(value.replace('.0', ''))
+							converted_row.append(value)  # Convert ".0" to integer
+						#check if value has decimal points
+						elif "." in value:
+							converted_row.append(float(value))
+						elif value.isdigit():
+							converted_row.append(int(value))  # Convert to integer
+						else:
+							print('The value is not defined as integer or float')
 					else:
-						print('The value is not defined as integer or float')
+						converted_row.append(value)
 				else:
 					converted_row.append(value)
-			else:
-				converted_row.append(value)
-		converted_data.append(converted_row)
+			converted_data.append(converted_row)
 	return converted_data
 
 def convert_packets_units(data, pkt_units):
@@ -226,11 +230,11 @@ def format_numeric_value(value, bw_units=None, pkt_units=None):
 
 
 def convert_to_int(column):
-    try:
-        return column.astype(int)
-    except ValueError:
-        return column
-    
+	try:
+		return column.astype(int)
+	except ValueError:
+		return column
+	
 def csv_to_html_table(filename, bw_units=None, pkt_units=None):
 	# Read the CSV file, if the value is integer, leave it as integer, if float, leave it as float
 	
@@ -258,19 +262,19 @@ def write_html(html_page,month,year):
 
 
 def extract_values_from_csv(csv_file):
-    values = []
+	values = []
 
-    with open(charts_tables_path + csv_file, 'r') as csv_file:
-        csv_reader = csv.reader(csv_file)
-        
-        # Skip the header row
-        next(csv_reader)
+	with open(charts_tables_path + csv_file, 'r') as csv_file:
+		csv_reader = csv.reader(csv_file)
+		
+		# Skip the header row
+		next(csv_reader)
 
-        # Extract values from the first column
-        for row in csv_reader:
-            values.append(row[0])
+		# Extract values from the first column
+		for row in csv_reader:
+			values.append(row[0])
 
-    return values
+	return values
 
 
 def events_per_day_html():
@@ -462,7 +466,7 @@ def sip_bpm_html(sip_bpm):
 
 
 def format_with_commas(value):
-    return '{:,}'.format(value)
+	return '{:,}'.format(value)
 
 if __name__ == '__main__':
 

@@ -176,6 +176,11 @@ V9.2.2 (1/25/2024)
 	- analyze_trends_daily.py and analyze_trends.py
 		modification of the trends_CUSTOMER_MONTH_YEAR.html to trends-daily_CUSTOMER_MONTH_YEAR.html and trends-monthly_CUSTOMER_MONTH_YEAR.html
 
+9.3.4 (2/27/24)
+	- analyze_trends_daily.py asnd analyze_trends.py
+		Added corner case not to convert strings to numbers for the csv headlines for all csv files
+		This is when policy name is a number, do not convert the policy name to be the integer otherwise it breaks the JS
+
 ===========================================================================================================================
 Instructions how to deploy as a docker container (on Vision example):
  
