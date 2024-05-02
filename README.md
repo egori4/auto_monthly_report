@@ -181,6 +181,9 @@ V9.2.2 (1/25/2024)
 		Added corner case not to convert strings to numbers for the csv headlines for all csv files
 		This is when policy name is a number, do not convert the policy name to be the integer otherwise it breaks the JS
 
+9.3.5 (4/4/24)
+	- analyze_trends_daily.py asnd analyze_trends.py
+		Added exporting durationRange as 'Duration Range' to csv database
 ===========================================================================================================================
 Instructions how to deploy as a docker container (on Vision example):
  
