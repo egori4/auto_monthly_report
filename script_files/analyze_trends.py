@@ -523,7 +523,7 @@ if __name__ == '__main__':
 
 	# Traffic utilization
 	if db_from_forensics:
-		traffic_trends = [['Date,Traffic Utilization(Mbps),Blocked traffic,Excluded traffic'][]]
+		traffic_trends = [['Date,Traffic Utilization(Mbps),Blocked traffic,Excluded traffic']]
 	else:
 		traffic_trends = convert_csv_to_list_of_lists(charts_tables_path + 'traffic.csv')
 	
