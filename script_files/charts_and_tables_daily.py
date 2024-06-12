@@ -23,8 +23,6 @@ tmp_path = f'./tmp_files/'+cust_id+'/'
 reports_path = f'./report_files/'+cust_id+'/'
 run_file = 'run_daily.sh'
 
-internet_conn = True
-
 with open (run_file) as f:
 	for line in f:
 	#find line starting with top_n
@@ -32,7 +30,17 @@ with open (run_file) as f:
 			#print value after = sign
 			top_n = int(line.split('=')[1].replace('\n',''))
 			continue
+		if line.startswith('abuseipdb='):
+			abuseipdb = line.split('=')[1].replace('\n','').capitalize()
 
+			if abuseipdb.lower() == 'true':
+				abuseipdb = True
+				print(f'abuseipdb = {abuseipdb}')
+				continue
+			if abuseipdb.lower() == 'false':
+				abuseipdb = False
+				print(f'abuseipdb = {abuseipdb}')
+				continue
 
 ########DefensePro IP to Name translation########
 
@@ -49,6 +57,22 @@ for cust_config_block in customers_json:
 		pkt_units = cust_config_block['variables']['pktUnitDaily']
 		#Can be configured "Millions" or "Billions" or "Thousands"
 
+######## Set units sum Units ###############################
+
+		if bw_units.lower() == 'megabytes':	
+			bw_units_sum = 'SUM(packetBandwidth)/8000'
+			
+
+		if bw_units.lower() == 'gigabytes':	
+			bw_units_sum = 'SUM(packetBandwidth)/8000000'
+		
+		if bw_units.lower() == 'gigabytes':	
+			bw_units_sum = 'SUM(packetBandwidth)/8000000000'
+
+
+		bw_units_sum_mb = 'SUM(packetBandwidth)/8000'
+		bw_units_sum_gb = 'SUM(packetBandwidth)/8000000'
+		bw_units_sum_tb = 'SUM(packetBandwidth)/8000000000'
 #################################################
 
 # check if tmp_files directory exists and create it if it doesn't
@@ -204,14 +228,8 @@ def gen_charts_data(db_path):
 
 	####Get malicious bandwidth by day from the last month and write to csv########
 
-	if bw_units.lower() == 'megabytes':					
-		cur.execute("SELECT startDayOfMonth, SUM(packetBandwidth)/8000 FROM attacks GROUP BY startDayOfMonth")
 
-	if bw_units.lower()=='gigabytes':
-		cur.execute("SELECT startDayOfMonth, SUM(packetBandwidth)/8000000 FROM attacks GROUP BY startDayOfMonth")
-
-	if bw_units.lower()=='terabytes':
-		cur.execute("SELECT startDayOfMonth, SUM(packetBandwidth)/8000000000 FROM attacks GROUP BY startDayOfMonth")
+	cur.execute(f"SELECT startDayOfMonth, {bw_units_sum} FROM attacks GROUP BY startDayOfMonth")
 				
 	new_column_names = ['Day of the month', 'Malicious Bandwidth']
 
@@ -563,7 +581,7 @@ def gen_charts_data(db_path):
 	srcip_events_trend_chart_alltimehigh.T.iloc[: , :top_n].to_csv(tmp_path + 'sip_events_per_day_chart_alltimehigh.csv') #save packets count chart (sorted by last month highest to lowest) to csv file
 
 
-	if internet_conn and aidb.internet_conn():
+	if abuseipdb and aidb.internet_conn():
 		
 		for ip in srcip_events_list:
 			aidb.abuseipdb_call(ip, cust_id)
@@ -654,7 +672,7 @@ def gen_charts_data(db_path):
 
 	srcip_packets_list = srcip_packets_trend_chart_alltimehigh.index[0:top_n].tolist()
 
-	if internet_conn and aidb.internet_conn():
+	if abuseipdb and aidb.internet_conn():
 
 		for ip in srcip_packets_list:
 			aidb.abuseipdb_call(ip, cust_id)
@@ -744,7 +762,7 @@ def gen_charts_data(db_path):
 
 	srcip_bandwidth_list = srcip_bandwidth_trend_chart_alltimehigh.index[0:top_n].tolist()
 
-	if internet_conn and aidb.internet_conn():
+	if abuseipdb and aidb.internet_conn():
 
 		for ip in srcip_bandwidth_list:
 			aidb.abuseipdb_call(ip, cust_id)

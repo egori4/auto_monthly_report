@@ -292,9 +292,35 @@ def events_per_day_html():
 	return events_per_day_top5
 
 
+def bw_units_conversion(value):
+
+	if isinstance(value, (int, float)):
+		if bw_units.lower() == 'megabytes':
+			return round(value / 8000, 2)
+		elif bw_units.lower() == 'gigabytes':
+			return round(value / 8000000, 2)
+		elif bw_units.lower() == 'terabytes':
+			return round(value / 8000000000, 2)
+
+def pkt_units_conversion(value):
+
+	if isinstance(value, (int, float)):
+		if pkt_units.lower() == 'millions':
+			return round(value / 1000000, 2)
+		elif pkt_units.lower() == 'billions':
+			return round(value / 1000000000, 2)
+		if pkt_units.lower() == 'thousands':
+			return round(value / 1000, 2)
+
+	return value
+
+
 def bandwidth_per_day_html():
 	# Group by day_of_month, name, Device Name, ruleName and aggregate sum of packetCount
 	bandwidth_per_day = data_month.groupby(['Day of the Month', 'Attack Name', 'Device Name', 'Policy Name'])['packetBandwidth'].sum()
+
+	# Convert units to Megabytes/Gigabytes/Terabytes
+	bandwidth_per_day = bandwidth_per_day.apply(bw_units_conversion)
 
 	# Get the top 5 events with the highest sum of packet counts for each day
 	bandwidth_per_day_top5 = bandwidth_per_day.groupby(level=['Day of the Month'], group_keys=False).nlargest(5).apply(format_with_commas).to_frame('Malicious bandwidth sum')
@@ -310,6 +336,9 @@ def packets_per_day_html():
 
 	# Group by day_of_month, name, Device Name, ruleName and aggregate sum of packetCount
 	packets_per_day = data_month.groupby(['Day of the Month', 'Attack Name', 'Device Name', 'Policy Name'])['packetCount'].sum()
+
+	# Convert units
+	packets_per_day = packets_per_day.apply(pkt_units_conversion)
 
 	# Get the top 5 events with the highest sum of packet counts for each day
 	packets_per_day_top5 = packets_per_day.groupby(level=['Day of the Month'], group_keys=False).nlargest(5).apply(format_with_commas).to_frame('Malicious Packets sum')
@@ -334,7 +363,9 @@ def epm_html(epm):
 
 def ppm_html(ppm):
 	data_month_ppm = data_month[data_month['Attack Name'] == ppm]
-	series_ppm = data_month_ppm.groupby(['Attack Name','Device Name','Policy Name']).sum()['packetCount'].sort_values(ascending=False).apply(format_with_commas).head(10)
+	series_ppm = data_month_ppm.groupby(['Attack Name','Device Name','Policy Name']).sum()['packetCount'].sort_values(ascending=False)
+	# Convert units
+	series_ppm = series_ppm.apply(pkt_units_conversion).apply(format_with_commas).head(10)
 	ppm_html = series_ppm.to_frame('Malicious Packets')
 	ppm_html=ppm_html.to_html()
 
@@ -345,7 +376,9 @@ def ppm_html(ppm):
 
 def bpm_html(bpm):
 	data_month_bpm = data_month[data_month['Attack Name'] == bpm]
-	series_bpm = data_month_bpm.groupby(['Attack Name','Device Name','Policy Name']).sum()['packetBandwidth'].sort_values(ascending=False).apply(format_with_commas).head(10)
+	series_bpm = data_month_bpm.groupby(['Attack Name','Device Name','Policy Name']).sum()['packetBandwidth'].sort_values(ascending=False)
+	# Convert units
+	series_bpm = series_bpm.apply(bw_units_conversion).apply(format_with_commas).head(10)
 	df_bpm_html = series_bpm.to_frame('Malicious Bandwidth')
 	df_bpm_html=df_bpm_html.to_html()
 
@@ -366,31 +399,33 @@ def device_epm_html(device_epm):
 			device_epm_html = device_series_epm.to_frame('Security Events')
 			device_epm_html=device_epm_html.to_html().replace(device_ip, device_name)
 			return device_epm_html
-		else:	
-			return ''
+		else:
+			continue
 
 def device_ppm_html(device_ppm):
 	for device_ip, device_name in defensepros.items():
 		if device_name == device_ppm:
 			data_month_ppm = data_month[data_month['Device Name'] == device_ip]
-			device_series_ppm = data_month_ppm.groupby(['Device Name','Attack Name','Policy Name']).sum()['packetCount'].sort_values(ascending=False).apply(format_with_commas).head(10)
+			device_series_ppm = data_month_ppm.groupby(['Device Name','Attack Name','Policy Name']).sum()['packetCount'].sort_values(ascending=False)
+			device_series_ppm = device_series_ppm.apply(pkt_units_conversion).apply(format_with_commas).head(10)
 			device_ppm_html = device_series_ppm.to_frame('Malicious Packets')
 			device_ppm_html=device_ppm_html.to_html().replace(device_ip, device_name)
 			return device_ppm_html
 		else:
-			return ''
+			continue
 
 def device_bpm_html(device_bpm):
 
 	for device_ip, device_name in defensepros.items():
 		if device_name == device_bpm:
 			data_month_bpm = data_month[data_month['Device Name'] == device_ip]
-			device_series_bpm = data_month_bpm.groupby(['Device Name','Attack Name','Policy Name']).sum()['packetBandwidth'].sort_values(ascending=False).apply(format_with_commas).head(10)
+			device_series_bpm = data_month_bpm.groupby(['Device Name','Attack Name','Policy Name']).sum()['packetBandwidth'].sort_values(ascending=False)
+			device_series_bpm = device_series_bpm.apply(bw_units_conversion).apply(format_with_commas).head(10)
 			device_df_bpm_html = device_series_bpm.to_frame('Malicious Bandwidth')
 			device_df_bpm_html= device_df_bpm_html.to_html().replace(device_ip, device_name)
 			return device_df_bpm_html
 		else:
-			return ''
+			continue
 
 
 def policy_epm_html(policy_epm):
@@ -407,7 +442,8 @@ def policy_epm_html(policy_epm):
 
 def policy_ppm_html(policy_ppm):
 	data_month_ppm = data_month[data_month['Policy Name'] == policy_ppm]
-	series_ppm = data_month_ppm.groupby(['Policy Name','Attack Name','Device Name']).sum()['packetCount'].sort_values(ascending=False).apply(format_with_commas).head(10)
+	series_ppm = data_month_ppm.groupby(['Policy Name','Attack Name','Device Name']).sum()['packetCount'].sort_values(ascending=False)
+	series_ppm = series_ppm.apply(pkt_units_conversion).apply(format_with_commas).head(10)
 	ppm_html = series_ppm.to_frame('Malicious Packets')
 	ppm_html=ppm_html.to_html()
 	
@@ -418,7 +454,8 @@ def policy_ppm_html(policy_ppm):
 
 def policy_bpm_html(policy_bpm):
 	data_month_bpm = data_month[data_month['Policy Name'] == policy_bpm]
-	series_bpm = data_month_bpm.groupby(['Policy Name','Attack Name','Device Name']).sum()['packetBandwidth'].sort_values(ascending=False).apply(format_with_commas).head(10)
+	series_bpm = data_month_bpm.groupby(['Policy Name','Attack Name','Device Name']).sum()['packetBandwidth'].sort_values(ascending=False)
+	series_bpm = series_bpm.apply(bw_units_conversion).apply(format_with_commas).head(10)
 	df_bpm_html = series_bpm.to_frame('Malicious Bandwidth')
 	df_bpm_html=df_bpm_html.to_html()
 
@@ -443,7 +480,8 @@ def sip_epm_html(sip_epm):
 
 def sip_ppm_html(sip_ppm):
 	data_month_ppm = data_month[data_month['Source IP'] == sip_ppm]
-	series_ppm = data_month_ppm.groupby(['Source IP','Attack Name','Device Name','Policy Name']).sum()['packetCount'].sort_values(ascending=False).apply(format_with_commas).head(10)
+	series_ppm = data_month_ppm.groupby(['Source IP','Attack Name','Device Name','Policy Name']).sum()['packetCount'].sort_values(ascending=False)
+	series_ppm = series_ppm.apply(pkt_units_conversion).apply(format_with_commas).head(10)
 	ppm_html = series_ppm.to_frame('Malicious Packets')
 	ppm_html=ppm_html.to_html()
 	
@@ -454,7 +492,8 @@ def sip_ppm_html(sip_ppm):
 
 def sip_bpm_html(sip_bpm):
 	data_month_bpm = data_month[data_month['Source IP'] == sip_bpm]
-	series_bpm = data_month_bpm.groupby(['Source IP','Attack Name','Device Name','Policy Name']).sum()['packetBandwidth'].sort_values(ascending=False).apply(format_with_commas).head(10)
+	series_bpm = data_month_bpm.groupby(['Source IP','Attack Name','Device Name','Policy Name']).sum()['packetBandwidth'].sort_values(ascending=False)
+	series_bpm = series_bpm.apply(bw_units_conversion).apply(format_with_commas).head(10)
 	df_bpm_html = series_bpm.to_frame('Malicious Bandwidth')
 	df_bpm_html=df_bpm_html.to_html()
 

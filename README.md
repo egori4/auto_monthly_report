@@ -184,6 +184,18 @@ V9.2.2 (1/25/2024)
 9.3.5 (4/4/24)
 	- analyze_trends_daily.py asnd analyze_trends.py
 		Added exporting durationRange as 'Duration Range' to csv database
+
+9.4 (6/12/24)
+	- charts_and_tables.py + charts_and_tables_daily.py
+		- Added bw_units_sum variables
+		- Added configurable abuseipdb that can be set to true or false.
+		  !Must update run.sh and run_daily.sh
+			add abuseipdb variable and set it to true or false (compare run.sh with run_example.sh and run_daily.sh with run_daily_example.sh)
+
+	- analyze_trends.py + analyze_trends_daily.py
+		- Fixed tablef "Top Attacks and policies for devices"
+		- Fixed units table to align with configured units under customers.json
+
 ===========================================================================================================================
 Instructions how to deploy as a docker container (on Vision example):
  

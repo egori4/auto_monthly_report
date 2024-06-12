@@ -41,7 +41,7 @@ if (( "$prev_month" >= 1 && "$prev_month" <= 9 )); then
     #echo "Formatted current month: $prev_month"
 fi
 
-
+abuseipdb=true
 abuseipdb_key="xxxx"
 #This variable is needed to fetch the information about top 10 malicious IP addresses from abuseipdb.com.
 #Register and obtain your API key from https://www.abuseipdb.com/account/api

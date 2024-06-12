@@ -30,7 +30,20 @@ with open (run_file) as f:
 			#print value after = sign
 			top_n = int(line.split('=')[1].replace('\n',''))
 			continue
+		if line.startswith('abuseipdb='):
+			abuseipdb = line.split('=')[1].replace('\n','').capitalize()
 
+			if abuseipdb.lower() == 'true':
+				abuseipdb = True
+				print(f'abuseipdb = {abuseipdb}')
+				continue
+			if abuseipdb.lower() == 'false':
+				abuseipdb = False
+				print(f'abuseipdb = {abuseipdb}')
+				continue
+
+
+			
 
 ########DefensePro IP to Name translation########
 
@@ -46,6 +59,23 @@ for cust_config_block in customers_json:
 		
 		pkt_units = cust_config_block['variables']['pktUnit']
 		#Can be configured "Millions" or "Billions" or "Thousands"
+######## Set units sum Units ###############################
+
+		if bw_units.lower() == 'megabytes':	
+			bw_units_sum = 'SUM(packetBandwidth)/8000'
+			
+
+		if bw_units.lower() == 'gigabytes':	
+			bw_units_sum = 'SUM(packetBandwidth)/8000000'
+		
+		if bw_units.lower() == 'gigabytes':	
+			bw_units_sum = 'SUM(packetBandwidth)/8000000000'
+
+
+		bw_units_sum_mb = 'SUM(packetBandwidth)/8000'
+		bw_units_sum_gb = 'SUM(packetBandwidth)/8000000'
+		bw_units_sum_tb = 'SUM(packetBandwidth)/8000000000'
+
 
 #################################################
 
@@ -208,14 +238,8 @@ def gen_charts_data(db_path):
 
 
 				####Get malicious bandwidth by day from the last month and write to csv########
-				if bw_units.lower() == 'megabytes':					
-					cur.execute("SELECT startDayOfMonth, SUM(packetBandwidth)/8000 FROM attacks GROUP BY startDayOfMonth")
-
-				if bw_units.lower()=='gigabytes':
-					cur.execute("SELECT startDayOfMonth, SUM(packetBandwidth)/8000000 FROM attacks GROUP BY startDayOfMonth")
-
-				if bw_units.lower()=='terabytes':
-					cur.execute("SELECT startDayOfMonth, SUM(packetBandwidth)/8000000000 FROM attacks GROUP BY startDayOfMonth")
+					
+				cur.execute(f"SELECT startDayOfMonth, {bw_units_sum} FROM attacks GROUP BY startDayOfMonth")
 							
 				new_column_names = ['Day of the month', 'Malicious Bandwidth']
 
@@ -452,25 +476,33 @@ def gen_charts_data(db_path):
 
 	srcip_events_trend_chart_by_last_month.T.iloc[: , :top_n].to_csv(tmp_path + 'sip_epm_chart_lm.csv') #save packets count chart (sorted by last month highest to lowest) to csv file
 
-	if aidb.internet_conn():
+	if abuseipdb:
+		if aidb.internet_conn():
+			
+			for ip in srcip_events_list:
+				aidb.abuseipdb_call(ip, cust_id)
+
+			srcip_events_trend_chart_by_last_month['srcip'] = srcip_events_trend_chart_by_last_month.index
+			srcip_events_trend_chart_by_last_month['GEO'] = srcip_events_trend_chart_by_last_month['srcip'].apply(AbuseIPDBGEO)
+			srcip_events_trend_chart_by_last_month['Abuse Confidence'] = srcip_events_trend_chart_by_last_month['srcip'].apply(AbuseIPDBScore)
+			srcip_events_trend_chart_by_last_month['ISP'] = srcip_events_trend_chart_by_last_month['srcip'].apply(AbuseIPDBISP)
+
+			srcip_events_trend_chart_by_last_month = srcip_events_trend_chart_by_last_month.drop(['srcip'], axis=1)
+
+			cols = srcip_events_trend_chart_by_last_month.columns.tolist()
+			cols = cols[-1:] + cols[:-1]
+			cols = cols[-1:] + cols[:-1]
+			cols = cols[-1:] + cols[:-1]
+			srcip_events_trend_chart_by_last_month = srcip_events_trend_chart_by_last_month[cols]
+
+			srcip_events_trend_chart_by_last_month.head(top_n).to_csv(tmp_path + 'sip_epm_table_lm.csv') #save packets count table (sorted by last month highest to lowest) to csv file
 		
-		for ip in srcip_events_list:
-			aidb.abuseipdb_call(ip, cust_id)
+		else:
 
-		srcip_events_trend_chart_by_last_month['srcip'] = srcip_events_trend_chart_by_last_month.index
-		srcip_events_trend_chart_by_last_month['GEO'] = srcip_events_trend_chart_by_last_month['srcip'].apply(AbuseIPDBGEO)
-		srcip_events_trend_chart_by_last_month['Abuse Confidence'] = srcip_events_trend_chart_by_last_month['srcip'].apply(AbuseIPDBScore)
-		srcip_events_trend_chart_by_last_month['ISP'] = srcip_events_trend_chart_by_last_month['srcip'].apply(AbuseIPDBISP)
-
-		srcip_events_trend_chart_by_last_month = srcip_events_trend_chart_by_last_month.drop(['srcip'], axis=1)
-
-		cols = srcip_events_trend_chart_by_last_month.columns.tolist()
-		cols = cols[-1:] + cols[:-1]
-		cols = cols[-1:] + cols[:-1]
-		cols = cols[-1:] + cols[:-1]
-		srcip_events_trend_chart_by_last_month = srcip_events_trend_chart_by_last_month[cols]
-
-		srcip_events_trend_chart_by_last_month.head(top_n).to_csv(tmp_path + 'sip_epm_table_lm.csv') #save packets count table (sorted by last month highest to lowest) to csv file
+			srcip_events_trend_chart_by_last_month.insert(0, "GEO", "N/A", True)
+			srcip_events_trend_chart_by_last_month.insert(1, "Abuse Confidence", 0, True)
+			srcip_events_trend_chart_by_last_month.insert(2, "ISP", "N/A", True)
+			srcip_events_trend_chart_by_last_month.head(top_n).to_csv(tmp_path + 'sip_epm_table_lm.csv') #save packets count table (sorted by last month highest to lowest) to csv file
 
 	else:
 
@@ -494,34 +526,40 @@ def gen_charts_data(db_path):
 	
 	srcip_packets_list = srcip_packets_trend_chart_by_last_month.index[0:top_n].tolist()
 	
-	if aidb.internet_conn():
+	if abuseipdb:
+		if aidb.internet_conn():
 
-		for ip in srcip_packets_list:
-			aidb.abuseipdb_call(ip, cust_id)
+			for ip in srcip_packets_list:
+				aidb.abuseipdb_call(ip, cust_id)
 
-		srcip_packets_trend_chart_by_last_month['srcip'] = srcip_packets_trend_chart_by_last_month.index
-		srcip_packets_trend_chart_by_last_month['GEO'] = srcip_packets_trend_chart_by_last_month['srcip'].apply(AbuseIPDBGEO)
-		srcip_packets_trend_chart_by_last_month['Abuse Confidence'] = srcip_packets_trend_chart_by_last_month['srcip'].apply(AbuseIPDBScore)
-		srcip_packets_trend_chart_by_last_month['ISP'] = srcip_packets_trend_chart_by_last_month['srcip'].apply(AbuseIPDBISP)
+			srcip_packets_trend_chart_by_last_month['srcip'] = srcip_packets_trend_chart_by_last_month.index
+			srcip_packets_trend_chart_by_last_month['GEO'] = srcip_packets_trend_chart_by_last_month['srcip'].apply(AbuseIPDBGEO)
+			srcip_packets_trend_chart_by_last_month['Abuse Confidence'] = srcip_packets_trend_chart_by_last_month['srcip'].apply(AbuseIPDBScore)
+			srcip_packets_trend_chart_by_last_month['ISP'] = srcip_packets_trend_chart_by_last_month['srcip'].apply(AbuseIPDBISP)
 
 
-		srcip_packets_trend_chart_by_last_month = srcip_packets_trend_chart_by_last_month.drop(['srcip'], axis=1)
+			srcip_packets_trend_chart_by_last_month = srcip_packets_trend_chart_by_last_month.drop(['srcip'], axis=1)
 
-		cols = srcip_packets_trend_chart_by_last_month.columns.tolist()
-		cols = cols[-1:] + cols[:-1]
-		cols = cols[-1:] + cols[:-1]
-		cols = cols[-1:] + cols[:-1]
-		srcip_packets_trend_chart_by_last_month = srcip_packets_trend_chart_by_last_month[cols]
+			cols = srcip_packets_trend_chart_by_last_month.columns.tolist()
+			cols = cols[-1:] + cols[:-1]
+			cols = cols[-1:] + cols[:-1]
+			cols = cols[-1:] + cols[:-1]
+			srcip_packets_trend_chart_by_last_month = srcip_packets_trend_chart_by_last_month[cols]
 
-		srcip_packets_trend_chart_by_last_month.head(top_n).to_csv(tmp_path + 'sip_ppm_table_lm.csv')
+			srcip_packets_trend_chart_by_last_month.head(top_n).to_csv(tmp_path + 'sip_ppm_table_lm.csv')
+		else:
+
+			srcip_packets_trend_chart_by_last_month.insert(0, "GEO", "N/A", True)
+			srcip_packets_trend_chart_by_last_month.insert(1, "Abuse Confidence", 0 , True)
+			srcip_packets_trend_chart_by_last_month.insert(2, "ISP", "N/A", True)
+			srcip_packets_trend_chart_by_last_month.head(top_n).to_csv(tmp_path + 'sip_ppm_table_lm.csv') #save packets count table (sorted by last month highest to lowest) to csv file
+
 	else:
 
 		srcip_packets_trend_chart_by_last_month.insert(0, "GEO", "N/A", True)
 		srcip_packets_trend_chart_by_last_month.insert(1, "Abuse Confidence", 0 , True)
 		srcip_packets_trend_chart_by_last_month.insert(2, "ISP", "N/A", True)
 		srcip_packets_trend_chart_by_last_month.head(top_n).to_csv(tmp_path + 'sip_ppm_table_lm.csv') #save packets count table (sorted by last month highest to lowest) to csv file
-
-
 
 	###############Top 10 source IP by bandwidth sum by last month################
 
@@ -536,27 +574,35 @@ def gen_charts_data(db_path):
 
 	srcip_bandwidth_list = srcip_bandwidth_trend_chart_by_last_month.index[0:top_n].tolist()
 
-	if aidb.internet_conn():
+	if abuseipdb:
+		if aidb.internet_conn():
 
-		for ip in srcip_bandwidth_list:
-			aidb.abuseipdb_call(ip, cust_id)
+			for ip in srcip_bandwidth_list:
+				aidb.abuseipdb_call(ip, cust_id)
 
-		srcip_bandwidth_trend_chart_by_last_month['srcip'] = srcip_bandwidth_trend_chart_by_last_month.index
-		srcip_bandwidth_trend_chart_by_last_month['GEO'] = srcip_bandwidth_trend_chart_by_last_month['srcip'].apply(AbuseIPDBGEO)
-		srcip_bandwidth_trend_chart_by_last_month['Abuse Confidence'] = srcip_bandwidth_trend_chart_by_last_month['srcip'].apply(AbuseIPDBScore)
-		srcip_bandwidth_trend_chart_by_last_month['ISP'] = srcip_bandwidth_trend_chart_by_last_month['srcip'].apply(AbuseIPDBISP)
+			srcip_bandwidth_trend_chart_by_last_month['srcip'] = srcip_bandwidth_trend_chart_by_last_month.index
+			srcip_bandwidth_trend_chart_by_last_month['GEO'] = srcip_bandwidth_trend_chart_by_last_month['srcip'].apply(AbuseIPDBGEO)
+			srcip_bandwidth_trend_chart_by_last_month['Abuse Confidence'] = srcip_bandwidth_trend_chart_by_last_month['srcip'].apply(AbuseIPDBScore)
+			srcip_bandwidth_trend_chart_by_last_month['ISP'] = srcip_bandwidth_trend_chart_by_last_month['srcip'].apply(AbuseIPDBISP)
 
 
-		srcip_bandwidth_trend_chart_by_last_month = srcip_bandwidth_trend_chart_by_last_month.drop(['srcip'], axis=1)
+			srcip_bandwidth_trend_chart_by_last_month = srcip_bandwidth_trend_chart_by_last_month.drop(['srcip'], axis=1)
 
-		cols = srcip_bandwidth_trend_chart_by_last_month.columns.tolist()
-		cols = cols[-1:] + cols[:-1]
-		cols = cols[-1:] + cols[:-1]
-		cols = cols[-1:] + cols[:-1]
-		srcip_bandwidth_trend_chart_by_last_month = srcip_bandwidth_trend_chart_by_last_month[cols]
+			cols = srcip_bandwidth_trend_chart_by_last_month.columns.tolist()
+			cols = cols[-1:] + cols[:-1]
+			cols = cols[-1:] + cols[:-1]
+			cols = cols[-1:] + cols[:-1]
+			srcip_bandwidth_trend_chart_by_last_month = srcip_bandwidth_trend_chart_by_last_month[cols]
 
-		srcip_bandwidth_trend_chart_by_last_month.head(top_n).to_csv(tmp_path + 'sip_bpm_table_lm.csv')
-		
+			srcip_bandwidth_trend_chart_by_last_month.head(top_n).to_csv(tmp_path + 'sip_bpm_table_lm.csv')
+			
+		else:
+
+			srcip_bandwidth_trend_chart_by_last_month.insert(0, "GEO", "N/A", True)
+			srcip_bandwidth_trend_chart_by_last_month.insert(1, "Abuse Confidence", 0 , True)
+			srcip_bandwidth_trend_chart_by_last_month.insert(2, "ISP", "N/A", True)
+			srcip_bandwidth_trend_chart_by_last_month.head(top_n).to_csv(tmp_path + 'sip_bpm_table_lm.csv') #save packets count table (sorted by last month highest to lowest) to csv file
+
 	else:
 
 		srcip_bandwidth_trend_chart_by_last_month.insert(0, "GEO", "N/A", True)
