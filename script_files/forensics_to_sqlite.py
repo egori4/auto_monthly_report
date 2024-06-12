@@ -22,7 +22,10 @@ with open (run_file) as f:
 			converted_sqlite_file_name = str(line.split('=')[1].replace('\n','').replace('"',''))
 			continue
 
-
+		if line.startswith('forensics_date_format'):
+			forensics_date_format = str(line.split('=')[1].replace('\n','').replace('"',''))
+			continue
+        
 
 # Function to convert CSV to SQLite
 def csv_to_sqlite(csv_file_path, sqlite_file_path):
@@ -44,17 +47,9 @@ def csv_to_sqlite(csv_file_path, sqlite_file_path):
 
     # Create 'startDate' column
     
-    try:
-        df_selected['startDate'] = pd.to_datetime(df_selected['startDate'], format='%m.%d.%Y %H:%M:%S')
-        print('Creating startDate column using date format "%m.%d.%Y %H:%M:%S"')
+    df_selected['startDate'] = pd.to_datetime(df_selected['startDate'], format=forensics_date_format)
+    print(f'Creating startDate column using date format {forensics_date_format}')
 
-    except:
-        df_selected['startDate'] = pd.to_datetime(df_selected['startDate'], format='%d.%m.%Y %H:%M:%S')
-        print('Creating startDate column using date format "%d.%m.%Y %H:%M:%S"')
-
-
-    # df_selected['startDate'] = pd.to_datetime(df_selected['startDate'], infer_datetime_format=True)
-	
 
     df_selected['month'] = df_selected['startDate'].dt.month
     df_selected['year'] = df_selected['startDate'].dt.year

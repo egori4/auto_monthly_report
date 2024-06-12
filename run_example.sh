@@ -58,6 +58,13 @@ top_n=7
 ######################## Convert Forensics(optional) ############################################################
 convert_forensics_to_sqlite=false
 forensics_file_cust_id="CustomerName"
+forensics_date_format="%m.%d.%Y %I:%M:%S %p"
+#forensic_date_format options: 
+#'%m.%d.%Y %I:%M:%S %p',     # Format with 12-hour time
+#'%m.%d.%Y %H:%M:%S',        # Format with 24-hour time
+#'%d.%m.%Y %I:%M:%S %p',     # Alternate day-month order with 12-hour time
+#'%d.%m.%Y %H:%M:%S'         # Alternate day-month order with 24-hour time
+# Note, if date includes timezone(example 04.03.2024 8:00:11 PM EDT), remove it in csv before so it will be (04.03.2024 8:00:11 PM). In this case '%m.%d.%Y %I:%M:%S %p' format can be used
 forensics_file_name="1_week_2023-11-27_15-53-20.csv"
 converted_sqlite_file_name="database_CUSTID_10.sqlite"
 
@@ -69,6 +76,7 @@ gen_python_csv_data=true #generate csv data using python scripts
 modify_csv=true
 generate_report=true
 generate_appendix=true
+db_from_forensics=false
 analyze_trends=true
 email_send=true
 ####################################################################################################

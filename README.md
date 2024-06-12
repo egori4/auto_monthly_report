@@ -195,7 +195,12 @@ V9.2.2 (1/25/2024)
 	- analyze_trends.py + analyze_trends_daily.py
 		- Fixed tablef "Top Attacks and policies for devices"
 		- Fixed units table to align with configured units under customers.json
-
+9.5 (6/12/24)
+	- forensics_to_sqlite.py
+		Added user configurable date format "forensics_date_format"
+	!Must update run.sh 
+		- add "forensics_date_format" variable
+		- add "db_from_forensics" variable
 ===========================================================================================================================
 Instructions how to deploy as a docker container (on Vision example):
  

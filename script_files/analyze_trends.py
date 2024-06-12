@@ -25,7 +25,16 @@ for cust_config_block in customers_json:
 charts_tables_path = f"./tmp_files/{cust_id}/"
 reports_path = f"./report_files/{cust_id}/"
 db_path = f'./database_files/{cust_id}/'
+run_file = 'run.sh'
 
+
+with open (run_file) as f:
+	for line in f:
+	#find line starting with top_n
+		if line.startswith('db_from_forensics'):
+			#print value after = sign
+			db_from_forensics = str(line.split('=')[1].replace('\n','').replace('"',''))
+			continue
 
 def convert_csv_to_list_of_lists(filename):
 	# Open csv file and convert to list of lists function
@@ -513,8 +522,11 @@ if __name__ == '__main__':
 
 
 	# Traffic utilization
-	traffic_trends = convert_csv_to_list_of_lists(charts_tables_path + 'traffic.csv')
-
+	if db_from_forensics:
+		traffic_trends = [['Date,Traffic Utilization(Mbps),Blocked traffic,Excluded traffic'][]]
+	else:
+		traffic_trends = convert_csv_to_list_of_lists(charts_tables_path + 'traffic.csv')
+	
 	# Events per day count
 	events_per_day_trends = convert_csv_to_list_of_lists(charts_tables_path + 'events_per_day_last_month.csv')
 	
@@ -558,7 +570,10 @@ if __name__ == '__main__':
 	#1 Create a data frame
 	con = sqlite3.connect(db_path + 'database_'+cust_id+'_'+str(month)+'.sqlite')
 	# data = pd.read_sql_query("SELECT * from attacks", con)
-	data_month = pd.read_sql_query(f"SELECT deviceName as 'Device Name',month,year,packetBandwidth,name as 'Attack Name',packetCount,ruleName as 'Policy Name',category,sourceAddress as 'Source IP',destAddress,startTime,endTime,startDate,attackIpsId,actionType,maxAttackPacketRatePps,maxAttackRateBps,destPort,protocol,geoLocation,durationRange,startDayOfMonth as 'Day of the Month',durationRange as 'Duration Range' from attacks", con)
+	if db_from_forensics:
+		data_month = pd.read_sql_query(f"SELECT deviceName as 'Device Name',month,year,packetBandwidth,name as 'Attack Name',packetCount,ruleName as 'Policy Name',category,sourceAddress as 'Source IP',destAddress,startTime,endTime,startDate,attackIpsId,actionType,maxAttackPacketRatePps,maxAttackRateBps,destPort,protocol,startDayOfMonth as 'Day of the Month' from attacks", con)
+	else:
+		data_month = pd.read_sql_query(f"SELECT deviceName as 'Device Name',month,year,packetBandwidth,name as 'Attack Name',packetCount,ruleName as 'Policy Name',category,sourceAddress as 'Source IP',destAddress,startTime,endTime,startDate,attackIpsId,actionType,maxAttackPacketRatePps,maxAttackRateBps,destPort,protocol,geoLocation,durationRange,startDayOfMonth as 'Day of the Month',durationRange as 'Duration Range' from attacks", con)
 
 	#export data to csv
 	data_month.to_csv(reports_path +'database_'+cust_id+'_'+str(month)+'_'+str(year)+'.csv', encoding='utf-8', index=False)
