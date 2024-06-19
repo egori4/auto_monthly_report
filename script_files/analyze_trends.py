@@ -33,7 +33,11 @@ with open (run_file) as f:
 	#find line starting with top_n
 		if line.startswith('db_from_forensics'):
 			#print value after = sign
-			db_from_forensics = str(line.split('=')[1].replace('\n','').replace('"',''))
+			db_from_forensics = (line.split('=')[1].replace('\n','').replace('"','')).lower()
+			if db_from_forensics == 'true':
+				db_from_forensics = True
+			else:
+				db_from_forensics = False
 			continue
 
 def convert_csv_to_list_of_lists(filename):
@@ -285,6 +289,22 @@ def extract_values_from_csv(csv_file):
 
 	return values
 
+def maxpps_per_day_html_table():
+
+	maxpps_indices = data_month.groupby(['Day of the Month'])['maxAttackPacketRatePps'].idxmax()
+	maxpps_rows = data_month.loc[maxpps_indices][['startDate', 'Device Name','Policy Name','Attack Name', 'maxAttackPacketRatePps']].reset_index(drop=True)
+	maxpps_rows['maxAttackPacketRatePps'] = maxpps_rows['maxAttackPacketRatePps'].apply(lambda x: f"{x:,}")
+	maxpps_rows= maxpps_rows.to_html(index=False)
+	return maxpps_rows
+
+
+def maxbps_per_day_html_table():
+
+	maxbps_indices = data_month.groupby(['Day of the Month'])['maxAttackRateBps'].idxmax()
+	maxbps_rows = data_month.loc[maxbps_indices][['startDate', 'Device Name','Policy Name','Attack Name', 'maxAttackRateBps']].reset_index(drop=True)
+	maxbps_rows['maxAttackRateBps'] = maxbps_rows['maxAttackRateBps'].apply(lambda x: f"{x / 1000000000:,.2f} Gbps")
+	maxbps_rows= maxbps_rows.to_html(index=False)
+	return maxbps_rows
 
 def events_per_day_html():
 
@@ -520,6 +540,10 @@ def format_with_commas(value):
 
 if __name__ == '__main__':
 
+	maxpps_per_day_trends = convert_csv_to_list_of_lists(charts_tables_path + 'maxpps_per_day_last_month.csv')
+
+	# Malicious bandwidth per day
+	maxbps_per_day_trends = convert_csv_to_list_of_lists(charts_tables_path + 'maxbps_per_day_last_month.csv')
 
 	# Traffic utilization
 	if db_from_forensics:
@@ -675,6 +699,10 @@ if __name__ == '__main__':
 
 	#5 Generate html for the last month
 
+
+	maxpps_per_day_table = maxpps_per_day_html_table()
+	maxbps_per_day_table = maxbps_per_day_html_table()
+
 	events_per_day_table = events_per_day_html()
 	bandwidth_per_day_table = bandwidth_per_day_html()
 	packets_per_day_table = packets_per_day_html()
@@ -763,6 +791,9 @@ if __name__ == '__main__':
 		  
 			var traffic_data = google.visualization.arrayToDataTable({traffic_trends});
 
+			var maxpps_per_day_data = google.visualization.arrayToDataTable({maxpps_per_day_trends});
+			var maxbps_per_day_data = google.visualization.arrayToDataTable({maxbps_per_day_trends});
+
 			var events_per_day_data = google.visualization.arrayToDataTable({events_per_day_trends});
 			var bandwidth_per_day_data = google.visualization.arrayToDataTable({bandwidth_per_day_trends});
 			var packets_per_day_data = google.visualization.arrayToDataTable({packets_per_day_trends});
@@ -802,7 +833,24 @@ if __name__ == '__main__':
 			  width: '100%'
 			}};
 
-			
+			var maxpps_per_day_options = {{
+			  title: 'Highest PPS rate attack of the day, last month (packet units as is)',
+			  vAxis: {{minValue: 0}},
+			  hAxis: {{ticks: maxpps_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
+			  isStacked: false,
+			  legend: {{position: 'top', maxLines: 5}},
+			  width: '100%'
+			}};
+
+			var maxbps_per_day_options = {{
+			  title: 'Highest BPS rate attack of the day, last month (units Gbps)',
+			  vAxis: {{minValue: 0}},
+			  hAxis: {{ticks: maxbps_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
+			  isStacked: false,
+			  legend: {{position: 'top', maxLines: 5}},
+			  width: '100%'
+			}};
+
 			var events_per_day_options = {{
 			  title: 'Events per day, last month',
 			  vAxis: {{minValue: 0}},
@@ -975,6 +1023,9 @@ if __name__ == '__main__':
 
 			var traffic_chart = new google.visualization.AreaChart(document.getElementById('traffic_chart_div'));
 
+			var maxpps_per_day_chart = new google.visualization.AreaChart(document.getElementById('maxpps_per_day_chart_div'));
+			var maxbps_per_day_chart = new google.visualization.AreaChart(document.getElementById('maxbps_per_day_chart_div'));
+
 			var events_per_day_chart = new google.visualization.AreaChart(document.getElementById('events_per_day_chart_div'));
 			var bandwidth_per_day_chart = new google.visualization.AreaChart(document.getElementById('bandwidth_per_day_chart_div'));
 			var packets_per_day_chart = new google.visualization.AreaChart(document.getElementById('packets_per_day_chart_div'));
@@ -1006,6 +1057,9 @@ if __name__ == '__main__':
 
 
 			traffic_chart.draw(traffic_data, traffic_options);
+
+			maxpps_per_day_chart.draw(maxpps_per_day_data, maxpps_per_day_options);
+			maxbps_per_day_chart.draw(maxbps_per_day_data, maxbps_per_day_options);
 
 			events_per_day_chart.draw(events_per_day_data, events_per_day_options);
 			bandwidth_per_day_chart.draw(bandwidth_per_day_data, bandwidth_per_day_options);
@@ -1067,6 +1121,15 @@ if __name__ == '__main__':
 	  
 	  #traffic_chart_div {{
 		height: 40vh;
+	  }}
+
+	  
+	  #maxpps_per_day_chart_div {{
+		height: 20vh;
+	  }}
+
+	  #maxbps_per_day_chart_div {{
+		height: 20vh;
 	  }}
 
 	  #events_per_day_chart_div {{
@@ -1173,7 +1236,27 @@ if __name__ == '__main__':
 		  	<td colspan="3">
 			<div id="traffic_chart_div">
 			</td>
+		  </tr>
 
+		  <tr>
+		  	<td colspan="3">
+			<div id="maxpps_per_day_chart_div">
+			
+			</td>
+		  </tr>
+
+		  <tr>
+			<td colspan="3" valign="top">{maxpps_per_day_table}</td>
+		  </tr>
+
+		  <tr>
+		  	<td colspan="3">
+			<div id="maxbps_per_day_chart_div">
+			</td>
+		  </tr>
+
+		  <tr>
+			<td colspan="3" valign="top">{maxbps_per_day_table}</td>
 		  </tr>
 
 		  <tr>

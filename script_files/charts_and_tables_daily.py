@@ -60,19 +60,28 @@ for cust_config_block in customers_json:
 ######## Set units sum Units ###############################
 
 		if bw_units.lower() == 'megabytes':	
-			bw_units_sum = 'SUM(packetBandwidth)/8000'
-			
+			bw_units_sum = 'ROUND(SUM(packetBandwidth)/8000.0, 2)'
 
 		if bw_units.lower() == 'gigabytes':	
-			bw_units_sum = 'SUM(packetBandwidth)/8000000'
+			bw_units_sum = 'ROUND(SUM(packetBandwidth)/8000000.0, 2)'
+	
+		if bw_units.lower() == 'gigabytes':	
+			bw_units_sum = 'ROUND(SUM(packetBandwidth)/8000000000.0, 2)'
+
+
+		if pkt_units.lower() == 'as is':	
+			pkt_units_sum = 'SUM(packetCount)'
+
+		if pkt_units.lower() == 'thousands':	
+			pkt_units_sum = 'SUM(packetCount)/1000'
 		
-		if bw_units.lower() == 'gigabytes':	
-			bw_units_sum = 'SUM(packetBandwidth)/8000000000'
+		if pkt_units.lower() == 'millions':	
+			pkt_units_sum = 'SUM(packetCount)/1000000'
+		
+		if pkt_units.lower() == 'billions':	
+			pkt_units_sum = 'SUM(packetCount)/1000000000'
 
 
-		bw_units_sum_mb = 'SUM(packetBandwidth)/8000'
-		bw_units_sum_gb = 'SUM(packetBandwidth)/8000000'
-		bw_units_sum_tb = 'SUM(packetBandwidth)/8000000000'
 #################################################
 
 # check if tmp_files directory exists and create it if it doesn't
@@ -192,22 +201,9 @@ def gen_charts_data(db_path):
 	###################################################################
 
 
-
-
 	####Get malicious packets by day from the last month and write to csv########
 
-	if pkt_units.lower() == 'thousands':					
-		cur.execute("SELECT startDayOfMonth, SUM(packetCount)/1000 FROM attacks GROUP BY startDayOfMonth")
-
-	if pkt_units.lower() == 'millions':
-		cur.execute("SELECT startDayOfMonth, SUM(packetCount)/1000000 FROM attacks GROUP BY startDayOfMonth")
-
-	if pkt_units.lower() == 'billions':
-		cur.execute("SELECT startDayOfMonth, SUM(packetCount)/1000000000 FROM attacks GROUP BY startDayOfMonth")
-
-	if pkt_units.lower() == 'as is':
-		cur.execute("SELECT startDayOfMonth, SUM(packetCount) FROM attacks GROUP BY startDayOfMonth")
-	
+	cur.execute(f"SELECT startDayOfMonth, {pkt_units_sum} FROM attacks GROUP BY startDayOfMonth")
 
 	new_column_names = ['Day of the month', 'Malicious Packets']
 
@@ -228,7 +224,6 @@ def gen_charts_data(db_path):
 
 	####Get malicious bandwidth by day from the last month and write to csv########
 
-
 	cur.execute(f"SELECT startDayOfMonth, {bw_units_sum} FROM attacks GROUP BY startDayOfMonth")
 				
 	new_column_names = ['Day of the month', 'Malicious Bandwidth']
@@ -248,7 +243,51 @@ def gen_charts_data(db_path):
 	csv_file.close
 	###################################################################
 
+	####Get attack Max PPS by day from the last month and write to csv########
 
+	cur.execute("SELECT startDayOfMonth, MAX(maxAttackPacketRatePps) as 'Max Attack rate PPS' FROM attacks GROUP BY startDayOfMonth ORDER BY startDayOfMonth")
+
+
+	new_column_names = ['Day of the month', 'Attack rate Max PPS']
+
+	data = cur.fetchall()
+
+	# Write to CSV with renamed columns
+	with open(tmp_path + 'maxpps_per_day_last_month.csv', 'w', newline='') as csv_file:
+		csv_writer = csv.writer(csv_file)
+
+		# Write the new header
+		csv_writer.writerow(new_column_names)
+
+		# Write data
+		csv_writer.writerows(data)
+
+	csv_file.close
+	###################################################################
+
+
+
+	####Get attack Max Gbps by day from the last month and write to csv########
+
+	cur.execute("SELECT startDayOfMonth, ROUND(MAX(maxAttackRateBps)/1000000000.0, 2) as 'Max Attack rate BPS' FROM attacks GROUP BY startDayOfMonth ORDER BY startDayOfMonth")
+
+
+	new_column_names = ['Day of the month', 'Attack rate Max BPS']
+
+	data = cur.fetchall()
+
+	# Write to CSV with renamed columns
+	with open(tmp_path + 'maxbps_per_day_last_month.csv', 'w', newline='') as csv_file:
+		csv_writer = csv.writer(csv_file)
+
+		# Write the new header
+		csv_writer.writerow(new_column_names)
+
+		# Write data
+		csv_writer.writerows(data)
+
+	csv_file.close
+	###################################################################
 
 
 

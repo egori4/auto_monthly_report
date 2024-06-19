@@ -201,6 +201,14 @@ V9.2.2 (1/25/2024)
 	!Must update run.sh 
 		- add "forensics_date_format" variable
 		- add "db_from_forensics" variable
+
+9.6 (6/19/24)
+	- New charts Max PPS and Max BPS daily distribution for daily/monthly reports
+	- Fixed traffic utilization chart
+	- Fixed daily packets charts
+	- charts_and_tables_daily.py
+		bw_units and pkts_units optimizations
+
 ===========================================================================================================================
 Instructions how to deploy as a docker container (on Vision example):
  

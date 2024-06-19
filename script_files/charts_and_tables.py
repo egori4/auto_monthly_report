@@ -209,7 +209,9 @@ def gen_charts_data(db_path):
 						# Write data
 						csv_writer.writerows(formatted_data)
 					csv_file.close
-				except:
+
+				except Exception as e:
+					print(f"An error occurred: {e}")
 					pass
 				###################################################################
 
@@ -247,6 +249,52 @@ def gen_charts_data(db_path):
 	
 				# Write to CSV with renamed columns
 				with open(tmp_path + 'bandwidth_per_day_last_month.csv', 'w', newline='') as csv_file:
+					csv_writer = csv.writer(csv_file)
+
+					# Write the new header
+					csv_writer.writerow(new_column_names)
+
+					# Write data
+					csv_writer.writerows(data)
+
+				csv_file.close
+				###################################################################
+
+				####Get attack Max PPS by day from the last month and write to csv########
+
+				cur.execute("SELECT startDayOfMonth, MAX(maxAttackPacketRatePps) as 'Max Attack rate PPS' FROM attacks GROUP BY startDayOfMonth ORDER BY startDayOfMonth")
+
+
+				new_column_names = ['Day of the month', 'Attack rate Max PPS']
+
+				data = cur.fetchall()
+
+				# Write to CSV with renamed columns
+				with open(tmp_path + 'maxpps_per_day_last_month.csv', 'w', newline='') as csv_file:
+					csv_writer = csv.writer(csv_file)
+
+					# Write the new header
+					csv_writer.writerow(new_column_names)
+
+					# Write data
+					csv_writer.writerows(data)
+
+				csv_file.close
+				###################################################################
+
+
+
+				####Get attack Max Gbps by day from the last month and write to csv########
+
+				cur.execute("SELECT startDayOfMonth, ROUND(MAX(maxAttackRateBps)/1000000000.0, 2) as 'Max Attack rate BPS' FROM attacks GROUP BY startDayOfMonth ORDER BY startDayOfMonth")
+
+
+				new_column_names = ['Day of the month', 'Attack rate Max BPS']
+
+				data = cur.fetchall()
+
+				# Write to CSV with renamed columns
+				with open(tmp_path + 'maxbps_per_day_last_month.csv', 'w', newline='') as csv_file:
 					csv_writer = csv.writer(csv_file)
 
 					# Write the new header
