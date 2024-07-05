@@ -214,6 +214,11 @@ V9.2.2 (1/25/2024)
 		If customers.json key "bwUnitDaily" is set to:
 			"Megabytes", BPS units will be Mbps
 			"Gigabytes" or "Terabytes", BPS units will be Gbps
+
+9.7.1 (7/5/24)
+	- Bugfix monthly report "Malicious bandwidth per day, last month (units Gigabytes) chart"
+
+
 ===========================================================================================================================
 Instructions how to deploy as a docker container (on Vision example):
  

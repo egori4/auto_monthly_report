@@ -61,14 +61,14 @@ for cust_config_block in customers_json:
 		#Can be configured "Millions" or "Billions" or "Thousands"
 
 		if bw_units.lower() == 'megabytes':	
-			bw_units_sum = 'SUM(packetBandwidth)/8000'
+			bw_units_sum = 'ROUND(SUM(packetBandwidth)/8000.0, 2)'
 		
 
 		if bw_units.lower() == 'gigabytes':	
-			bw_units_sum = 'SUM(packetBandwidth)/8000000'
+			bw_units_sum = 'ROUND(SUM(packetBandwidth)/8000000.0, 2)'
 		
 		if bw_units.lower() == 'terabytes':	
-			bw_units_sum = 'SUM(packetBandwidth)/8000000000'
+			bw_units_sum = 'ROUND(SUM(packetBandwidth)/8000000000.0, 2)'
 
 ######## Get Daily Units ###############################
 
@@ -79,17 +79,14 @@ for cust_config_block in customers_json:
 		#Can be configured "Millions" or "Billions" or "Thousands"
 
 		if bw_units_daily.lower() == 'megabytes':	
-			bw_units_sum = 'SUM(packetBandwidth)/8000'
 			bps_units = 'ROUND(MAX(maxAttackRateBps)/1000000.0, 2)'
 			bps_units_desc = 'Mbps'	
 
 		if bw_units_daily.lower() == 'gigabytes':	
-			bw_units_sum = 'SUM(packetBandwidth)/8000000'
 			bps_units = 'ROUND(MAX(maxAttackRateBps)/1000000000.0, 2)'
 			bps_units_desc = 'Gbps'
 
 		if bw_units_daily.lower() == 'terabytes':	
-			bw_units_sum = 'SUM(packetBandwidth)/8000000000'
 			bps_units = 'ROUND(MAX(maxAttackRateBps)/1000000000.0, 2)'
 			bps_units_desc = 'Gbps'
 
