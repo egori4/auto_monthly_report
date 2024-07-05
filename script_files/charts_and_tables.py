@@ -53,28 +53,47 @@ for cust_config_block in customers_json:
 	if cust_config_block['id'] == cust_id:
 		defensepros = cust_config_block['defensepros']
 
-######## Get Units ###############################
+######## Get Monthly Units ###############################
 		bw_units = cust_config_block['variables']['bwUnit']
 		#Can be configured "Gigabytes", "Terabytes" or "Megabytes"
 		
 		pkt_units = cust_config_block['variables']['pktUnit']
 		#Can be configured "Millions" or "Billions" or "Thousands"
-######## Set units sum Units ###############################
 
 		if bw_units.lower() == 'megabytes':	
 			bw_units_sum = 'SUM(packetBandwidth)/8000'
-			
+		
 
 		if bw_units.lower() == 'gigabytes':	
 			bw_units_sum = 'SUM(packetBandwidth)/8000000'
 		
-		if bw_units.lower() == 'gigabytes':	
+		if bw_units.lower() == 'terabytes':	
 			bw_units_sum = 'SUM(packetBandwidth)/8000000000'
 
+######## Get Daily Units ###############################
 
-		bw_units_sum_mb = 'SUM(packetBandwidth)/8000'
-		bw_units_sum_gb = 'SUM(packetBandwidth)/8000000'
-		bw_units_sum_tb = 'SUM(packetBandwidth)/8000000000'
+		bw_units_daily = cust_config_block['variables']['bwUnitDaily']
+		#Can be configured "Gigabytes", "Terabytes" or "Megabytes"
+		
+		pkt_units_daily = cust_config_block['variables']['pktUnitDaily']
+		#Can be configured "Millions" or "Billions" or "Thousands"
+
+		if bw_units_daily.lower() == 'megabytes':	
+			bw_units_sum = 'SUM(packetBandwidth)/8000'
+			bps_units = 'ROUND(MAX(maxAttackRateBps)/1000000.0, 2)'
+			bps_units_desc = 'Mbps'	
+
+		if bw_units_daily.lower() == 'gigabytes':	
+			bw_units_sum = 'SUM(packetBandwidth)/8000000'
+			bps_units = 'ROUND(MAX(maxAttackRateBps)/1000000000.0, 2)'
+			bps_units_desc = 'Gbps'
+
+		if bw_units_daily.lower() == 'terabytes':	
+			bw_units_sum = 'SUM(packetBandwidth)/8000000000'
+			bps_units = 'ROUND(MAX(maxAttackRateBps)/1000000000.0, 2)'
+			bps_units_desc = 'Gbps'
+
+
 
 
 #################################################
@@ -286,7 +305,7 @@ def gen_charts_data(db_path):
 
 				####Get attack Max Gbps by day from the last month and write to csv########
 
-				cur.execute("SELECT startDayOfMonth, ROUND(MAX(maxAttackRateBps)/1000000000.0, 2) as 'Max Attack rate BPS' FROM attacks GROUP BY startDayOfMonth ORDER BY startDayOfMonth")
+				cur.execute(f"SELECT startDayOfMonth, {bps_units} as 'Max Attack rate BPS' FROM attacks GROUP BY startDayOfMonth ORDER BY startDayOfMonth")
 
 
 				new_column_names = ['Day of the month', 'Attack rate Max BPS']

@@ -209,6 +209,11 @@ V9.2.2 (1/25/2024)
 	- charts_and_tables_daily.py
 		bw_units and pkts_units optimizations
 
+9.7 (7/5/24)
+	- Added BPS as Mbps or Gbps variable.
+		If customers.json key "bwUnitDaily" is set to:
+			"Megabytes", BPS units will be Mbps
+			"Gigabytes" or "Terabytes", BPS units will be Gbps
 ===========================================================================================================================
 Instructions how to deploy as a docker container (on Vision example):
  

@@ -21,6 +21,20 @@ for cust_config_block in customers_json:
 		
 		pkt_units = cust_config_block['variables']['pktUnitDaily']
 		#Can be configured "Millions" or "Billions" or "Thousands"
+		if bw_units.lower() == 'megabytes':	
+			bw_units_sum = 'ROUND(SUM(packetBandwidth)/8000.0, 2)'
+			bps_unit = 1000000
+			bps_units_desc = 'Mbps'
+
+		if bw_units.lower() == 'gigabytes':	
+			bw_units_sum = 'ROUND(SUM(packetBandwidth)/8000000.0, 2)'
+			bps_unit = 1000000000
+			bps_units_desc = 'Gbps'
+
+		if bw_units.lower() == 'terabytes':
+			bw_units_sum = 'ROUND(SUM(packetBandwidth)/8000000000.0, 2)'
+			bps_unit = 1000000000
+			bps_units_desc = 'Gbps'
 
 ##### Extract variables from run.sh ##############
 run_file = 'run_daily.sh'
@@ -355,7 +369,7 @@ def maxbps_per_day_html_table():
 
 	maxbps_indices = data_month.groupby(['Day of the Month'])['maxAttackRateBps'].idxmax()
 	maxbps_rows = data_month.loc[maxbps_indices][['startDate', 'Device Name','Policy Name','Attack Name', 'maxAttackRateBps']].reset_index(drop=True)
-	maxbps_rows['maxAttackRateBps'] = maxbps_rows['maxAttackRateBps'].apply(lambda x: f"{x / 1000000000:,.2f} Gbps")
+	maxbps_rows['maxAttackRateBps'] = maxbps_rows['maxAttackRateBps'].apply(lambda x: f"{x / bps_unit:,.2f} {bps_units_desc}")
 	maxbps_rows= maxbps_rows.to_html(index=False)
 	return maxbps_rows
 
@@ -856,7 +870,7 @@ if __name__ == '__main__':
 			}};
 
 			var maxbps_per_day_options = {{
-			  title: 'Highest BPS rate attack of the day, last month (units Gbps)',
+			  title: 'Highest BPS rate attack of the day, last month (units {bps_units_desc})',
 			  vAxis: {{minValue: 0}},
 			  hAxis: {{ticks: maxbps_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
 			  isStacked: false,

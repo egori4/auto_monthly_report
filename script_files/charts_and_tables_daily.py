@@ -61,12 +61,18 @@ for cust_config_block in customers_json:
 
 		if bw_units.lower() == 'megabytes':	
 			bw_units_sum = 'ROUND(SUM(packetBandwidth)/8000.0, 2)'
+			bps_units = 'ROUND(MAX(maxAttackRateBps)/1000000.0, 2)'
+			bps_units_desc = 'Mbps'
 
 		if bw_units.lower() == 'gigabytes':	
 			bw_units_sum = 'ROUND(SUM(packetBandwidth)/8000000.0, 2)'
-	
-		if bw_units.lower() == 'gigabytes':	
+			bps_units = 'ROUND(MAX(maxAttackRateBps)/1000000000.0, 2)'
+			bps_units_desc = 'Gbps'
+
+		if bw_units.lower() == 'terabytes':	
 			bw_units_sum = 'ROUND(SUM(packetBandwidth)/8000000000.0, 2)'
+			bps_units = 'ROUND(MAX(maxAttackRateBps)/1000000000.0, 2)'
+			bps_units_desc = 'Gbps'
 
 
 		if pkt_units.lower() == 'as is':	
@@ -269,7 +275,7 @@ def gen_charts_data(db_path):
 
 	####Get attack Max Gbps by day from the last month and write to csv########
 
-	cur.execute("SELECT startDayOfMonth, ROUND(MAX(maxAttackRateBps)/1000000000.0, 2) as 'Max Attack rate BPS' FROM attacks GROUP BY startDayOfMonth ORDER BY startDayOfMonth")
+	cur.execute(f"SELECT startDayOfMonth, {bps_units} as 'Max Attack rate BPS' FROM attacks GROUP BY startDayOfMonth ORDER BY startDayOfMonth")
 
 
 	new_column_names = ['Day of the month', 'Attack rate Max BPS']
