@@ -112,8 +112,8 @@ def convert_packets_units(data, pkt_units):
 						value = value/1000000
 					elif pkt_units == "Thousands":
 						value = value/1000
-					# elif pkt_units.lower() == "as is":
-					# 	pass
+					elif pkt_units.lower() == "as is":
+						pass
 					else:
 						print(f'Packets unit variable "pkt_units" is not set.')
 				

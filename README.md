@@ -218,6 +218,9 @@ V9.2.2 (1/25/2024)
 9.7.1 (7/5/24)
 	- Bugfix monthly report "Malicious bandwidth per day, last month (units Gigabytes) chart"
 
+9.7.2 (7/10/24)
+	- Cosmetic fix analyze_trends_daily.py
+		added elif for "as is" pkt_units to avoid printing message "Packets unit variable "pkt_units" is not set."
 
 ===========================================================================================================================
 Instructions how to deploy as a docker container (on Vision example):
