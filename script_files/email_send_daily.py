@@ -125,7 +125,7 @@ def send_report(SMTP_AUTH,SMTP_SERVER,SMTP_SERVER_PORT,SMTP_SENDER,SMTP_PASSWORD
 
         #################################################### Attach files to the email ########################################################
 
-        msg["Subject"] = SMTP_SUBJECT_PREFIX + f" Dailly report  - {today_formatted}"
+        msg["Subject"] = SMTP_SUBJECT_PREFIX + f" Daily report  - {today_formatted}"
 		
         archive_files(currentmonth)
         send_files(currentmonth ,msg)
