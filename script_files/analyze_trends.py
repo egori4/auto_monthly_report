@@ -450,7 +450,8 @@ def device_epm_html(device_epm):
 			device_epm_html=device_epm_html.to_html().replace(device_ip, device_name)
 			return device_epm_html
 		else:
-			continue
+			return 'N/A'
+			
 
 def device_ppm_html(device_ppm):
 	for device_ip, device_name in defensepros.items():
@@ -462,7 +463,7 @@ def device_ppm_html(device_ppm):
 			device_ppm_html=device_ppm_html.to_html().replace(device_ip, device_name)
 			return device_ppm_html
 		else:
-			continue
+			return 'N/A'
 
 def device_bpm_html(device_bpm):
 
@@ -475,7 +476,7 @@ def device_bpm_html(device_bpm):
 			device_df_bpm_html= device_df_bpm_html.to_html().replace(device_ip, device_name)
 			return device_df_bpm_html
 		else:
-			continue
+			return 'N/A'
 
 
 def policy_epm_html(policy_epm):

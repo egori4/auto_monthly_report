@@ -223,6 +223,9 @@ V9.2.2 (1/25/2024)
 		added elif for "as is" pkt_units to avoid printing message "Packets unit variable "pkt_units" is not set."
 	- Fixed typo in the email subject for daily reports under email_send_daily.py
 
+9.8.0 (10/4/24)
+	- Bugfix - if device is removed but data exists in db, script was failing to complete.
+	- Added option removing device information from the report if needed
 ===========================================================================================================================
 Instructions how to deploy as a docker container (on Vision example):
  
