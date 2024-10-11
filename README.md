@@ -226,6 +226,9 @@ V9.2.2 (1/25/2024)
 9.8.0 (10/4/24)
 	- Bugfix - if device is removed but data exists in db, script was failing to complete.
 	- Added option removing device information from the report if needed
+
+10.0 (10/11/24)
+	- Adding new functionality - selection/deselection of categories
 ===========================================================================================================================
 Instructions how to deploy as a docker container (on Vision example):
  

@@ -819,7 +819,7 @@ if __name__ == '__main__':
 
 			// Filter events_trends to include only the selected columns
 
-			var filteredData = events_trends.map(row => selectedColumns.map(index => row[index]));
+			var filteredData = {events_trends}.map(row => selectedColumns.map(index => row[index]));
 
 
 			var traffic_data = google.visualization.arrayToDataTable({traffic_trends});
@@ -1128,7 +1128,7 @@ if __name__ == '__main__':
 
 			function generateCheckboxes() {{
 				var checkboxesDiv = document.getElementById('checkboxes');
-				var elements = events_trends[0].slice(1);  // Get the dynamic elements (skip the first empty cell)
+				var elements = {events_trends}[0].slice(1);  // Get the dynamic elements (skip the first empty cell)
 
 				elements.forEach(function(element, index) {{
 				var checkbox = document.createElement('input');
