@@ -807,10 +807,21 @@ if __name__ == '__main__':
 	  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 		<script type="text/javascript">
 		  google.charts.load('current', {{'packages':['corechart']}});
-		  google.charts.setOnLoadCallback(drawChart);
+		  google.charts.setOnLoadCallback(function() {{
+		  	generateCheckboxes();  // Generate checkboxes dynamically
+			drawChart();
+      	  }});
+			
+		  // Draw the chart with initially all columns visible
 
 		  function drawChart() {{
-		  
+		    var selectedColumns = getSelectedColumns();
+
+			// Filter events_trends to include only the selected columns
+
+			var filteredData = events_trends.map(row => selectedColumns.map(index => row[index]));
+
+
 			var traffic_data = google.visualization.arrayToDataTable({traffic_trends});
 
 			var maxpps_per_day_data = google.visualization.arrayToDataTable({maxpps_per_day_trends});
@@ -824,7 +835,7 @@ if __name__ == '__main__':
 			var ppm_total_data = google.visualization.arrayToDataTable({packets_total_bar});
 			var bpm_total_data = google.visualization.arrayToDataTable({bw_total_bar});
 
-			var epm_data = google.visualization.arrayToDataTable({events_trends});
+        	var epm_data = google.visualization.arrayToDataTable(filteredData);
 			var ppm_data = google.visualization.arrayToDataTable({packets_trends_chart});
 			var bpm_data = google.visualization.arrayToDataTable({bw_trends});
 
@@ -1113,6 +1124,48 @@ if __name__ == '__main__':
 
 		  }}
 
+	      	// Dynamically generate checkboxes based on the elements in the first row of events_trends
+
+			function generateCheckboxes() {{
+				var checkboxesDiv = document.getElementById('checkboxes');
+				var elements = events_trends[0].slice(1);  // Get the dynamic elements (skip the first empty cell)
+
+				elements.forEach(function(element, index) {{
+				var checkbox = document.createElement('input');
+				checkbox.type = 'checkbox';
+				checkbox.value = index + 1; // Column indices start from 1 (0 is the month column)
+				checkbox.checked = true; // All checkboxes checked initially
+				checkbox.onchange = updateChart;
+
+				var label = document.createElement('label');
+				label.appendChild(checkbox);
+				label.appendChild(document.createTextNode(" " + element));
+				label.appendChild(document.createElement('br'));
+
+				checkboxesDiv.appendChild(label);
+				}});  
+
+				}}
+
+				// Returns the columns selected by checkboxes (always include the date column at index 0)
+				function getSelectedColumns() {{
+					var selectedColumns = [0]; // Always include the first column (e.g., month names)
+					var checkboxes = document.querySelectorAll('input[type=checkbox]:checked');
+
+					checkboxes.forEach(checkbox => {{
+					selectedColumns.push(parseInt(checkbox.value));
+					}});
+
+					return selectedColumns;
+				}}
+
+				// Redraw the chart when checkboxes are changed
+				function updateChart() {{
+					drawChart();
+				}}
+
+
+
 		</script>
 
 	<style>
@@ -1334,7 +1387,10 @@ if __name__ == '__main__':
 
 
 		  <tr>
-			<td><div id="epm_chart_div" style="height: 600px;"></td>
+			<td>
+				<div id="checkboxes"></div>
+				<div id="epm_chart_div" style="height: 600px;">
+			</td>
 			<td><div id="ppm_chart_div" style="height: 600px;"></td>
 			<td><div id="bpm_chart_div" style="height: 600px;"></td>
 		  </tr>
