@@ -936,6 +936,7 @@ if __name__ == '__main__':
 			  title: 'Security Events trends - TopN by last month',
 			  vAxis: {{minValue: 0}},
 			  isStacked: true,
+			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
 			}};
@@ -1388,8 +1389,9 @@ if __name__ == '__main__':
 
 		  <tr>
 			<td>
-				<div id="checkboxes"></div>
+				<div align="left" id="checkboxes"></div>
 				<div id="epm_chart_div" style="height: 600px;">
+
 			</td>
 			<td><div id="ppm_chart_div" style="height: 600px;"></td>
 			<td><div id="bpm_chart_div" style="height: 600px;"></td>
