@@ -805,7 +805,10 @@ if __name__ == '__main__':
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 	  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-		<script type="text/javascript">
+	  <script type="text/javascript">
+
+	  	var isStacked = true; // Initialize the chart as stacked by default
+
 		  google.charts.load('current', {{'packages':['corechart']}});
 		  google.charts.setOnLoadCallback(function() {{
 		  	generateCheckboxes();  // Generate checkboxes dynamically
@@ -935,7 +938,7 @@ if __name__ == '__main__':
 			var epm_options = {{
 			  title: 'Security Events trends - TopN by last month',
 			  vAxis: {{minValue: 0}},
-			  isStacked: true,
+			  isStacked: isStacked, // Use the current value of isStacked (true or false)
 			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
@@ -1165,7 +1168,12 @@ if __name__ == '__main__':
 					drawChart();
 				}}
 
-
+				// Toggle between stacked and unstacked when the user changes the radio button
+				function toggleStacked(isStackedValue) {{
+					isStacked = isStackedValue; // Update the global variable
+					drawChart(); // Redraw the chart with the updated stacking option
+				}}
+				</script>
 
 		</script>
 
@@ -1390,8 +1398,11 @@ if __name__ == '__main__':
 		  <tr>
 			<td>
 				<div align="left" id="checkboxes"></div>
-				<div id="epm_chart_div" style="height: 600px;">
-
+				<div id="epm_chart_div" style="height: 600px;"></div>
+				<div align="center">
+					<label><input type="radio" name="stackedOption" value="true" checked onchange="toggleStacked(true)"> Stacked</label>
+					<label><input type="radio" name="stackedOption" value="false" onchange="toggleStacked(false)"> Unstacked</label>
+    			</div>
 			</td>
 			<td><div id="ppm_chart_div" style="height: 600px;"></td>
 			<td><div id="bpm_chart_div" style="height: 600px;"></td>
