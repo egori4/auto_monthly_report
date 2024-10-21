@@ -925,6 +925,7 @@ if __name__ == '__main__':
 			  title: 'Security Events trends - TopN by last month',
 			  vAxis: {{minValue: 0}},
 			  isStacked: true,
+			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
 			}};
@@ -933,6 +934,7 @@ if __name__ == '__main__':
 			  title: 'Malicious Packets trends (units {pkt_units}) - TopN by last month',
 			  vAxis: {{minValue: 0}},
 			  isStacked: true,
+			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
 			}};
@@ -941,6 +943,7 @@ if __name__ == '__main__':
 			  title: 'Malicious Bandwidth trends (units {bw_units}) - TopN by last month',
 			  vAxis: {{minValue: 0}},
 			  isStacked: true,
+			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
 			}};
@@ -949,6 +952,7 @@ if __name__ == '__main__':
 			  title: 'Security Events trends - TopN all time high',
 			  vAxis: {{minValue: 0}},
 			  isStacked: true,
+			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
 			}};
@@ -957,6 +961,7 @@ if __name__ == '__main__':
 			  title: 'Malicious Packets trends (units {pkt_units}) - TopN all time high',
 			  vAxis: {{minValue: 0}},
 			  isStacked: true,
+			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
 			}};
@@ -965,6 +970,7 @@ if __name__ == '__main__':
 			  title: 'Malicious Bandwidth trends (units {bw_units}) - TopN all time high',
 			  vAxis: {{minValue: 0}},
 			  isStacked: true,
+			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
 			}};
@@ -973,6 +979,7 @@ if __name__ == '__main__':
 			  title: 'Events by device trends',
 			  vAxis: {{minValue: 0}},
 			  isStacked: true,
+			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
 			}};
@@ -981,6 +988,7 @@ if __name__ == '__main__':
 			  title: 'Packets by device trends (units {pkt_units})',
 			  vAxis: {{minValue: 0}},
 			  isStacked: true,
+			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
 			}};
@@ -989,6 +997,7 @@ if __name__ == '__main__':
 			  title: 'Malicious Bandwidth by device trends (units {bw_units})',
 			  vAxis: {{minValue: 0}},
 			  isStacked: true,
+			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
 			}};
@@ -997,6 +1006,7 @@ if __name__ == '__main__':
 			  title: 'Security Events trends by source IP',
 			  vAxis: {{minValue: 0}},
 			  isStacked: true,
+			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
 			}};
@@ -1005,6 +1015,7 @@ if __name__ == '__main__':
 			  title: 'Malicious Packets trends (units {pkt_units}) by source IP',
 			  vAxis: {{minValue: 0}},
 			  isStacked: true,
+			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
 			}};
@@ -1013,6 +1024,7 @@ if __name__ == '__main__':
 			  title: 'Malicious Bandwidth trends (Megabytes) by source IP',
 			  vAxis: {{minValue: 0}},
 			  isStacked: true,
+			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
 			}};
@@ -1021,6 +1033,7 @@ if __name__ == '__main__':
 			  title: 'Security Events trends by Policy',
 			  vAxis: {{minValue: 0}},
 			  isStacked: true,
+			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
 			}};
@@ -1029,6 +1042,7 @@ if __name__ == '__main__':
 			  title: 'Malicious Packets trends (units {pkt_units}) by Policy',
 			  vAxis: {{minValue: 0}},
 			  isStacked: true,
+			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
 			}};
@@ -1037,6 +1051,7 @@ if __name__ == '__main__':
 			  title: 'Malicious Bandwidth trends (units {bw_units}) by Policy',
 			  vAxis: {{minValue: 0}},
 			  isStacked: true,
+			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
 			}};
@@ -1077,6 +1092,109 @@ if __name__ == '__main__':
 			var policy_bpm_chart = new google.visualization.AreaChart(document.getElementById('policy_bpm_chart_div'));
 			
 
+			// Create checkboxes for each chart
+			createCheckboxes('epm_chart_div', {events_trends}, function(selectedCategories) {{
+				var filteredData = filterDataByCategories({events_trends}, selectedCategories);
+				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
+				epm_chart.draw(filteredDataTable, epm_options);
+			}});
+
+			createCheckboxes('ppm_chart_div', {packets_trends_chart}, function(selectedCategories) {{
+				var filteredData = filterDataByCategories({packets_trends_chart}, selectedCategories);
+				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
+				ppm_chart.draw(filteredDataTable, ppm_options);
+			}});
+
+			createCheckboxes('bpm_chart_div', {bw_trends}, function(selectedCategories) {{
+				var filteredData = filterDataByCategories({bw_trends}, selectedCategories);
+				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
+				bpm_chart.draw(filteredDataTable, bpm_options);
+			}});
+
+			createCheckboxes('epm_chart_div_alltimehigh', {events_trends_alltimehigh}, function(selectedCategories) {{
+				var filteredData = filterDataByCategories({events_trends_alltimehigh}, selectedCategories);
+				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
+				epm_chart_alltimehigh.draw(filteredDataTable, epm_options_alltimehigh);
+			}});
+
+			createCheckboxes('ppm_chart_div_alltimehigh', {packets_trends_chart_alltimehigh}, function(selectedCategories) {{
+				var filteredData = filterDataByCategories({packets_trends_chart_alltimehigh}, selectedCategories);
+				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
+				ppm_chart_alltimehigh.draw(filteredDataTable, ppm_options_alltimehigh);
+			}});
+
+			createCheckboxes('bpm_chart_div_alltimehigh', {bw_trends_alltimehigh}, function(selectedCategories) {{
+				var filteredData = filterDataByCategories({bw_trends_alltimehigh}, selectedCategories);
+				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
+				bpm_chart_alltimehigh.draw(filteredDataTable, bpm_options_alltimehigh);
+			}});
+
+
+			createCheckboxes('epm_by_device_chart_div', {events_by_device_trends_chart_data}, function(selectedCategories) {{
+				var filteredData = filterDataByCategories({events_by_device_trends_chart_data}, selectedCategories);
+				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
+				epm_by_device_chart.draw(filteredDataTable, epm_by_device_options);
+			}});
+
+			createCheckboxes('ppm_by_device_chart_div', {packets_by_device_trends_chart_data}, function(selectedCategories) {{
+				var filteredData = filterDataByCategories({packets_by_device_trends_chart_data}, selectedCategories);
+				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
+				ppm_by_device_chart.draw(filteredDataTable, ppm_by_device_options);
+			}});
+
+			createCheckboxes('bpm_by_device_chart_div', {bw_by_device_trends_chart_data}, function(selectedCategories) {{
+				var filteredData = filterDataByCategories({bw_by_device_trends_chart_data}, selectedCategories);
+				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
+				bpm_by_device_chart.draw(filteredDataTable, bpm_by_device_options);
+			}});
+
+			
+
+
+			
+
+			createCheckboxes('sip_epm_chart_div', {sip_events_trends_chart}, function(selectedCategories) {{
+				var filteredData = filterDataByCategories({sip_events_trends_chart}, selectedCategories);
+				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
+				sip_epm_chart.draw(filteredDataTable, sip_epm_options);
+			}});
+
+			createCheckboxes('sip_ppm_chart_div', {sip_packets_trends_chart}, function(selectedCategories) {{
+				var filteredData = filterDataByCategories({sip_packets_trends_chart}, selectedCategories);
+				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
+				sip_ppm_chart.draw(filteredDataTable, sip_ppm_options);
+			}});
+
+			createCheckboxes('sip_bpm_chart_div', {sip_bw_trends_chart}, function(selectedCategories) {{
+				var filteredData = filterDataByCategories({sip_bw_trends_chart}, selectedCategories);
+				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
+				sip_bpm_chart.draw(filteredDataTable, sip_bpm_options);
+			}});
+
+			
+
+
+			createCheckboxes('policy_epm_chart_div', {policy_events_trends_chart}, function(selectedCategories) {{
+				var filteredData = filterDataByCategories({policy_events_trends_chart}, selectedCategories);
+				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
+				policy_epm_chart.draw(filteredDataTable, policy_epm_options);
+			}});
+
+			createCheckboxes('policy_ppm_chart_div', {policy_packets_trends_chart}, function(selectedCategories) {{
+				var filteredData = filterDataByCategories({policy_packets_trends_chart}, selectedCategories);
+				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
+				policy_ppm_chart.draw(filteredDataTable, policy_ppm_options);
+			}});
+
+			createCheckboxes('policy_bpm_chart_div', {policy_bw_trends_chart}, function(selectedCategories) {{
+				var filteredData = filterDataByCategories({policy_bw_trends_chart}, selectedCategories);
+				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
+				policy_bpm_chart.draw(filteredDataTable, policy_bpm_options);
+			}});
+
+
+
+			// Draw initial charts
 
 			traffic_chart.draw(traffic_data, traffic_options);
 
@@ -1111,7 +1229,106 @@ if __name__ == '__main__':
 			policy_ppm_chart.draw(policy_ppm_data, policy_ppm_options);
 			policy_bpm_chart.draw(policy_bpm_data, policy_bpm_options);
 
-		  }}
+			
+
+			// Add radio button toggles for stacked/non-stacked
+			addStackedToggle('epm_chart_div', epm_chart, epm_data, epm_options);
+			addStackedToggle('ppm_chart_div', ppm_chart, ppm_data, ppm_options);
+			addStackedToggle('bpm_chart_div', bpm_chart, bpm_data, bpm_options);
+
+			addStackedToggle('epm_chart_div_alltimehigh', epm_chart_alltimehigh, epm_data_alltimehigh, epm_options_alltimehigh);
+			addStackedToggle('ppm_chart_div_alltimehigh', ppm_chart_alltimehigh, ppm_data_alltimehigh, ppm_options_alltimehigh);
+			addStackedToggle('bpm_chart_div_alltimehigh', bpm_chart_alltimehigh, bpm_data_alltimehigh, bpm_options_alltimehigh);
+
+			addStackedToggle('epm_by_device_chart_div', epm_by_device_chart, epm_by_device_data, epm_by_device_options);
+			addStackedToggle('ppm_by_device_chart_div', ppm_by_device_chart, ppm_by_device_data, ppm_by_device_options);
+			addStackedToggle('bpm_by_device_chart_div', bpm_by_device_chart, bpm_by_device_data, bpm_by_device_options);
+
+			addStackedToggle('sip_epm_chart_div', sip_epm_chart, sip_epm_data, sip_epm_options);
+			addStackedToggle('sip_ppm_chart_div', sip_ppm_chart, sip_ppm_data, sip_ppm_options);
+			addStackedToggle('sip_bpm_chart_div', sip_bpm_chart, sip_bpm_data, sip_bpm_options);
+
+			addStackedToggle('policy_epm_chart_div', policy_epm_chart, policy_epm_data, policy_epm_options);
+			addStackedToggle('policy_ppm_chart_div', policy_ppm_chart, policy_ppm_data, policy_ppm_options);
+			addStackedToggle('policy_bpm_chart_div', policy_bpm_chart, policy_bpm_data, policy_bpm_options);
+
+
+			}}
+
+			// Function to create checkboxes
+			function createCheckboxes(containerId, data, callback) {{
+			var container = document.getElementById(containerId);
+			var categories = data[0].slice(1);  // Extract categories from the first row
+
+			var checkboxContainer = document.createElement('div');
+			checkboxContainer.className = 'checkbox-container';
+			
+			categories.forEach(function(category, index) {{
+				var checkbox = document.createElement('input');
+				checkbox.type = 'checkbox';
+				checkbox.checked = true;
+				checkbox.value = index + 1;  // Offset for data columns
+
+				checkbox.onchange = function() {{
+				var selectedCategories = Array.from(checkboxContainer.querySelectorAll('input:checked')).map(input => input.value);
+				callback(selectedCategories);
+				}};
+
+				var label = document.createElement('label');
+				label.appendChild(checkbox);
+				label.appendChild(document.createTextNode(category));
+				
+				checkboxContainer.appendChild(label);
+			}});
+
+			container.parentNode.insertBefore(checkboxContainer, container);
+			}}
+
+			// Function to filter data based on selected categories
+			function filterDataByCategories(data, selectedCategories) {{
+			var header = [data[0][0], ...selectedCategories.map(index => data[0][index])];  // Filter header row
+			var rows = data.slice(1).map(row => [row[0], ...selectedCategories.map(index => row[index])]);  // Filter data rows
+			return [header, ...rows];
+			}}
+
+			// Function to add Stacked/Non-Stacked toggle via radio buttons
+			function addStackedToggle(containerId, chart, data, options) {{
+			var container = document.getElementById(containerId);
+			var radioContainer = document.createElement('div');
+			radioContainer.className = 'radio-container';
+			
+			var stackedLabel = document.createElement('label');
+			var stackedRadio = document.createElement('input');
+			stackedRadio.type = 'radio';
+			stackedRadio.name = 'stackedToggle_' + containerId;
+			stackedRadio.value = 'stacked';
+			stackedRadio.checked = true;
+			stackedRadio.onchange = function() {{
+				options.isStacked = true;
+				chart.draw(data, options);
+			}};
+			stackedLabel.appendChild(stackedRadio);
+			stackedLabel.appendChild(document.createTextNode('Stacked'));
+
+			var nonStackedLabel = document.createElement('label');
+			var nonStackedRadio = document.createElement('input');
+			nonStackedRadio.type = 'radio';
+			nonStackedRadio.name = 'stackedToggle_' + containerId;
+			nonStackedRadio.value = 'non-stacked';
+			nonStackedRadio.onchange = function() {{
+				options.isStacked = false;
+				chart.draw(data, options);
+			}};
+			nonStackedLabel.appendChild(nonStackedRadio);
+			nonStackedLabel.appendChild(document.createTextNode('Non-Stacked'));
+
+			radioContainer.appendChild(stackedLabel);
+			radioContainer.appendChild(nonStackedLabel);
+			
+			// container.parentNode.insertBefore(radioContainer, container);
+			container.parentNode.insertBefore(radioContainer, container.nextSibling);
+			}}
+		
 
 		</script>
 
@@ -1139,6 +1356,14 @@ if __name__ == '__main__':
 		border: 1px solid black;
 		padding: 10px;
 	  }}
+
+	  .checkbox-container, .radio-container {{
+      margin-bottom: 10px;
+    }}
+
+	  .radio-container {{
+		margin-top: 20px; /* Adds space after the chart */
+	}}
 
 	  
 	  #traffic_chart_div {{

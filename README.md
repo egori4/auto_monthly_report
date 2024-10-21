@@ -226,6 +226,12 @@ V9.2.2 (1/25/2024)
 9.8.0 (10/4/24)
 	- Bugfix - if device is removed but data exists in db, script was failing to complete.
 	- Added option removing device information from the report if needed
+
+10.0 (10/21/24)
+	- Added user configurable options for charts
+		a. Stacked/Non-Stacked
+		b. Select/Deselect
+	- Changed charts blob popup JS to show all categories on hover over mouse 
 ===========================================================================================================================
 Instructions how to deploy as a docker container (on Vision example):
  
