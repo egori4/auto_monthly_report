@@ -228,10 +228,10 @@ V9.2.2 (1/25/2024)
 	- Added option removing device information from the report if needed
 
 10.0 (10/21/24)
-	- Added user configurable options for charts
+	- Added user configurable options for monthly and daily charts
 		a. Stacked/Non-Stacked
-		b. Select/Deselect
-	- Changed charts blob popup JS to show all categories on hover over mouse 
+		b. Select/Deselect categories
+	- Changed charts blob popup JS to show all categories on hover over mouse
 ===========================================================================================================================
 Instructions how to deploy as a docker container (on Vision example):
  

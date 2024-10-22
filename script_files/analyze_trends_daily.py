@@ -913,6 +913,7 @@ if __name__ == '__main__':
 			  vAxis: {{minValue: 0}},
 			  hAxis: {{ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
 			  isStacked: true,
+			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
 			}};
@@ -923,6 +924,7 @@ if __name__ == '__main__':
 			  vAxis: {{minValue: 0}},
 			  hAxis: {{ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
 			  isStacked: true,
+			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
 			}};
@@ -932,6 +934,7 @@ if __name__ == '__main__':
 			  vAxis: {{minValue: 0}},
 			  hAxis: {{ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
 			  isStacked: true,
+			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
 			}};
@@ -943,6 +946,7 @@ if __name__ == '__main__':
 			  vAxis: {{minValue: 0}},
 			  hAxis: {{ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
 			  isStacked: true,
+			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
 			}};
@@ -952,6 +956,7 @@ if __name__ == '__main__':
 			  vAxis: {{minValue: 0}},
 			  hAxis: {{ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
 			  isStacked: true,
+			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
 			}};
@@ -960,7 +965,7 @@ if __name__ == '__main__':
 			  title: 'Malicious Bandwidth trends (units {bw_units}) - TopN all time high',
 			  vAxis: {{minValue: 0}},
 			  isStacked: true,
-			  hAxis: {{ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
+			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
 			}};
@@ -970,6 +975,7 @@ if __name__ == '__main__':
 			  vAxis: {{minValue: 0}},
 			  hAxis: {{ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
 			  isStacked: true,
+			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
 			}};
@@ -979,6 +985,7 @@ if __name__ == '__main__':
 			  vAxis: {{minValue: 0}},
 			  hAxis: {{ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
 			  isStacked: true,
+			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
 			}};
@@ -988,6 +995,7 @@ if __name__ == '__main__':
 			  vAxis: {{minValue: 0}},
 			  hAxis: {{ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
 			  isStacked: true,
+			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
 			}};
@@ -997,6 +1005,7 @@ if __name__ == '__main__':
 			  vAxis: {{minValue: 0}},
 			  hAxis: {{ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
 			  isStacked: true,
+			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
 			}};
@@ -1006,6 +1015,7 @@ if __name__ == '__main__':
 			  vAxis: {{minValue: 0}},
 			  hAxis: {{ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
 			  isStacked: true,
+			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
 			}};
@@ -1015,6 +1025,7 @@ if __name__ == '__main__':
 			  vAxis: {{minValue: 0}},
 			  hAxis: {{ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
 			  isStacked: true,
+			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
 			}};
@@ -1024,6 +1035,7 @@ if __name__ == '__main__':
 			  vAxis: {{minValue: 0}},
 			  hAxis: {{ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
 			  isStacked: true,
+			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
 			}};
@@ -1033,6 +1045,7 @@ if __name__ == '__main__':
 			  vAxis: {{minValue: 0}},
 			  hAxis: {{ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
 			  isStacked: true,
+			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
 			}};
@@ -1042,6 +1055,7 @@ if __name__ == '__main__':
 			  vAxis: {{minValue: 0}},
 			  hAxis: {{ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
 			  isStacked: true,
+			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
 			}};
@@ -1069,7 +1083,90 @@ if __name__ == '__main__':
 			var policy_events_per_day_chart = new google.visualization.AreaChart(document.getElementById('policy_events_per_day_chart_div'));
 			var policy_packets_per_day_chart = new google.visualization.AreaChart(document.getElementById('policy_packets_per_day_chart_div'));
 			var policy_bandwidth_per_day_chart = new google.visualization.AreaChart(document.getElementById('policy_bandwidth_per_day_chart_div'));
+
+
+			// Create checkboxes for each chart
+			createCheckboxes('events_per_day_chart_div_alltimehigh', {events_trends_alltimehigh}, function(selectedCategories) {{
+				var filteredData = filterDataByCategories({events_trends_alltimehigh}, selectedCategories);
+				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
+				events_per_day_chart_alltimehigh.draw(filteredDataTable, events_per_day_options_alltimehigh);
+			}});
+
+			createCheckboxes('packets_per_day_chart_div_alltimehigh', {packets_trends_chart_alltimehigh}, function(selectedCategories) {{
+				var filteredData = filterDataByCategories({packets_trends_chart_alltimehigh}, selectedCategories);
+				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
+				packets_per_day_chart_alltimehigh.draw(filteredDataTable, packets_per_day_options_alltimehigh);
+			}});
+
+			createCheckboxes('bandwidth_per_day_chart_div_alltimehigh', {bw_trends_alltimehigh}, function(selectedCategories) {{
+				var filteredData = filterDataByCategories({bw_trends_alltimehigh}, selectedCategories);
+				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
+				bandwidth_per_day_chart_alltimehigh.draw(filteredDataTable, bandwidth_per_day_options_alltimehigh);
+			}});
+
+
 			
+
+
+			createCheckboxes('events_per_day_by_device_chart_div', {events_by_device_trends_chart_data}, function(selectedCategories) {{
+				var filteredData = filterDataByCategories({events_by_device_trends_chart_data}, selectedCategories);
+				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
+				events_per_day_by_device_chart.draw(filteredDataTable, events_per_day_by_device_options);
+			}});
+
+			createCheckboxes('packets_per_day_by_device_chart_div', {packets_by_device_trends_chart_data}, function(selectedCategories) {{
+				var filteredData = filterDataByCategories({packets_by_device_trends_chart_data}, selectedCategories);
+				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
+				packets_per_day_by_device_chart.draw(filteredDataTable, packets_per_day_by_device_options);
+			}});
+
+			createCheckboxes('bandwidth_per_day_by_device_chart_div', {bw_by_device_trends_chart_data}, function(selectedCategories) {{
+				var filteredData = filterDataByCategories({bw_by_device_trends_chart_data}, selectedCategories);
+				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
+				bandwidth_per_day_by_device_chart.draw(filteredDataTable, bandwidth_per_day_by_device_options);
+			}});
+
+
+
+
+			createCheckboxes('sip_events_per_day_chart_div', {sip_events_trends_chart}, function(selectedCategories) {{
+				var filteredData = filterDataByCategories({sip_events_trends_chart}, selectedCategories);
+				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
+				sip_events_per_day_chart.draw(filteredDataTable, sip_events_per_day_options);
+			}});
+
+			createCheckboxes('sip_packets_per_day_chart_div', {sip_packets_trends_chart}, function(selectedCategories) {{
+				var filteredData = filterDataByCategories({sip_packets_trends_chart}, selectedCategories);
+				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
+				sip_packets_per_day_chart.draw(filteredDataTable, sip_packets_per_day_options);
+			}});
+
+			createCheckboxes('sip_bandwidth_per_day_chart_div', {sip_bw_trends_chart}, function(selectedCategories) {{
+				var filteredData = filterDataByCategories({sip_bw_trends_chart}, selectedCategories);
+				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
+				sip_bandwidth_per_day_chart.draw(filteredDataTable, sip_bandwidth_per_day_options);
+			}});
+
+
+
+			createCheckboxes('policy_events_per_day_chart_div', {policy_events_trends_chart}, function(selectedCategories) {{
+				var filteredData = filterDataByCategories({policy_events_trends_chart}, selectedCategories);
+				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
+				policy_events_per_day_chart.draw(filteredDataTable, policy_events_per_day_options);
+			}});
+
+			createCheckboxes('policy_packets_per_day_chart_div', {policy_packets_trends_chart}, function(selectedCategories) {{
+				var filteredData = filterDataByCategories({policy_packets_trends_chart}, selectedCategories);
+				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
+				policy_packets_per_day_chart.draw(filteredDataTable, policy_packets_per_day_options);
+			}});
+
+			createCheckboxes('policy_bandwidth_per_day_chart_div', {policy_bw_trends_chart}, function(selectedCategories) {{
+				var filteredData = filterDataByCategories({policy_bw_trends_chart}, selectedCategories);
+				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
+				policy_bandwidth_per_day_chart.draw(filteredDataTable, policy_bandwidth_per_day_options);
+			}});
+
 
 			maxpps_per_day_chart.draw(maxpps_per_day_data, maxpps_per_day_options);
 			maxbps_per_day_chart.draw(maxbps_per_day_data, maxbps_per_day_options);
@@ -1094,7 +1191,100 @@ if __name__ == '__main__':
 			policy_packets_per_day_chart.draw(policy_packets_per_day_data, policy_packets_per_day_options);
 			policy_bandwidth_per_day_chart.draw(policy_bandwidth_per_day_data, policy_bandwidth_per_day_options);
 
+			
+
+			// Add radio button toggles for stacked/non-stacked
+			addStackedToggle('events_per_day_chart_div_alltimehigh', events_per_day_chart_alltimehigh, events_per_day_data_alltimehigh, events_per_day_options_alltimehigh);
+			addStackedToggle('packets_per_day_chart_div_alltimehigh', packets_per_day_chart_alltimehigh, packets_per_day_data_alltimehigh, packets_per_day_options_alltimehigh);
+			addStackedToggle('bandwidth_per_day_chart_div_alltimehigh', bandwidth_per_day_chart_alltimehigh, bandwidth_per_day_data_alltimehigh, bandwidth_per_day_options_alltimehigh);
+
+			addStackedToggle('events_per_day_by_device_chart_div', events_per_day_by_device_chart, events_per_day_by_device_data, events_per_day_by_device_options);
+			addStackedToggle('packets_per_day_by_device_chart_div', packets_per_day_by_device_chart, packets_per_day_by_device_data, packets_per_day_by_device_options);
+			addStackedToggle('bandwidth_per_day_by_device_chart_div', bandwidth_per_day_by_device_chart, bandwidth_per_day_by_device_data, bandwidth_per_day_by_device_options);
+
+			addStackedToggle('sip_events_per_day_chart_div', sip_events_per_day_chart, sip_events_per_day_data, sip_events_per_day_options);
+			addStackedToggle('sip_packets_per_day_chart_div', sip_packets_per_day_chart, sip_packets_per_day_data, sip_packets_per_day_options);
+			addStackedToggle('sip_bandwidth_per_day_chart_div', sip_bandwidth_per_day_chart, sip_bandwidth_per_day_data, sip_bandwidth_per_day_options);
+
+			addStackedToggle('policy_events_per_day_chart_div', policy_events_per_day_chart, policy_events_per_day_data, policy_events_per_day_options);
+			addStackedToggle('policy_packets_per_day_chart_div', policy_packets_per_day_chart, policy_packets_per_day_data, policy_packets_per_day_options);
+			addStackedToggle('policy_bandwidth_per_day_chart_div', policy_bandwidth_per_day_chart, policy_bandwidth_per_day_data, policy_bandwidth_per_day_options);
+
 		  }}
+
+			// Function to create checkboxes
+			function createCheckboxes(containerId, data, callback) {{
+			var container = document.getElementById(containerId);
+			var categories = data[0].slice(1);  // Extract categories from the first row
+
+			var checkboxContainer = document.createElement('div');
+			checkboxContainer.className = 'checkbox-container';
+			
+			categories.forEach(function(category, index) {{
+				var checkbox = document.createElement('input');
+				checkbox.type = 'checkbox';
+				checkbox.checked = true;
+				checkbox.value = index + 1;  // Offset for data columns
+
+				checkbox.onchange = function() {{
+				var selectedCategories = Array.from(checkboxContainer.querySelectorAll('input:checked')).map(input => input.value);
+				callback(selectedCategories);
+				}};
+
+				var label = document.createElement('label');
+				label.appendChild(checkbox);
+				label.appendChild(document.createTextNode(category));
+				
+				checkboxContainer.appendChild(label);
+			}});
+
+			container.parentNode.insertBefore(checkboxContainer, container);
+			}}
+
+			// Function to filter data based on selected categories
+			function filterDataByCategories(data, selectedCategories) {{
+			var header = [data[0][0], ...selectedCategories.map(index => data[0][index])];  // Filter header row
+			var rows = data.slice(1).map(row => [row[0], ...selectedCategories.map(index => row[index])]);  // Filter data rows
+			return [header, ...rows];
+			}}
+
+			// Function to add Stacked/Non-Stacked toggle via radio buttons
+			function addStackedToggle(containerId, chart, data, options) {{
+			var container = document.getElementById(containerId);
+			var radioContainer = document.createElement('div');
+			radioContainer.className = 'radio-container';
+			
+			var stackedLabel = document.createElement('label');
+			var stackedRadio = document.createElement('input');
+			stackedRadio.type = 'radio';
+			stackedRadio.name = 'stackedToggle_' + containerId;
+			stackedRadio.value = 'stacked';
+			stackedRadio.checked = true;
+			stackedRadio.onchange = function() {{
+				options.isStacked = true;
+				chart.draw(data, options);
+			}};
+			stackedLabel.appendChild(stackedRadio);
+			stackedLabel.appendChild(document.createTextNode('Stacked'));
+
+			var nonStackedLabel = document.createElement('label');
+			var nonStackedRadio = document.createElement('input');
+			nonStackedRadio.type = 'radio';
+			nonStackedRadio.name = 'stackedToggle_' + containerId;
+			nonStackedRadio.value = 'non-stacked';
+			nonStackedRadio.onchange = function() {{
+				options.isStacked = false;
+				chart.draw(data, options);
+			}};
+			nonStackedLabel.appendChild(nonStackedRadio);
+			nonStackedLabel.appendChild(document.createTextNode('Non-Stacked'));
+
+			radioContainer.appendChild(stackedLabel);
+			radioContainer.appendChild(nonStackedLabel);
+			
+			// container.parentNode.insertBefore(radioContainer, container);
+			container.parentNode.insertBefore(radioContainer, container.nextSibling);
+			}}
 
 		</script>
 
@@ -1123,6 +1313,14 @@ if __name__ == '__main__':
 		padding: 10px;
 	  }}
 
+	  .checkbox-container, .radio-container {{
+      margin-bottom: 10px;
+      }}
+
+	  .radio-container {{
+		margin-top: 20px; /* Adds space after the chart */
+	  }}
+	  
       .fit-text {{
         font-size: 14px; /* Adjust the font size as needed */
         word-wrap: break-word; /* Allow text to break onto the next line if needed */
