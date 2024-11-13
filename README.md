@@ -232,6 +232,10 @@ V9.2.2 (1/25/2024)
 		a. Stacked/Non-Stacked
 		b. Select/Deselect categories
 	- Changed charts blob popup JS to show all categories on hover over mouse
+
+10.1 (11/13/24)
+	- Changed detailed information tables as buttons under the tables (daily report)
+	- Changed all charts from stacked to non-stacked by default (daily report)
 ===========================================================================================================================
 Instructions how to deploy as a docker container (on Vision example):
  
