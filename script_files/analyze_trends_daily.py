@@ -1441,7 +1441,7 @@ if __name__ == '__main__':
         /* Styling for the toggle button */
         .toggle-btn {{
             cursor: pointer;
-            background-color: #007bff;
+            background-color: #6c757d; /* Gray color */
             color: white;
             padding: 12px 24px;
             border: none;
@@ -1454,13 +1454,13 @@ if __name__ == '__main__':
 
         /* Style for the button when active */
         .toggle-btn.active {{
-            background-color: #0056b3;
+            background-color: #5a6268; /* Darker gray */
         }}
 
 
         /* Hover effect */
         .toggle-btn:hover {{
-            background-color: #0069d9;
+            background-color: #868e96; /* Lighter gray for hover */
             transform: scale(1.05);
         }}
 
