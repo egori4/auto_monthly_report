@@ -912,7 +912,7 @@ if __name__ == '__main__':
 			  title: 'Security Events trends - TopN by last day',
 			  vAxis: {{minValue: 0}},
 			  hAxis: {{ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
-			  isStacked: true,
+			  isStacked: false,
 			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
@@ -923,7 +923,7 @@ if __name__ == '__main__':
 			  title: 'Malicious Packets trends (units {pkt_units}) - TopN by last day',
 			  vAxis: {{minValue: 0}},
 			  hAxis: {{ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
-			  isStacked: true,
+			  isStacked: false,
 			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
@@ -933,7 +933,7 @@ if __name__ == '__main__':
 			  title: 'Malicious Bandwidth trends (units {bw_units}) - TopN by last day',
 			  vAxis: {{minValue: 0}},
 			  hAxis: {{ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
-			  isStacked: true,
+			  isStacked: false,
 			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
@@ -945,7 +945,7 @@ if __name__ == '__main__':
 			  title: 'Security Events trends - TopN all time high',
 			  vAxis: {{minValue: 0}},
 			  hAxis: {{ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
-			  isStacked: true,
+			  isStacked: false,
 			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
@@ -955,7 +955,7 @@ if __name__ == '__main__':
 			  title: 'Malicious Packets trends (units {pkt_units}) - TopN all time high',
 			  vAxis: {{minValue: 0}},
 			  hAxis: {{ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
-			  isStacked: true,
+			  isStacked: false,
 			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
@@ -964,7 +964,7 @@ if __name__ == '__main__':
 			var bandwidth_per_day_options_alltimehigh = {{
 			  title: 'Malicious Bandwidth trends (units {bw_units}) - TopN all time high',
 			  vAxis: {{minValue: 0}},
-			  isStacked: true,
+			  isStacked: false,
 			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
@@ -974,7 +974,7 @@ if __name__ == '__main__':
 			  title: 'Events by device trends',
 			  vAxis: {{minValue: 0}},
 			  hAxis: {{ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
-			  isStacked: true,
+			  isStacked: false,
 			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
@@ -984,7 +984,7 @@ if __name__ == '__main__':
 			  title: 'Packets by device trends (units {pkt_units})',
 			  vAxis: {{minValue: 0}},
 			  hAxis: {{ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
-			  isStacked: true,
+			  isStacked: false,
 			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
@@ -994,7 +994,7 @@ if __name__ == '__main__':
 			  title: 'Malicious Bandwidth by device trends (units {bw_units})',
 			  vAxis: {{minValue: 0}},
 			  hAxis: {{ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
-			  isStacked: true,
+			  isStacked: false,
 			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
@@ -1004,7 +1004,7 @@ if __name__ == '__main__':
 			  title: 'Security Events trends by source IP',
 			  vAxis: {{minValue: 0}},
 			  hAxis: {{ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
-			  isStacked: true,
+			  isStacked: false,
 			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
@@ -1014,7 +1014,7 @@ if __name__ == '__main__':
 			  title: 'Malicious Packets trends (units {pkt_units}) by source IP',
 			  vAxis: {{minValue: 0}},
 			  hAxis: {{ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
-			  isStacked: true,
+			  isStacked: false,
 			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
@@ -1024,7 +1024,7 @@ if __name__ == '__main__':
 			  title: 'Malicious Bandwidth trends (Megabytes) by source IP',
 			  vAxis: {{minValue: 0}},
 			  hAxis: {{ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
-			  isStacked: true,
+			  isStacked: false,
 			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
@@ -1034,7 +1034,7 @@ if __name__ == '__main__':
 			  title: 'Security Events trends by Policy Name',
 			  vAxis: {{minValue: 0}},
 			  hAxis: {{ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
-			  isStacked: true,
+			  isStacked: false,
 			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
@@ -1044,7 +1044,7 @@ if __name__ == '__main__':
 			  title: 'Malicious Packets trends (units {pkt_units}) by Policy Name',
 			  vAxis: {{minValue: 0}},
 			  hAxis: {{ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
-			  isStacked: true,
+			  isStacked: false,
 			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
@@ -1054,7 +1054,7 @@ if __name__ == '__main__':
 			  title: 'Malicious Bandwidth trends (units {bw_units}) by Policy Name',
 			  vAxis: {{minValue: 0}},
 			  hAxis: {{ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
-			  isStacked: true,
+			  isStacked: false,
 			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
@@ -1259,7 +1259,7 @@ if __name__ == '__main__':
 			stackedRadio.type = 'radio';
 			stackedRadio.name = 'stackedToggle_' + containerId;
 			stackedRadio.value = 'stacked';
-			stackedRadio.checked = true;
+			
 			stackedRadio.onchange = function() {{
 				options.isStacked = true;
 				chart.draw(data, options);
@@ -1272,6 +1272,8 @@ if __name__ == '__main__':
 			nonStackedRadio.type = 'radio';
 			nonStackedRadio.name = 'stackedToggle_' + containerId;
 			nonStackedRadio.value = 'non-stacked';
+			stackedRadio.checked = false;
+			nonStackedRadio.checked = true;
 			nonStackedRadio.onchange = function() {{
 				options.isStacked = false;
 				chart.draw(data, options);
@@ -1285,6 +1287,22 @@ if __name__ == '__main__':
 			// container.parentNode.insertBefore(radioContainer, container);
 			container.parentNode.insertBefore(radioContainer, container.nextSibling);
 			}}
+
+
+		// Toggle table visibility on button click
+		function toggleTable(tableId, button) {{
+			const collapsibleTable = document.getElementById(tableId);
+
+			if (collapsibleTable.style.display === 'none' || collapsibleTable.style.display === '') {{
+				collapsibleTable.style.display = 'block';
+				button.textContent = 'Hide Details';
+				button.classList.add('active');
+			}} else {{
+				collapsibleTable.style.display = 'none';
+				button.textContent = button.getAttribute('data-original-text'); // Restore original text
+				button.classList.remove('active');
+			}}
+		}}
 
 		</script>
 
@@ -1410,10 +1428,75 @@ if __name__ == '__main__':
 		height: 50vh;
 	  }}
 
+
+        /* Center the toggle button */
+        .button-container {{
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }}
+
+
+
+        /* Styling for the toggle button */
+        .toggle-btn {{
+            cursor: pointer;
+            background-color: #6c757d; /* Gray color */
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            outline: none;
+            font-size: 18px;
+            border-radius: 5px;
+            transition: background-color 0.3s, transform 0.2s;
+        }}
+
+
+        /* Style for the button when active */
+        .toggle-btn.active {{
+            background-color: #5a6268; /* Darker gray */
+        }}
+
+
+        /* Hover effect */
+        .toggle-btn:hover {{
+            background-color: #868e96; /* Lighter gray for hover */
+            transform: scale(1.05);
+        }}
+
+        /* Initial state to hide the collapsible content */
+        .collapsible-content {{
+            display: none;
+            margin-top: 15px;
+        }}
+
+		
+
+        /* Styling for the table */
+        .dataframe {{
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }}
+
+        .dataframe th, .dataframe td {{
+            padding: 8px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }}
+
+        .dataframe thead th {{
+            background-color: #f2f2f2;
+        }}
+
+
+
 	</style>
 	<title>Radware Daily Report</title>
 	</head>
 	<body>
+
+
 
 	  <table>
 		<thead>
@@ -1426,274 +1509,556 @@ if __name__ == '__main__':
 
 
 		  <tr>
-		  	<td colspan="3">
+		  	<td colspan="3" style="border-bottom: 0;">
 			<div id="maxpps_per_day_chart_div">
-			
 			</td>
 		  </tr>
 
-		  <tr>
-			<td colspan="3" valign="top">{maxpps_per_day_table}</td>
-		  </tr>
+
 
 		  <tr>
-		  	<td colspan="3">
+
+		  	<td colspan="3" valign="top" style="border-top: 0;" class="fit-text">
+			  
+				<!-- Button container for centering -->
+				<div class="button-container">
+					<button class="toggle-btn" data-original-text="Show Details" onclick="toggleTable('maxppsPerDayTable', this)">Show Details</button>
+				</div>
+			
+		  		<div id="maxppsPerDayTable" class="collapsible-content">
+		  			{maxpps_per_day_table}
+		  		</div>
+		  	</td>
+		  </tr>
+
+
+		  <tr>
+		  	<td colspan="3" style="border-bottom: 0;">
 			<div id="maxbps_per_day_chart_div">
 			</td>
 		  </tr>
 
 		  <tr>
-			<td colspan="3" valign="top">{maxbps_per_day_table}</td>
+
+			<td colspan="3" valign="top" style="border-top: 0;" class="fit-text">
+				<!-- Button container for centering -->
+				<div class="button-container">
+					<button class="toggle-btn" data-original-text="Show Details" onclick="toggleTable('maxbpsPerDayTable', this)">Show Details</button>
+				</div>
+		  		<div id="maxbpsPerDayTable" class="collapsible-content">
+				{maxbps_per_day_table}
+				</div>
+			</td>
 		  </tr>
 
 		  <tr>
-		  	<td colspan="3">
+		  	<td colspan="3" style="border-bottom: 0;">
 			<div id="events_per_day_chart_div">
 			</td>
 		  </tr>
 
+		  
+
 		  <tr>
-		  	<td colspan="3">
-			<div id="packets_per_day_chart_div">
+
+			<td colspan="3" valign="top" style="border-top: 0;" class="fit-text">
+				<!-- Button container for centering -->
+				<div class="button-container">
+					<button class="toggle-btn" data-original-text="Show Details" onclick="toggleTable('eventsPerDayTable', this)">Show Details</button>
+				</div>
+		  		<div id="eventsPerDayTable" class="collapsible-content">
+				  
+				{events_per_day_table}
+				</div>
+			</td>
+		  </tr>		  
+
+
+
+		  <tr>
+		  	<td colspan="3" style="border-bottom: 0;">
+				<div id="packets_per_day_chart_div">
 			</td>
 		  </tr>
 
+		  
+
 		  <tr>
-		  	<td colspan="3">
-			<div id="bandwidth_per_day_chart_div">
+
+			<td colspan="3" valign="top" style="border-top: 0;" class="fit-text">
+				<!-- Button container for centering -->
+				<div class="button-container">
+					<button class="toggle-btn" data-original-text="Show Details" onclick="toggleTable('packetsPerDayTable', this)">Show Details</button>
+				</div>
+		  		<div id="packetsPerDayTable" class="collapsible-content">
+				  
+				{packets_per_day_table}
+				</div>
+			</td>
+		  </tr>		
+
+
+
+
+		  <tr>
+		  	<td colspan="3" style="border-bottom: 0;">
+				<div id="bandwidth_per_day_chart_div">
 			</td>
 		  </tr>
 
-		  <tr>
-			<th>Security Events count by day</th>
-			<th>Malicious Packets(cumulative) by day</th>
-			<th>Malicious Bandwidth sum(cumulative) by day</th>
-		  </tr>
-		</thead>
-		<tbody>
-		  <tr>
-			<td valign="top">{events_per_day_table}</td>
-			<td valign="top"> {packets_per_day_table}</td>
-			<td valign="top">{bandwidth_per_day_table}</td>
-		  </tr>
+		  
 
 		  <tr>
-		  	<td colspan="3">
+
+			<td colspan="3" valign="top" style="border-top: 0;" class="fit-text">
+				<!-- Button container for centering -->
+				<div class="button-container">
+					<button class="toggle-btn" data-original-text="Show Details" onclick="toggleTable('bwPerDayTable', this)">Show Details</button>
+				</div>
+		  		<div id="bwPerDayTable" class="collapsible-content">
+				  
+				{bandwidth_per_day_table}
+				</div>
+			</td>
+		  </tr>		
+
+
+
+	
+
+		  <tr>
+		  	<td colspan="3" style="border-bottom: 0;">
 			<h4>Daily trends by Security Events count</h4>
 			<div id="events_per_day_chart_div_alltimehigh" style="height: 400px;">
 			</td>
 		  </tr>	
+
+
+		  
+		  <tr>
+
+			<td colspan="3" valign="top" style="border-top: 0;" class="fit-text">
+				<!-- Button container for centering -->
+				<div class="button-container">
+					<button class="toggle-btn" data-original-text="Attack Events count per Day" onclick="toggleTable('AttackEventsPerDayTable', this)">Attack Events count per Day</button>
+				</div>
+		  		<div id="AttackEventsPerDayTable" class="collapsible-content">
+				  
+				{events_trends_table_alltimehigh}
+				
+				</div>
+
+
+				<!-- Button container for centering -->
+				<div class="button-container">
+					<button class="toggle-btn" data-original-text="Distribution of topmost attack events across Devices and Policies" onclick="toggleTable('DistributionOfAttacksPerDayTable', this)">Distribution of topmost attack events across Devices and Policies</button>
+				</div>
+		  		<div id="DistributionOfAttacksPerDayTable" class="collapsible-content">
+				  
+				
+				{events_per_day_html_final}
+				</div>
+
+
+			</td>
+	
+		  </tr>		
+
+
+
+
 	  
 		  <tr>
-		  	<td colspan="3">
+		  	<td colspan="3" style="border-bottom: 0;">
 			<h4>Daily trends by Malicious Packets(cumulative)</h4>
 			<div id="packets_per_day_chart_div_alltimehigh" style="height: 400px;">
 			</td>
 		  </tr>
 
+
 		  <tr>
-		  	<td colspan="3">
+
+			<td colspan="3" valign="top" style="border-top: 0;" class="fit-text">
+				<!-- Button container for centering -->
+				<div class="button-container">
+					<button class="toggle-btn" data-original-text="Malicious packets table" onclick="toggleTable('AttackPacketsPerDayTable', this)">Malicious packets table</button>
+				</div>
+		  		<div id="AttackPacketsPerDayTable" class="collapsible-content">
+				{packets_table_alltimehigh}
+				</div>
+
+
+				<!-- Button container for centering -->
+				<div class="button-container">
+					<button class="toggle-btn" data-original-text="Distribution of topmost malicious packets across Devices and Policies" onclick="toggleTable('DistributionOfPacketsPerDayTable', this)">Distribution of topmost malicious packets across Devices and Policies</button>
+				</div>
+		  		<div id="DistributionOfPacketsPerDayTable" class="collapsible-content">
+				
+				{packets_per_day_html_final} 
+				</div>
+
+
+			</td>
+	
+		  </tr>		
+
+
+		  <tr>
+		  	<td colspan="3" style="border-bottom: 0;" class="fit-text">
 			<h4>Daily trends by Malicious Bandwidth sum(cumulative)</h4>
 			<div id="bandwidth_per_day_chart_div_alltimehigh" style="height: 400px;">
 			</td>
 		  </tr>
   
-		  <tr>
-			<td colspan="3">
-			<h4>Security Events table</h4>
-			{events_trends_table_alltimehigh}
-			</td>
-		  </tr>
-		  <tr>
-			<td colspan="3" class="fit-text">
-			<h4>Malicious packets table (units {pkt_units})</h4>
-			{packets_table_alltimehigh}
-			</td>
-		  </tr>
-		  <tr>
-			<td colspan="3" class="fit-text">
-			<h4>Malicious bandwidth table (units {bw_units})</h4>
-			{bw_table_alltimehigh}
-			</td>
-		  </tr>	  
+
+		   <tr>
 		  
-		  <tr>
-		 	<td valign="top">
-				{events_per_day_html_final}
-			</td>
-		 	<td valign="top">
-				{packets_per_day_html_final} 
-			</td>
-		 	<td valign="top">
+			<td colspan="3" valign="top" style="border-top: 0;">
+				<!-- Button container for centering -->
+				<div class="button-container">
+					<button class="toggle-btn" data-original-text="Accumulated Malicious bandwidh per day table" onclick="toggleTable('AttackBWPerDayTable', this)">Accumulated Malicious bandwidh per day table</button>
+				</div>
+		  		<div id="AttackBWPerDayTable" class="collapsible-content">
+				{bw_table_alltimehigh}
+				</div>
+
+
+				<!-- Button container for centering -->
+				<div class="button-container">
+					<button class="toggle-btn" data-original-text="Distribution of accumulated malicious bandwidth across Devices and Policies" onclick="toggleTable('DistributionOfBWPerDayTable', this)">Distribution of accumulated malicious bandwidth across Devices and Policies</button>
+				</div>
+		  		<div id="DistributionOfBWPerDayTable" class="collapsible-content">
+				
 				{bandwidth_per_day_html_final}
+				</div>
+
+
 			</td>
-		  </tr>
+	
+		  </tr>		
+
+		  
 
 
 
 
 		  <tr>
 		  	<td colspan="3">
-			<div id="events_per_day_by_device_chart_div" style="height: 400px;">
+			<div id="events_per_day_by_device_chart_div" style="height: 400px;" style="border-bottom: 0;">
 
 			</td>
 		  </tr>	
-	  
+
+
+
 		  <tr>
-		  	<td colspan="3">
+
+			<td colspan="3" valign="top" style="border-top: 0;" class="fit-text">
+				<!-- Button container for centering -->
+				<div class="button-container">
+					<button class="toggle-btn" data-original-text="Attack Events by device table" onclick="toggleTable('DeviceAttackEventsPerDayTable', this)">Attack Events by device table</button>
+				</div>
+		  		<div id="DeviceAttackEventsPerDayTable" class="collapsible-content">
+				  
+				{events_by_device_table}
+				
+				</div>
+
+
+				<!-- Button container for centering -->
+				<div class="button-container">
+					<button class="toggle-btn" data-original-text="Distribution of topmost attack events" onclick="toggleTable('DistributionOfDeviceAttacksPerDayTable', this)">Distribution of topmost attack events</button>
+				</div>
+		  		<div id="DistributionOfDeviceAttacksPerDayTable" class="collapsible-content">
+				  
+				
+				{device_events_per_day_html_final}
+				</div>
+
+
+			</td>
+	
+		  </tr>		
+
+
+
+		  
+		   
+		  <tr>
+		  	<td colspan="3" style="border-bottom: 0;">
 			<div id="packets_per_day_by_device_chart_div" style="height: 400px;">
 			</td>
 		  </tr>
 
+		  
+
 		  <tr>
-		  	<td colspan="3">
+
+			<td colspan="3" valign="top" style="border-top: 0;" class="fit-text">
+				<!-- Button container for centering -->
+				<div class="button-container">
+					<button class="toggle-btn" data-original-text="Malicious packets by device table" onclick="toggleTable('AttackDevicePacketsPerDayTable', this)">Malicious packets by device table</button>
+				</div>
+		  		<div id="AttackDevicePacketsPerDayTable" class="collapsible-content">
+				{packets_by_device_table}
+				</div>
+
+
+				<!-- Button container for centering -->
+				<div class="button-container">
+					<button class="toggle-btn" data-original-text="Distribution of topmost malicious packets for device" onclick="toggleTable('DistributionOfDevicePacketsPerDayTable', this)">Distribution of topmost malicious packets for device</button>
+				</div>
+		  		<div id="DistributionOfDevicePacketsPerDayTable" class="collapsible-content">
+				
+				{device_packets_per_day_html_final} 
+				</div>
+
+
+			</td>
+	
+		  </tr>		
+
+
+
+		  <tr>
+		  	<td colspan="3" style="border-bottom: 0;">
 			<div id="bandwidth_per_day_by_device_chart_div" style="height: 400px;">
 			</td>
 		  </tr>
 
-
-
-		  <tr>
-			<td colspan="3">
-			<h4>Security Events by device table</h4>
-			{events_by_device_table}
-			</td>
-		  </tr>
+		   <tr>
 		  
-
-		  <tr>
-			<td colspan="3" class="fit-text">
-			<h4>Malicious packets by device table (units {pkt_units})</h4>
-			{packets_by_device_table}
-			</td>
-		  </tr>
-			
-		  <tr>
-			<td colspan="3" class="fit-text">
-			<h4>Malicious Bandwidth by device table (units {bw_units})</h4>
-			{bw_by_device_table}
-			</td>
-		  </tr>
+			<td colspan="3" valign="top" style="border-top: 0;" class="fit-text">
+				<!-- Button container for centering -->
+				<div class="button-container">
+					<button class="toggle-btn" data-original-text="Malicious Bandwidth by device table" onclick="toggleTable('AttackDeviceBWPerDayTable', this)">Malicious Bandwidth by device table</button>
+				</div>
+		  		<div id="AttackDeviceBWPerDayTable" class="collapsible-content">
+				{bw_by_device_table}
+				</div>
 
 
-		  <tr>
-		 	<td valign="top">
-				{device_events_per_day_html_final}
+				<!-- Button container for centering -->
+				<div class="button-container">
+					<button class="toggle-btn" data-original-text="Distribution of accumulated malicious bandwidth across Devices and Policies" onclick="toggleTable('DistributionOfDeviceBWPerDayTable', this)">Distribution of accumulated malicious bandwidth across Devices and Policies</button>
+				</div>
+		  		<div id="DistributionOfDeviceBWPerDayTable" class="collapsible-content">
+				
+				{device_bandwidth_per_day_html_final}
+				</div>
+
+
 			</td>
-		 	<td valign="top">
-				{device_packets_per_day_html_final}
-			</td>
-		 	<td valign="top">
-				{device_bandwidth_per_day_html_final}			
-			</td>
+	
 		  </tr>
 
 
 
 		  <tr>
-		  	<td colspan="3">
+		  	<td colspan="3" style="border-bottom: 0;">
 			<div id="policy_events_per_day_chart_div" style="height: 400px;">
 
 			</td>
 		  </tr>	
-	  
+
+
+
+
 		  <tr>
-		  	<td colspan="3">
+
+			<td colspan="3" valign="top" style="border-top: 0;" class="fit-text">
+				<!-- Button container for centering -->
+				<div class="button-container">
+					<button class="toggle-btn" data-original-text="Attack Events by policy table" onclick="toggleTable('PolicyAttackEventsPerDayTable', this)">Attack Events by policy table</button>
+				</div>
+		  		<div id="PolicyAttackEventsPerDayTable" class="collapsible-content">
+				  
+				{policy_events_trends_table}
+				
+				</div>
+
+
+				<!-- Button container for centering -->
+				<div class="button-container">
+					<button class="toggle-btn" data-original-text="Distribution of topmost attack events" onclick="toggleTable('DistributionOfPolicyAttacksPerDayTable', this)">Distribution of topmost attack events</button>
+				</div>
+		  		<div id="DistributionOfPolicyAttacksPerDayTable" class="collapsible-content">
+				  
+				
+				{policy_events_per_day_html_final}
+				</div>
+
+
+			</td>
+	
+		  </tr>	
+
+
+		  <tr>
+		  	<td colspan="3" style="border-bottom: 0;" class="fit-text">
 			<div id="policy_packets_per_day_chart_div" style="height: 400px;">
 			</td>
 		  </tr>
-
 		  <tr>
-		  	<td colspan="3">
+
+			<td colspan="3" valign="top" style="border-top: 0;" class="fit-text">
+				<!-- Button container for centering -->
+				<div class="button-container">
+					<button class="toggle-btn" data-original-text="Malicious packets by device table" onclick="toggleTable('AttackPolicyPacketsPerDayTable', this)">Malicious packets by policy table</button>
+				</div>
+		  		<div id="AttackPolicyPacketsPerDayTable" class="collapsible-content">
+				{policy_packets_table}
+				</div>
+
+
+				<!-- Button container for centering -->
+				<div class="button-container">
+					<button class="toggle-btn" data-original-text="Distribution of topmost malicious packets for device" onclick="toggleTable('DistributionOfPolicyPacketsPerDayTable', this)">Distribution of topmost malicious packets</button>
+				</div>
+		  		<div id="DistributionOfPolicyPacketsPerDayTable" class="collapsible-content">
+				
+				{policy_packets_per_day_html_final} 
+				</div>
+
+
+			</td>
+	
+		  </tr>		
+		  <tr>
+		  	<td colspan="3" style="border-bottom: 0;">
 			<div id="policy_bandwidth_per_day_chart_div" style="height: 400px;">
 			</td>
 		  </tr>
-
+		   <tr>
 		  
-		  <tr>
-			<td colspan="3">
-			<h4>Security Events table by Policy Name</h4>
-			{policy_events_trends_table}
-			</td>
-		  </tr>
-		  <tr>
-			<td colspan="3" class="fit-text">
-			<h4>Malicious packets table by Policy Name (units {pkt_units})</h4>
-			{policy_packets_table}
-			</td>
-		  </tr>
-		  <tr>
-			<td colspan="3" class="fit-text">
-			<h4>Malicious bandwidth table by Policy Name (units Megabytes)</h4>
-			{policy_bw_table}
-			</td>
-		  </tr>	  
+			<td colspan="3" valign="top" style="border-top: 0;" class="fit-text">
+				<!-- Button container for centering -->
+				<div class="button-container">
+					<button class="toggle-btn" data-original-text="Malicious Bandwidth by policy table" onclick="toggleTable('AttackPolicyBWPerDayTable', this)">Malicious Bandwidth by policy table</button>
+				</div>
+		  		<div id="AttackPolicyBWPerDayTable" class="collapsible-content">
+				{policy_bw_table}
+				</div>
 
-		  <tr>
-		 	<td valign="top">
-				{policy_events_per_day_html_final}
-			</td>
-		 	<td valign="top">
-				{policy_packets_per_day_html_final} 
-			</td>
-		 	<td valign="top">
+
+				<!-- Button container for centering -->
+				<div class="button-container">
+					<button class="toggle-btn" data-original-text="Distribution of accumulated malicious bandwidth across Devices and Policies" onclick="toggleTable('DistributionOfPolicyBWPerDayTable', this)">Distribution of accumulated malicious bandwidth across Devices and Policies</button>
+				</div>
+		  		<div id="DistributionOfPolicyBWPerDayTable" class="collapsible-content">
+				
 				{policy_bandwidth_per_day_html_final}
+				</div>
+
+
 			</td>
+	
 		  </tr>
+		  
+
+
+
 
 
 
 		  <tr>
-		  	<td colspan="3">
+		  	<td colspan="3" style="border-bottom: 0;">
 			<div id="sip_events_per_day_chart_div" style="height: 400px;">
 
 			</td>
 		  </tr>	
-	  
 		  <tr>
-		  	<td colspan="3">
+
+			<td colspan="3" valign="top" style="border-top: 0;" class="fit-text">
+				<!-- Button container for centering -->
+				<div class="button-container">
+					<button class="toggle-btn" data-original-text="Attack Events per day table by source IP" onclick="toggleTable('SIPAttackEventsPerDayTable', this)">Attack Events per day table by source IP</button>
+				</div>
+		  		<div id="SIPAttackEventsPerDayTable" class="collapsible-content">
+				  
+				{sip_events_trends_table}
+				
+				</div>
+
+
+				<!-- Button container for centering -->
+				<div class="button-container">
+					<button class="toggle-btn" data-original-text="Distribution of topmost Security events for Source IP's" onclick="toggleTable('DistributionOfSIPAttacksPerDayTable', this)">Distribution of topmost Security events for Source IP's</button>
+				</div>
+		  		<div id="DistributionOfSIPAttacksPerDayTable" class="collapsible-content">
+				  
+				
+				{sip_events_per_day_html_final}
+				</div>
+
+
+			</td>
+	
+		  </tr>	
+
+		  <tr>
+		  	<td colspan="3" style="border-bottom: 0;">
 			<div id="sip_packets_per_day_chart_div" style="height: 400px;">
 			</td>
 		  </tr>
-
 		  <tr>
-		  	<td colspan="3">
+
+			<td colspan="3" valign="top" style="border-top: 0;" class="fit-text">
+				<!-- Button container for centering -->
+				<div class="button-container">
+					<button class="toggle-btn" data-original-text="Malicious packets per day by Source IP" onclick="toggleTable('AttackSIPPacketsPerDayTable', this)">Malicious packets per day by Source IP</button>
+				</div>
+		  		<div id="AttackSIPPacketsPerDayTable" class="collapsible-content">
+				{sip_packets_table}
+				</div>
+
+
+				<!-- Button container for centering -->
+				<div class="button-container">
+					<button class="toggle-btn" data-original-text="Distribution of topmost malicious packets for Source IP's" onclick="toggleTable('DistributionOfSIPPacketsPerDayTable', this)">Distribution of topmost malicious packets for Source IP's</button>
+				</div>
+		  		<div id="DistributionOfSIPPacketsPerDayTable" class="collapsible-content">
+				
+				{sip_packets_per_day_html_final} 
+				</div>
+
+
+			</td>
+	
+		  </tr>	
+		  <tr>
+		  	<td colspan="3" style="border-bottom: 0;">
 			<div id="sip_bandwidth_per_day_chart_div" style="height: 400px;">
 			</td>
 		  </tr>
+		   <tr>
+		  
+			<td colspan="3" valign="top" style="border-top: 0;" class="fit-text">
+				<!-- Button container for centering -->
+				<div class="button-container">
+					<button class="toggle-btn" data-original-text="Malicious Bandwidth by Source IP" onclick="toggleTable('AttackSIPBWPerDayTable', this)">Malicious Bandwidth by Source IP</button>
+				</div>
+		  		<div id="AttackSIPBWPerDayTable" class="collapsible-content">
+				{sip_bw_table}
+				</div>
 
+
+				<!-- Button container for centering -->
+				<div class="button-container">
+					<button class="toggle-btn" data-original-text="Distribution of topmost malicious bandwidth for Source IP's" onclick="toggleTable('DistributionOfSIPBWPerDayTable', this)">Distribution of topmost malicious bandwidth for Source IP's</button>
+				</div>
+		  		<div id="DistributionOfSIPBWPerDayTable" class="collapsible-content">
+				
+				{sip_bandwidth_per_day_html_final}
+				</div>
+
+
+			</td>
+	
+		  </tr>
 		  
 
-		  <tr>
-			<td colspan="3" class="fit-text">
-			<h4>Security Events table by source IP</h4>
-			{sip_events_trends_table}
-			</td>
-		  </tr>
-		  <tr>
-			<td colspan="3" class="fit-text">
-			<h4>Malicious packets table (units {pkt_units}) by source IP</h4>
-			{sip_packets_table}
-			</td>
-		  </tr>
-		  <tr>
-			<td colspan="3" class="fit-text">
-			<h4>Malicious bandwidth table (Megabytes) by source IP</h4>
-			{sip_bw_table}
-			</td>
-		  </tr>
 
-		  <tr>
-		 	<td valign="top">
-				{sip_events_per_day_html_final}
-			</td>
-		 	<td valign="top">
-				{sip_packets_per_day_html_final} 
-			</td>
-		 	<td valign="top">
-				{sip_bandwidth_per_day_html_final}
-			</td>
-		  </tr>
 
 		</tbody>
 
