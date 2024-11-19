@@ -236,6 +236,9 @@ V9.2.2 (1/25/2024)
 10.1 (11/13/24)
 	- Changed detailed information tables as buttons under the tables (daily report)
 	- Changed all charts from stacked to non-stacked by default (daily report)
+
+10.2 (11/19/24)
+- Changed detailed information tables as buttons under the tables (monthly report)
 ===========================================================================================================================
 Instructions how to deploy as a docker container (on Vision example):
  
