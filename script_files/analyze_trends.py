@@ -811,7 +811,19 @@ if __name__ == '__main__':
 
 		  function drawChart() {{
 		  
-			var traffic_data = google.visualization.arrayToDataTable({traffic_trends});
+			var rawTrafficData = {traffic_trends}
+
+			var chartTrafficData = rawTrafficData.map(function(row, index) {{
+          		if (index === 0) {{
+            		// If it's the header row, return as is
+            		return row;
+          		}} else {{
+            		// Convert the epoch time (row[0]) to Date object
+            		return [new Date(row[0]), row[1], row[2], row[3], row[4]];
+          		}}
+        	}});
+		  
+			var traffic_data = google.visualization.arrayToDataTable(chartTrafficData);
 
 			var maxpps_per_day_data = google.visualization.arrayToDataTable({maxpps_per_day_trends});
 			var maxbps_per_day_data = google.visualization.arrayToDataTable({maxbps_per_day_trends});
@@ -852,7 +864,13 @@ if __name__ == '__main__':
 			  vAxis: {{minValue: 0}},
 			  isStacked: false,
 			  legend: {{position: 'top', maxLines: 5}},
-			  width: '100%'
+			  width: '100%',
+			  explorer: {{
+				actions: ['dragToZoom', 'rightClickToReset'],
+				axis: 'horizontal',
+				maxZoomIn: 0.01,
+				maxZoomOut: 4
+			}}
 			}};
 
 			var maxpps_per_day_options = {{

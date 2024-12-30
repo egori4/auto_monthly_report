@@ -239,6 +239,9 @@ V9.2.2 (1/25/2024)
 
 10.2 (11/19/24)
 - Changed detailed information tables as buttons under the tables (monthly report)
+
+11.0 (12/30/24)
+- Added collecting traffic utilization and forensics with python
 ===========================================================================================================================
 Instructions how to deploy as a docker container (on Vision example):
  
