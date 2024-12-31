@@ -25,7 +25,18 @@ except:
 
 raw_data_path = f"./raw_data_files/{cust_id}/"
 tmp_files_path = f"./tmp_files/{cust_id}/"
+db_files_path = f"./database_files/{cust_id}/"
 
+# Check if the directory exists, and create it if it doesn't
+if not os.path.exists(raw_data_path):
+    os.makedirs(raw_data_path)
+
+if not os.path.exists(tmp_files_path):
+    os.makedirs(tmp_files_path)
+
+if not os.path.exists(db_files_path):
+	os.makedirs(db_files_path)
+	
 ################################# Extract variables from customers.json #########################################
 
 try:
@@ -62,10 +73,6 @@ for cust_config_block in customers_json:
 		#Can be configured "Gigabytes", "Terabytes" or "Megabytes"
 
 
-# Check if the directory exists, and create it if it doesn't
-if not os.path.exists(raw_data_path):
-    os.makedirs(raw_data_path)
-
 
 class Vision:
 
@@ -81,7 +88,9 @@ class Vision:
 
 
 		self.today_day_number = datetime.today().day
-		# self.today_day_number = 22
+		self.today_month_number = datetime.today().month
+
+		# self.today_day_number = 31
 		self.start_time_lower, self.end_time_upper = self.generate_report_times(self.today_day_number)
 
 		
@@ -235,7 +244,6 @@ class Vision:
 		updated_data = existing_data + data
 
 		################ Write to CSV #######################
-		file_exists = os.path.isfile(filename)
 
 		if daily:
 			
@@ -480,45 +488,158 @@ class Vision:
 			print(error_message)
 			raise Exception(error_message)
 
+	def compile_to_sqldb(self):
+
+		db_file = db_files_path + f'database_{cust_id}_{self.today_month_number}.sqlite'
+
+		print(db_file)
+		
+		if daily:
+			if self.today_day_number != 2:
+					# Connect to SQLite database (it will be created if it doesn't exist)
+					conn = sqlite3.connect(db_file)
+					cursor = conn.cursor()
+					# Create table
+					cursor.execute('''
+						CREATE TABLE IF NOT EXISTS attacks (
+							deviceIp TEXT NOT NULL,
+							startDate DATE NOT NULL,
+							endDate DATE NOT NULL,
+							name TEXT NOT NULL,
+							actionType TEXT NOT NULL,
+							ruleName TEXT NOT NULL,
+							sourceAddress TEXT NOT NULL,
+							destAddress TEXT NOT NULL,
+							sourcePort TEXT NOT NULL,
+							destPort TEXT NOT NULL,
+							protocol TEXT NOT NULL,
+							threatGroup TEXT NOT NULL,
+							category TEXT NOT NULL,
+							attackIpsId TEXT NOT NULL
+							actionType TEXT NOT NULL,
+							status TEXT NOT NULL,
+							risk TEXT NOT NULL,
+							startTime INTEGER NOT NULL,
+							endTime INTEGER NOT NULL,
+							month INTEGER NOT NULL,
+							year INTEGER NOT NULL,
+							startDayOfMonth INTEGER NOT NULL,
+							endDayOfMonth INTEGER NOT NULL,
+							vlanTag TEXT NOT NULL,
+							packetCount INTEGER NOT NULL,
+							packetBandwidth INTEGER NOT NULL,
+							averageAttackPacketRatePps INTEGER NOT NULL,
+							averageAttackRateBps INTEGER NOT NULL,
+							maxAttackRateBps INTEGER NOT NULL,
+							maxAttackPacketRatePps INTEGER NOT NULL,
+							lastPeriodBandwidth INTEGER NOT NULL,
+							poId TEXT NOT NULL,
+							duration INTEGER NOT NULL,
+							radwareId TEXT NOT NULL,
+							direction TEXT NOT NULL,
+							geoLocation TEXT NOT NULL,
+							activationId TEXT NOT NULL,
+							packetType TEXT NOT NULL,
+							physicalPort TEXT NOT NULL,
+							lastPeriodPacketRate INTEGER NOT NULL,
+							tierId TEXT NOT NULL,
+						
+					
+						)
+						''')
+					
+					# Clear the table content if the file already exists
+					cursor.execute('DELETE FROM attacks')
+
+					# Insert data into the table
+					for entry in forensics_raw['data']:
+						cursor.execute('''
+						INSERT INTO attacks (name, attackIpsId)
+						VALUES (?, ?)
+						''', (entry["row"]["name"], entry["row"]["attackIpsId"]))
+
+					#json.loads(entry["row"]["enrichmentContainer"]).get("geoLocation", {}).get("countryCode", None)
+
+					# Commit changes and close the connection
+					conn.commit()
+					conn.close()
+
+#   "deviceIp":"10.106.32.43",
+#    "sourcePort":"53",
+#    "vlanTag":"N/A",
+#    "packetCount":"0",
+#    "destMsisdn":"N/A",
+#    "averageAttackPacketRatePps":"0",
+#    "lastPeriodBandwidth":"0",
+#    "poId":"N_A",
+#    "duration":"15001",
+#    "protocol":"UDP",
+#    "destPort":"80",
+#    "threatGroup":"DDoSGroup",
+#    "destAddress":"184.151.230.247",
+#    "ruleName":"HOC_New",
+#    "radwareId":"1361",
+#    "startTime":"1735595410317",
+#    "trapVersion":"V8",
+#    "direction":"In",
+#    "averageAttackRateBps":"0",
+#    "activationId":"N_A",
+#    "maxAttackRateBps":"0",
+#    "packetType":"Regular",
+#    "mplsRd":"N/A",
+#    "attackIpsId":"39-1734718136",
+#    "sourceAddress":"80.237.21.61",
+#    "srcMsisdn":"N/A",
+#    "enrichmentContainer":"{\"destinationGeoLocation\":{\"countryCode\":\"CA\"},\"geoLocation\":{\"countryCode\":\"RU\"}}",
+#    "physicalPort":"1",
+#    "actionType":"Drop",
+#    "lastPeriodPacketRate":"0",
+#    "maxAttackPacketRatePps":"0",
+#    "tierId":"N_A",
+#    "packetBandwidth":"0",
+#    "name":"DOSS-UDP-flood-80-Req",
+#    "risk":"Medium",
+#    "endTime":"1735595425318",
+#    "category":"DOSShield",
+#    "status":"Terminated"
 
 
+	# If daily
+		
+		# if not 2nd
+			# if file does not exists create new file append data
+			# if file exists
+				# read the file, check if entries for previous day exist, if yes, delete them and then paste new data
+	# if 2nd, create new file
 
 v = Vision(vision_ip, username, password)
 
-# Get AMS Traffic bandwidth BPS and write to csv
-traffic_bps_raw = v.ams_stats_dashboards_call(units = "bps")
-v.write_traffic_stats_to_csv(traffic_bps_raw, tmp_files_path + 'traffic_bps.csv')
+# # Get AMS Traffic bandwidth BPS and write to csv
+# traffic_bps_raw = v.ams_stats_dashboards_call(units = "bps")
+# v.write_traffic_stats_to_csv(traffic_bps_raw, tmp_files_path + 'traffic_bps.csv')
 
-# Get AMS Traffic bandwidth PPS and write to csv
-traffic_pps_raw = v.ams_stats_dashboards_call(units = "pps")
-v.write_traffic_stats_to_csv(traffic_bps_raw, tmp_files_path + 'traffic_pps.csv')
+# # Get AMS Traffic bandwidth PPS and write to csv
+# traffic_pps_raw = v.ams_stats_dashboards_call(units = "pps")
+# v.write_traffic_stats_to_csv(traffic_bps_raw, tmp_files_path + 'traffic_pps.csv')
 
-# Get Forensics data
-v.get_forensics()
+# # Get Forensics data
+forensics_raw = v.get_forensics()
+v.compile_to_sqldb()
 
-# Get connections per second stats
-cps_raw = v.ams_stats_dashboards_call(units = "cps", uri = '/mgmt/vrm/monitoring/traffic/cps')
-v.write_traffic_stats_to_csv(cps_raw, tmp_files_path + 'traffic_cps.csv')
+# # Get connections per second stats
+# cps_raw = v.ams_stats_dashboards_call(units = "cps", uri = '/mgmt/vrm/monitoring/traffic/cps')
 
-#Get concurrent established connections stats
-cec_raw = v.ams_stats_dashboards_call(units = "cec", uri = '/mgmt/vrm/monitoring/traffic/concurrent-connections')
-v.write_traffic_stats_to_csv(cec_raw, tmp_files_path + 'traffic_cec.csv')
+# v.write_traffic_stats_to_csv(cps_raw, tmp_files_path + 'traffic_cps.csv')
 
-
-# ################Traffic stats CEC - Concurrent Established Connections######################
-
-# 	def getTrafficStatsCEC(self, dp_ip):
-# 		url = f'https://{self.ip}/mgmt/monitor/reporter/reports-ext/DP_CONCURRENT_CONNECTIONS_HOURLY_REPORTS'
-		
-# 		self.trafficformatrequestcec['aggregation']['criteria'][0]['lower'] = self.report_duration
-# 		self.trafficformatrequestcec['aggregation']['criteria'][1]['filters'][0]['filters'][0]['value'] = dp_ip
-
-# 		r = self.sess.post(url = url, json = self.trafficformatrequestcec , verify=False)
-# 		jsonData = json.loads(r.text)
-	
-# 		trafficreportlistcec = jsonData['data']
-
-# 		return trafficreportlistcec
+# #Get concurrent established connections stats
+# cec_raw = v.ams_stats_dashboards_call(units = "cec", uri = '/mgmt/vrm/monitoring/traffic/concurrent-connections')
+# v.write_traffic_stats_to_csv(cec_raw, tmp_files_path + 'traffic_cec.csv')
 
 
 
+### To do ####
+
+# 2. compile to sqldb
+# 1. export to csv
+
+# 3. test full cycle running python only
