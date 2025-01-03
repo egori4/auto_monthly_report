@@ -86,11 +86,18 @@ class Vision:
 		self.login()
 		print('Connecting to Vision')
 
+		self.today_date = datetime.today()#.replace(day=2)
 
-		self.today_day_number = datetime.today().day
+		# self.today_day_number = datetime.today().day
+		self.today_day_number = self.today_date.day
+
+		self.previous_day_number = (self.today_date - timedelta(days=1)).day
+
+		print(f'Today is {self.today_day_number} and yesterday was {self.previous_day_number}')
+
 		self.today_month_number = datetime.today().month
+		self.today_year = datetime.today().year
 
-		# self.today_day_number = 31
 		self.start_time_lower, self.end_time_upper = self.generate_report_times(self.today_day_number)
 
 		
@@ -489,119 +496,158 @@ class Vision:
 			raise Exception(error_message)
 
 	def compile_to_sqldb(self):
+		
 
-		db_file = db_files_path + f'database_{cust_id}_{self.today_month_number}.sqlite'
-
-		print(db_file)
 		
 		if daily:
-			if self.today_day_number != 2:
-					# Connect to SQLite database (it will be created if it doesn't exist)
-					conn = sqlite3.connect(db_file)
-					cursor = conn.cursor()
-					# Create table
-					cursor.execute('''
-						CREATE TABLE IF NOT EXISTS attacks (
-							deviceIp TEXT NOT NULL,
-							startDate DATE NOT NULL,
-							endDate DATE NOT NULL,
-							name TEXT NOT NULL,
-							actionType TEXT NOT NULL,
-							ruleName TEXT NOT NULL,
-							sourceAddress TEXT NOT NULL,
-							destAddress TEXT NOT NULL,
-							sourcePort TEXT NOT NULL,
-							destPort TEXT NOT NULL,
-							protocol TEXT NOT NULL,
-							threatGroup TEXT NOT NULL,
-							category TEXT NOT NULL,
-							attackIpsId TEXT NOT NULL
-							actionType TEXT NOT NULL,
-							status TEXT NOT NULL,
-							risk TEXT NOT NULL,
-							startTime INTEGER NOT NULL,
-							endTime INTEGER NOT NULL,
-							month INTEGER NOT NULL,
-							year INTEGER NOT NULL,
-							startDayOfMonth INTEGER NOT NULL,
-							endDayOfMonth INTEGER NOT NULL,
-							vlanTag TEXT NOT NULL,
-							packetCount INTEGER NOT NULL,
-							packetBandwidth INTEGER NOT NULL,
-							averageAttackPacketRatePps INTEGER NOT NULL,
-							averageAttackRateBps INTEGER NOT NULL,
-							maxAttackRateBps INTEGER NOT NULL,
-							maxAttackPacketRatePps INTEGER NOT NULL,
-							lastPeriodBandwidth INTEGER NOT NULL,
-							poId TEXT NOT NULL,
-							duration INTEGER NOT NULL,
-							radwareId TEXT NOT NULL,
-							direction TEXT NOT NULL,
-							geoLocation TEXT NOT NULL,
-							activationId TEXT NOT NULL,
-							packetType TEXT NOT NULL,
-							physicalPort TEXT NOT NULL,
-							lastPeriodPacketRate INTEGER NOT NULL,
-							tierId TEXT NOT NULL,
+
+			if self.today_day_number == 1 and self.today_month_number != 1: # This is a case for not Jan 1st
+				db_file = db_files_path + f'database_{cust_id}_{self.today_month_number -1}_{self.today_year}.sqlite'
+				print(db_file)
+
+
+			elif self.today_day_number == 1 and self.today_month_number == 1: # This is a case for  Jan 1st
+				db_file = db_files_path + f'database_{cust_id}_{12}_{self.today_year -1}.sqlite'
+				print(db_file)
+
+			else:
+				db_file = db_files_path + f'database_{cust_id}_{self.today_month_number}_{self.today_year}.sqlite'
+				print(db_file)
+			
+			
+					
+			# Connect to SQLite database (it will be created if it doesn't exist)
+			conn = sqlite3.connect(db_file)
+			cursor = conn.cursor()
+			# Create table
+			cursor.execute('''
+				CREATE TABLE IF NOT EXISTS attacks (
+					deviceIp TEXT NOT NULL,
+					startDate DATE NOT NULL,
+					endDate DATE NOT NULL,
+					name TEXT NOT NULL,
+					actionType TEXT NOT NULL,
+					ruleName TEXT NOT NULL,
+					sourceAddress TEXT NOT NULL,
+					destAddress TEXT NOT NULL,
+					sourcePort TEXT NOT NULL,
+					destPort TEXT NOT NULL,
+					protocol TEXT NOT NULL,
+					threatGroup TEXT NOT NULL,
+					category TEXT NOT NULL,
+					attackIpsId TEXT NOT NULL,
+					status TEXT NOT NULL,
+					duration INTEGER NOT NULL,
+					risk TEXT NOT NULL,
+					startTime INTEGER NOT NULL,
+					endTime INTEGER NOT NULL,
+					month INTEGER NOT NULL,
+					year INTEGER NOT NULL,
+					startDayOfMonth INTEGER NOT NULL,
+					endDayOfMonth INTEGER NOT NULL,
+					vlanTag TEXT NOT NULL,
+					packetCount INTEGER NOT NULL,
+					packetBandwidth INTEGER NOT NULL,
+					averageAttackPacketRatePps INTEGER NOT NULL,
+					averageAttackRateBps INTEGER NOT NULL,
+					maxAttackRateBps INTEGER NOT NULL,
+					maxAttackPacketRatePps INTEGER NOT NULL,
+					lastPeriodBandwidth INTEGER NOT NULL,
+					poId TEXT NOT NULL,
+					radwareId TEXT NOT NULL,
+					direction TEXT NOT NULL,
+					geoLocation TEXT NOT NULL,
+					activationId TEXT NOT NULL,
+					packetType TEXT NOT NULL,
+					physicalPort TEXT NOT NULL,
+					lastPeriodPacketRate INTEGER NOT NULL,
+				  	originalStartDate DATE NOT NULL)
+				''')
+			
+			if self.today_day_number == 1 and self.today_month_number == 1: # This is a case for  Jan 1st
+				# Clear the table content for the previous day
+				cursor.execute('DELETE FROM attacks where month = ? and startDayOfMonth = ?', (12, 31))
+			
+			elif self.today_day_number == 1 and self.today_month_number != 1: # This is a case for 1st of the month, but not January month
+				# Clear the table content for the previous day
+				cursor.execute('DELETE FROM attacks where month = ? and startDayOfMonth = ?', (self.today_month_number -1, self.previous_day_number ))
+			else:
+				# Clear the table content for the previous day
+				cursor.execute('DELETE FROM attacks where month = ? and startDayOfMonth = ?', (self.today_month_number, self.previous_day_number))
+
+
+			# Insert data into the table
+			for entry in forensics_raw['data']:
+
+				start_date = datetime.fromtimestamp(int(entry["row"]["startTime"])/ 1000)
+				orig_start_date = start_date
+				end_date = datetime.fromtimestamp(int(entry["row"]["endTime"])/ 1000)
+				
+				if self.today_day_number == 2:
+					if start_date.day == (self.today_date - timedelta(days=2)).day: # This is a case when the attack started in the day before yesterday day and continued to yesterday
+						print(f'Attack started in the day before yesterday ({start_date}) day and continued to yesterday')
 						
+						if self.today_month_number !=1 : # This is a case for 2nd of the month, but not January month
+							start_date = start_date.replace(day= 1, hour=0, minute=0, second=0)
+							# print(f'New start date: {start_date}')
+						else: # This is a case for 2nd of January
+							start_date = start_date.replace(day= 1, month=1,year=self.today_year, hour=0, minute=0, second=0)
+							# print(f'New start date: {start_date}')
 					
-						)
-						''')
-					
-					# Clear the table content if the file already exists
-					cursor.execute('DELETE FROM attacks')
 
-					# Insert data into the table
-					for entry in forensics_raw['data']:
-						cursor.execute('''
-						INSERT INTO attacks (name, attackIpsId)
-						VALUES (?, ?)
-						''', (entry["row"]["name"], entry["row"]["attackIpsId"]))
 
-					#json.loads(entry["row"]["enrichmentContainer"]).get("geoLocation", {}).get("countryCode", None)
 
-					# Commit changes and close the connection
-					conn.commit()
-					conn.close()
+				cursor.execute('''
+				INSERT INTO attacks (deviceIp, startDate, endDate, name, actionType, ruleName, sourceAddress, destAddress, sourcePort, destPort, protocol, threatGroup, category, attackIpsId, status, duration, risk, startTime, endTime, month, year, startDayOfMonth, endDayOfMonth, vlanTag, packetCount, packetBandwidth, averageAttackPacketRatePps, averageAttackRateBps, maxAttackRateBps, maxAttackPacketRatePps, lastPeriodBandwidth, poId, radwareId, direction, geoLocation, activationId, packetType, physicalPort, lastPeriodPacketRate, originalStartDate)
+				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+				''', (
+					entry["row"]["deviceIp"], 
+					start_date.strftime('%Y-%m-%d %H:%M:%S'), 
+					end_date.strftime('%Y-%m-%d %H:%M:%S'), 
+					entry["row"]["name"], 
+					entry["row"]["actionType"], 
+					entry["row"]["ruleName"], 
+					entry["row"]["sourceAddress"], 
+					entry["row"]["destAddress"], 
+					entry["row"]["sourcePort"], 
+					entry["row"]["destPort"], 
+					entry["row"]["protocol"], 
+					entry["row"]["threatGroup"], 
+					entry["row"]["category"], 
+					entry["row"]["attackIpsId"], 
+					entry["row"]["status"], 
+					entry["row"]["duration"], 
+					entry["row"]["risk"], 
+					entry["row"]["startTime"], 
+					entry["row"]["endTime"], 
+					end_date.month,
+					end_date.year,
+					start_date.day, 
+					end_date.day, 
+					entry["row"]["vlanTag"], 
+					entry["row"]["packetCount"], 
+					entry["row"]["packetBandwidth"], 
+					entry["row"]["averageAttackPacketRatePps"], 
+					entry["row"]["averageAttackRateBps"], 
+					entry["row"]["maxAttackRateBps"], 
+					entry["row"]["maxAttackPacketRatePps"], 
+					entry["row"]["lastPeriodBandwidth"], 
+					entry["row"]["poId"], 
+					entry["row"]["radwareId"], 
+					entry["row"]["direction"], 
+					json.loads(entry["row"]["enrichmentContainer"]).get("geoLocation", {}).get("countryCode", None), 
+					entry["row"]["activationId"], 
+					entry["row"]["packetType"], 
+					entry["row"]["physicalPort"], 
+					entry["row"]["lastPeriodPacketRate"],
+					orig_start_date.strftime('%Y-%m-%d %H:%M:%S')
+					))
 
-#   "deviceIp":"10.106.32.43",
-#    "sourcePort":"53",
-#    "vlanTag":"N/A",
-#    "packetCount":"0",
-#    "destMsisdn":"N/A",
-#    "averageAttackPacketRatePps":"0",
-#    "lastPeriodBandwidth":"0",
-#    "poId":"N_A",
-#    "duration":"15001",
-#    "protocol":"UDP",
-#    "destPort":"80",
-#    "threatGroup":"DDoSGroup",
-#    "destAddress":"184.151.230.247",
-#    "ruleName":"HOC_New",
-#    "radwareId":"1361",
-#    "startTime":"1735595410317",
-#    "trapVersion":"V8",
-#    "direction":"In",
-#    "averageAttackRateBps":"0",
-#    "activationId":"N_A",
-#    "maxAttackRateBps":"0",
-#    "packetType":"Regular",
-#    "mplsRd":"N/A",
-#    "attackIpsId":"39-1734718136",
-#    "sourceAddress":"80.237.21.61",
-#    "srcMsisdn":"N/A",
-#    "enrichmentContainer":"{\"destinationGeoLocation\":{\"countryCode\":\"CA\"},\"geoLocation\":{\"countryCode\":\"RU\"}}",
-#    "physicalPort":"1",
-#    "actionType":"Drop",
-#    "lastPeriodPacketRate":"0",
-#    "maxAttackPacketRatePps":"0",
-#    "tierId":"N_A",
-#    "packetBandwidth":"0",
-#    "name":"DOSS-UDP-flood-80-Req",
-#    "risk":"Medium",
-#    "endTime":"1735595425318",
-#    "category":"DOSShield",
-#    "status":"Terminated"
+			
+			# Commit changes and close the connection
+			conn.commit()
+			conn.close()
+
 
 
 	# If daily
