@@ -201,37 +201,8 @@ def gen_charts_data(db_path):
 
 			# ########Get traffic utilization from the last month and write to csv######### ---> This is replaced by separate collect.py file
 			
-			# if int(last_month) == int(month_num):
+			if int(last_month) == int(month_num):
 				
-			# 	try:
-
-			# 		cur.execute("SELECT dateTime, trafficValue, discards, excluded FROM traffic")
-
-
-					
-			# 		new_column_names = ['Date', 'Traffic Utilization(Mbps)', 'Blocked traffic', 'Excluded traffic']
-
-			# 		data = cur.fetchall()
-
-			# 		formatted_data = [(datetime.strptime(row[0], '%Y-%m-%d %H:%M:%S').strftime('%m/%d %H:%M'),) + tuple(value / 2000 if isinstance(value, (int, float)) else value for value in row[1:]) for row in data]
-		
-			# 		# Write to CSV with renamed columns
-			# 		with open(tmp_path + 'traffic.csv', 'w', newline='') as csv_file:
-			# 			csv_writer = csv.writer(csv_file)
-
-			# 			# Write the new header
-			# 			csv_writer.writerow(new_column_names)
-
-			# 			# Write data
-			# 			csv_writer.writerows(formatted_data)
-			# 		csv_file.close
-
-			# 	except Exception as e:
-			# 		print(f"An error occurred: {e}")
-			# 		pass
-			# 	###################################################################
-
-
 				####Get security events count by day from the last month and write to csv########
 
 				cur.execute("SELECT startDayOfMonth, COUNT(*) FROM attacks GROUP BY startDayOfMonth")

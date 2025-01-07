@@ -86,19 +86,20 @@ class Vision:
 		self.login()
 		print('Connecting to Vision')
 
-		self.today_date = datetime.today()#.replace(day=2)
+		# To manipulate the desired date, replace day = 1 with the desired day or month with desired month , e.g self.today_date = datetime.today().replace(month=2) )
+		self.today_date = datetime.today()#.replace(month=2)
+		print(f'Today date is {self.today_date}')
 
-		# self.today_day_number = datetime.today().day
 		self.today_day_number = self.today_date.day
 
 		self.previous_day_number = (self.today_date - timedelta(days=1)).day
 
-		print(f'Today is {self.today_day_number} and yesterday was {self.previous_day_number}')
+		# print(f'Today is {self.today_day_number} and yesterday was {self.previous_day_number}')
 
-		self.today_month_number = datetime.today().month
-		self.today_year = datetime.today().year
+		self.today_month_number = self.today_date.month
+		self.today_year = self.today_date.year
 
-		self.start_time_lower, self.end_time_upper = self.generate_report_times(self.today_day_number)
+		self.start_time_lower, self.end_time_upper = self.generate_report_times(self.today_date)
 
 		
 		print('Collecting DefensePro device list')		
@@ -137,24 +138,24 @@ class Vision:
 		return r
 
 
-	def generate_report_times(self,today_day_number):
+	def generate_report_times(self,today_date):
 		# Get current time
-		now = datetime.now().replace(day=today_day_number)
+		
 	
 		if daily:
 			# Daily Report Time Variables
 			# Yesterday's start time: 00:00:00
-			yesterday_start = (now - timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
+			yesterday_start = (today_date - timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
 			start_time_lower = int(yesterday_start.timestamp())*1000
 
 			# Yesterday's end time: 23:59:59
-			yesterday_end = (now - timedelta(days=1)).replace(hour=23, minute=59, second=59, microsecond=0)
+			yesterday_end = (today_date - timedelta(days=1)).replace(hour=23, minute=59, second=59, microsecond=0)
 			end_time_upper = int(yesterday_end.timestamp())*1000
 
 		if monthly:
 			# Monthly Report Time Variables
 			# First day of the previous month at 00:00:00
-			first_day_of_prev_month = (now.replace(day=1) - timedelta(days=1)).replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+			first_day_of_prev_month = (today_date.replace(day=1) - timedelta(days=1)).replace(day=1, hour=0, minute=0, second=0, microsecond=0)
 			start_time_lower = int(first_day_of_prev_month.timestamp())*1000
 
 			# Last day of the previous month at 23:59:59
@@ -522,7 +523,7 @@ class Vision:
 			# Create table
 			cursor.execute('''
 				CREATE TABLE IF NOT EXISTS attacks (
-					deviceIp TEXT NOT NULL,
+					deviceName TEXT NOT NULL,
 					startDate DATE NOT NULL,
 					endDate DATE NOT NULL,
 					name TEXT NOT NULL,
@@ -598,7 +599,7 @@ class Vision:
 
 
 				cursor.execute('''
-				INSERT INTO attacks (deviceIp, startDate, endDate, name, actionType, ruleName, sourceAddress, destAddress, sourcePort, destPort, protocol, threatGroup, category, attackIpsId, status, duration, risk, startTime, endTime, month, year, startDayOfMonth, endDayOfMonth, vlanTag, packetCount, packetBandwidth, averageAttackPacketRatePps, averageAttackRateBps, maxAttackRateBps, maxAttackPacketRatePps, lastPeriodBandwidth, poId, radwareId, direction, geoLocation, activationId, packetType, physicalPort, lastPeriodPacketRate, originalStartDate)
+				INSERT INTO attacks (deviceName, startDate, endDate, name, actionType, ruleName, sourceAddress, destAddress, sourcePort, destPort, protocol, threatGroup, category, attackIpsId, status, duration, risk, startTime, endTime, month, year, startDayOfMonth, endDayOfMonth, vlanTag, packetCount, packetBandwidth, averageAttackPacketRatePps, averageAttackRateBps, maxAttackRateBps, maxAttackPacketRatePps, lastPeriodBandwidth, poId, radwareId, direction, geoLocation, activationId, packetType, physicalPort, lastPeriodPacketRate, originalStartDate)
 				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 				''', (
 					entry["row"]["deviceIp"], 
@@ -643,49 +644,172 @@ class Vision:
 					orig_start_date.strftime('%Y-%m-%d %H:%M:%S')
 					))
 
+		if monthly:
+			if self.today_month_number != 1: # This is a case for not Jan month
+				db_file = db_files_path + f'database_{cust_id}_{self.today_month_number -1}_{self.today_year}.sqlite'
+				print(db_file)
+
+
+			else: # This is a case for  Jan month
+				db_file = db_files_path + f'database_{cust_id}_{12}_{self.today_year -1}.sqlite'
+				print(db_file)
+
+					
+			# Connect to SQLite database (it will be created if it doesn't exist)
+			conn = sqlite3.connect(db_file)
+			cursor = conn.cursor()
+			# Create table
+			cursor.execute('''
+				CREATE TABLE IF NOT EXISTS attacks (
+					deviceName TEXT NOT NULL,
+					startDate DATE NOT NULL,
+					endDate DATE NOT NULL,
+					name TEXT NOT NULL,
+					actionType TEXT NOT NULL,
+					ruleName TEXT NOT NULL,
+					sourceAddress TEXT NOT NULL,
+					destAddress TEXT NOT NULL,
+					sourcePort TEXT NOT NULL,
+					destPort TEXT NOT NULL,
+					protocol TEXT NOT NULL,
+					threatGroup TEXT NOT NULL,
+					category TEXT NOT NULL,
+					attackIpsId TEXT NOT NULL,
+					status TEXT NOT NULL,
+					duration INTEGER NOT NULL,
+					risk TEXT NOT NULL,
+					startTime INTEGER NOT NULL,
+					endTime INTEGER NOT NULL,
+					month INTEGER NOT NULL,
+					year INTEGER NOT NULL,
+					startDayOfMonth INTEGER NOT NULL,
+					endDayOfMonth INTEGER NOT NULL,
+					vlanTag TEXT NOT NULL,
+					packetCount INTEGER NOT NULL,
+					packetBandwidth INTEGER NOT NULL,
+					averageAttackPacketRatePps INTEGER NOT NULL,
+					averageAttackRateBps INTEGER NOT NULL,
+					maxAttackRateBps INTEGER NOT NULL,
+					maxAttackPacketRatePps INTEGER NOT NULL,
+					lastPeriodBandwidth INTEGER NOT NULL,
+					poId TEXT NOT NULL,
+					radwareId TEXT NOT NULL,
+					direction TEXT NOT NULL,
+					geoLocation TEXT NOT NULL,
+					activationId TEXT NOT NULL,
+					packetType TEXT NOT NULL,
+					physicalPort TEXT NOT NULL,
+					lastPeriodPacketRate INTEGER NOT NULL,
+				  	originalStartDate DATE NOT NULL)
+				''')
 			
+			print(self.today_month_number)
+
+			if self.today_month_number != 1: # This is a case for not January month
+				# Clear the table content for the previous month
+				cursor.execute(f'DELETE FROM attacks where month = {self.today_month_number -1}')
+
+
+			else: # This is a case for  Jan 1st
+				# Clear the table content for the previous month (December)
+				cursor.execute('DELETE FROM attacks where month = 12')
+
+			# Insert data into the table
+			for entry in forensics_raw['data']:
+
+				start_date = datetime.fromtimestamp(int(entry["row"]["startTime"])/ 1000)
+				orig_start_date = start_date
+				end_date = datetime.fromtimestamp(int(entry["row"]["endTime"])/ 1000)
+				
+								# Calculate the month and year 2 months ago
+				if self.today_month_number > 2:
+					two_months_ago_month = self.today_month_number - 2
+				else:
+					two_months_ago_month = self.today_month_number + 10  # Wrap around (12 months in a year)
+				
+				if start_date.month == two_months_ago_month: # This is a case when the attack started in the last day of the month before last month and continued to the first day of the last month
+					print(f'Attack started in the last day of the month before last month and continued to the first day of the last month ({start_date})')
+					
+					if self.today_month_number !=1 : # This is a case for 2nd of the month, but not January month
+						start_date = start_date.replace(day= 1, month=self.today_month_number-1, hour=0, minute=0, second=0)
+						# print(f'New start date: {start_date}')
+					else: # This is a case for 2nd of January
+						start_date = start_date.replace(day= 1, month=12, hour=0, minute=0, second=0)
+						# print(f'New start date: {start_date}')
+
+				cursor.execute('''
+				INSERT INTO attacks (deviceName, startDate, endDate, name, actionType, ruleName, sourceAddress, destAddress, sourcePort, destPort, protocol, threatGroup, category, attackIpsId, status, duration, risk, startTime, endTime, month, year, startDayOfMonth, endDayOfMonth, vlanTag, packetCount, packetBandwidth, averageAttackPacketRatePps, averageAttackRateBps, maxAttackRateBps, maxAttackPacketRatePps, lastPeriodBandwidth, poId, radwareId, direction, geoLocation, activationId, packetType, physicalPort, lastPeriodPacketRate, originalStartDate)
+				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+				''', (
+					entry["row"]["deviceIp"], 
+					start_date.strftime('%Y-%m-%d %H:%M:%S'), 
+					end_date.strftime('%Y-%m-%d %H:%M:%S'), 
+					entry["row"]["name"], 
+					entry["row"]["actionType"], 
+					entry["row"]["ruleName"], 
+					entry["row"]["sourceAddress"], 
+					entry["row"]["destAddress"], 
+					entry["row"]["sourcePort"], 
+					entry["row"]["destPort"], 
+					entry["row"]["protocol"], 
+					entry["row"]["threatGroup"], 
+					entry["row"]["category"], 
+					entry["row"]["attackIpsId"], 
+					entry["row"]["status"], 
+					entry["row"]["duration"], 
+					entry["row"]["risk"], 
+					entry["row"]["startTime"], 
+					entry["row"]["endTime"], 
+					end_date.month,
+					end_date.year,
+					start_date.day, 
+					end_date.day, 
+					entry["row"]["vlanTag"], 
+					entry["row"]["packetCount"], 
+					entry["row"]["packetBandwidth"], 
+					entry["row"]["averageAttackPacketRatePps"], 
+					entry["row"]["averageAttackRateBps"], 
+					entry["row"]["maxAttackRateBps"], 
+					entry["row"]["maxAttackPacketRatePps"], 
+					entry["row"]["lastPeriodBandwidth"], 
+					entry["row"]["poId"], 
+					entry["row"]["radwareId"], 
+					entry["row"]["direction"], 
+					json.loads(entry["row"]["enrichmentContainer"]).get("geoLocation", {}).get("countryCode", None), 
+					entry["row"]["activationId"], 
+					entry["row"]["packetType"], 
+					entry["row"]["physicalPort"], 
+					entry["row"]["lastPeriodPacketRate"],
+					orig_start_date.strftime('%Y-%m-%d %H:%M:%S')
+					))
+
+
 			# Commit changes and close the connection
 			conn.commit()
 			conn.close()
 
 
 
-	# If daily
-		
-		# if not 2nd
-			# if file does not exists create new file append data
-			# if file exists
-				# read the file, check if entries for previous day exist, if yes, delete them and then paste new data
-	# if 2nd, create new file
 
 v = Vision(vision_ip, username, password)
 
-# # Get AMS Traffic bandwidth BPS and write to csv
-# traffic_bps_raw = v.ams_stats_dashboards_call(units = "bps")
-# v.write_traffic_stats_to_csv(traffic_bps_raw, tmp_files_path + 'traffic_bps.csv')
+# Get AMS Traffic bandwidth BPS and write to csv
+traffic_bps_raw = v.ams_stats_dashboards_call(units = "bps")
+v.write_traffic_stats_to_csv(traffic_bps_raw, tmp_files_path + 'traffic.csv')
 
-# # Get AMS Traffic bandwidth PPS and write to csv
-# traffic_pps_raw = v.ams_stats_dashboards_call(units = "pps")
-# v.write_traffic_stats_to_csv(traffic_bps_raw, tmp_files_path + 'traffic_pps.csv')
+# Get AMS Traffic bandwidth PPS and write to csv
+traffic_pps_raw = v.ams_stats_dashboards_call(units = "pps")
+v.write_traffic_stats_to_csv(traffic_bps_raw, tmp_files_path + 'traffic_pps.csv')
 
 # # Get Forensics data
 forensics_raw = v.get_forensics()
 v.compile_to_sqldb()
 
-# # Get connections per second stats
-# cps_raw = v.ams_stats_dashboards_call(units = "cps", uri = '/mgmt/vrm/monitoring/traffic/cps')
+# Get connections per second stats
+cps_raw = v.ams_stats_dashboards_call(units = "cps", uri = '/mgmt/vrm/monitoring/traffic/cps')
 
-# v.write_traffic_stats_to_csv(cps_raw, tmp_files_path + 'traffic_cps.csv')
+v.write_traffic_stats_to_csv(cps_raw, tmp_files_path + 'traffic_cps.csv')
 
-# #Get concurrent established connections stats
-# cec_raw = v.ams_stats_dashboards_call(units = "cec", uri = '/mgmt/vrm/monitoring/traffic/concurrent-connections')
-# v.write_traffic_stats_to_csv(cec_raw, tmp_files_path + 'traffic_cec.csv')
-
-
-
-### To do ####
-
-# 2. compile to sqldb
-# 1. export to csv
-
-# 3. test full cycle running python only
+#Get concurrent established connections stats
+cec_raw = v.ams_stats_dashboards_call(units = "cec", uri = '/mgmt/vrm/monitoring/traffic/concurrent-connections')
+v.write_traffic_stats_to_csv(cec_raw, tmp_files_path + 'traffic_cec.csv')
