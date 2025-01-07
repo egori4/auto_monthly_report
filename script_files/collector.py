@@ -643,7 +643,10 @@ class Vision:
 					entry["row"]["lastPeriodPacketRate"],
 					orig_start_date.strftime('%Y-%m-%d %H:%M:%S')
 					))
-
+			# Commit changes and close the connection
+			conn.commit()
+			conn.close()
+			
 		if monthly:
 			if self.today_month_number != 1: # This is a case for not Jan month
 				db_file = db_files_path + f'database_{cust_id}_{self.today_month_number -1}_{self.today_year}.sqlite'
