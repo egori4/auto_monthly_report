@@ -305,7 +305,7 @@ class Vision:
 				writer.writerows(data)
 				print (f'Created {filename}')
 
-	def ams_stats_dashboards_call(self, units="bps", uri = "/mgmt/vrm/monitoring/traffic/periodic/report"):
+	def ams_stats_dashboards_call(self, units="bps", uri = "/mgmt/vrm/monitoring/traffic/periodic/report", report_type="AMS Dasboard"):
 
 		api_url = f'https://{self.ip}' + uri
 		data = {
@@ -318,11 +318,10 @@ class Vision:
 		}
 		if units and units != "cps" and units != "cec":
 			data.update({"unit": units})
-		print(data)
 		response = self._post(api_url, json.dumps(data))
 		if response.status_code == 200:
 			print(
-				f"Pulled traffic utilization. Time range: "
+				f"Pulled {report_type} data. Time range: "
 				f"{time.strftime('%d-%b-%Y %H:%M:%S', time.localtime(v.start_time_lower/1000))} - "
 				f"{time.strftime('%d-%b-%Y %H:%M:%S', time.localtime(v.end_time_upper/1000))}"
 			)
@@ -461,41 +460,71 @@ class Vision:
 
 	def get_forensics(self):
 
+		print(
+		f"Pulling forensics data. Time range: "
+		f"{time.strftime('%d-%b-%Y %H:%M:%S', time.localtime(v.start_time_lower/1000))} - "
+		f"{time.strftime('%d-%b-%Y %H:%M:%S', time.localtime(v.end_time_upper/1000))}"
+			)
+		
 		api_url = f'https://{self.ip}/mgmt/monitor/reporter/reports-ext/ATTACK'
 
 
 		post_payload = self.create_forensics_post_payload()
+		current_page = 0
+		total_hits = 0
+		all_data = []
+		metaData = None  # To store metaData from the first response
+	
 
-		response = self._post(api_url, json.dumps(post_payload))
-		if response.status_code == 200:
-			print(
-				f"Pulled forensics data. Time range: "
-				f"{time.strftime('%d-%b-%Y %H:%M:%S', time.localtime(v.start_time_lower/1000))} - "
-				f"{time.strftime('%d-%b-%Y %H:%M:%S', time.localtime(v.end_time_upper/1000))}"
-			)
+		while True:
+			post_payload["pagination"]["page"] = current_page
+			response = self._post(api_url, json.dumps(post_payload))
+
+
+			if response.status_code == 200:
+
+				try:
+					response_json = response.json()
+					if "data" in response_json:
+						all_data.extend(response_json["data"])  # Append the current page's data
+						if not metaData:
+							metaData = response_json.get("metaData", {})  # Get metaData only once
+						total_hits += len(response_json["data"])
+
+						# Stop if the current page has fewer results than the page size
+						if len(response_json["data"]) < post_payload["pagination"]["size"]:
+							break  # No more data to fetch
+						
+						current_page += 1  # Move to the next page
+
+
+					else:
+						print(f"No data in the response")
+						break
+
+				except json.JSONDecodeError:
+					print("Response is not in JSON format, skipping JSON file save.")
+
 			
-			try:
-				response_json = response.json()
-				with open(raw_data_path + "forensics_raw.json", "w", encoding="utf-8") as json_file:
-					json.dump(response_json, json_file, indent=4)  # Save JSON with indentation
-				print("Response body saved as pretty JSON in forensics_raw.json")
+			else:
+				error_message = (
+					f"Error pulling forensics data. Time range: "
+					f"{time.strftime('%d-%b-%Y %H:%M:%S', time.localtime(v.start_time_lower/1000))} - "
+					f"{time.strftime('%d-%b-%Y %H:%M:%S', time.localtime(v.end_time_upper/1000))}"
+				)
+				print(error_message)
+				raise Exception(error_message)
 
-
-
-			except json.JSONDecodeError:
-				print("Response is not in JSON format, skipping JSON file save.")
-
-			return response.json()
-		
-		else:
-			error_message = (
-				f"Error pulling forensics data. Time range: "
-				f"{time.strftime('%d-%b-%Y %H:%M:%S', time.localtime(v.start_time_lower/1000))} - "
-				f"{time.strftime('%d-%b-%Y %H:%M:%S', time.localtime(v.end_time_upper/1000))}"
-			)
-			print(error_message)
-			raise Exception(error_message)
-
+		final_response = {
+			"data": all_data,
+			"metaData": metaData or {"totalHits": total_hits}
+		}
+	
+		with open(raw_data_path + "forensics_raw.json", "w", encoding="utf-8") as json_file:
+			json.dump(final_response, json_file, indent=4)  # Save JSON with indentation
+		print("Response body saved as pretty JSON in forensics_raw.json")
+		return final_response
+	
 	def compile_to_sqldb(self):
 		
 
@@ -646,7 +675,7 @@ class Vision:
 			# Commit changes and close the connection
 			conn.commit()
 			conn.close()
-			
+
 		if monthly:
 			if self.today_month_number != 1: # This is a case for not Jan month
 				db_file = db_files_path + f'database_{cust_id}_{self.today_month_number -1}_{self.today_year}.sqlite'
@@ -797,11 +826,11 @@ class Vision:
 v = Vision(vision_ip, username, password)
 
 # Get AMS Traffic bandwidth BPS and write to csv
-traffic_bps_raw = v.ams_stats_dashboards_call(units = "bps")
+traffic_bps_raw = v.ams_stats_dashboards_call(units = "bps", report_type="Traffic Utilization BPS")
 v.write_traffic_stats_to_csv(traffic_bps_raw, tmp_files_path + 'traffic.csv')
 
 # Get AMS Traffic bandwidth PPS and write to csv
-traffic_pps_raw = v.ams_stats_dashboards_call(units = "pps")
+traffic_pps_raw = v.ams_stats_dashboards_call(units = "pps", report_type="Traffic Utilization PPS")
 v.write_traffic_stats_to_csv(traffic_bps_raw, tmp_files_path + 'traffic_pps.csv')
 
 # # Get Forensics data
@@ -809,10 +838,10 @@ forensics_raw = v.get_forensics()
 v.compile_to_sqldb()
 
 # Get connections per second stats
-cps_raw = v.ams_stats_dashboards_call(units = "cps", uri = '/mgmt/vrm/monitoring/traffic/cps')
+cps_raw = v.ams_stats_dashboards_call(units = "cps", uri = '/mgmt/vrm/monitoring/traffic/cps', report_type="CPS")
 
 v.write_traffic_stats_to_csv(cps_raw, tmp_files_path + 'traffic_cps.csv')
 
 #Get concurrent established connections stats
-cec_raw = v.ams_stats_dashboards_call(units = "cec", uri = '/mgmt/vrm/monitoring/traffic/concurrent-connections')
+cec_raw = v.ams_stats_dashboards_call(units = "cec", uri = '/mgmt/vrm/monitoring/traffic/concurrent-connections', report_type="Concurrent Established Connections")
 v.write_traffic_stats_to_csv(cec_raw, tmp_files_path + 'traffic_cec.csv')

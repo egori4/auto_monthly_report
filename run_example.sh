@@ -135,7 +135,7 @@ for cust_id in "${cust_list[@]}"
 do
 	if [ $collect_data == "true" ]; then
 		echo "Collecting Data from Vision"
-		php collectAll.php -- -upper=01.$cur_month.$cur_year -range="-1 month" -id="$cust_id"
+		python3 script_files/collector.py ALILAB monthly
 	fi
 done
 

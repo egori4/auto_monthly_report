@@ -17,6 +17,7 @@ from datetime import datetime
 start_time = time.time()
 cust_id = sys.argv[1]
 last_month = sys.argv[2] #if day is 1st this will be this month, if it is 1st day of the month, the month is previous month.
+year = sys.argv[3]
 
 db_path = f'./database_files/'+cust_id+'/'
 tmp_path = f'./tmp_files/'+cust_id+'/'
@@ -160,8 +161,9 @@ def gen_charts_data(db_path):
 
 
 	############## Connect to the sqlite database ##############################
-	file = f'database_{cust_id}_{last_month}.sqlite' 
-
+	
+	
+	file = f'database_{cust_id}_{last_month}_{year}.sqlite'
 	con = None
 	try:
 		con = sqlite3.connect(db_path + file)

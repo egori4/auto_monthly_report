@@ -241,7 +241,9 @@ V9.2.2 (1/25/2024)
 - Changed detailed information tables as buttons under the tables (monthly report)
 
 11.0 (12/30/24)
-- Added collecting traffic utilization and forensics with python
+- Added collecting traffic utilization and forensics with python instead of php
+!Must update run.sh and run_daily.sh from run_sh_example.sh and run_daily_example.sh respectively
+!Must rename sqlite db files to include year. Example rename "database_EA_12.sqlite" to "database_EA_04_2024.sqlite"
 ===========================================================================================================================
 Instructions how to deploy as a docker container (on Vision example):
  

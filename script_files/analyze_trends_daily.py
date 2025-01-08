@@ -626,9 +626,9 @@ if __name__ == '__main__':
 	################################################# Analyze deeper top category ##########################################################
 
 	#1 Create a data frame
-	con = sqlite3.connect(db_path + 'database_'+cust_id+'_'+str(month)+'.sqlite')
+	con = sqlite3.connect(db_path + 'database_' + cust_id + '_' + str(month) + '_' + str(year) + '.sqlite')
 	# data = pd.read_sql_query("SELECT * from attacks", con)
-	data_month = pd.read_sql_query(f"SELECT deviceName as 'Device Name',month,year,packetBandwidth,name as 'Attack Name',packetCount,ruleName as 'Policy Name',category,sourceAddress as 'Source IP',destAddress,startTime,endTime,startDate,attackIpsId,actionType,maxAttackPacketRatePps,maxAttackRateBps,destPort,protocol,startDayOfMonth as 'Day of the Month',durationRange as 'Duration Range' from attacks", con)
+	data_month = pd.read_sql_query(f"SELECT deviceName as 'Device Name',month,year,packetBandwidth,name as 'Attack Name',packetCount,ruleName as 'Policy Name',category,sourceAddress as 'Source IP',destAddress,startTime,endTime,startDate,attackIpsId,actionType,maxAttackPacketRatePps,maxAttackRateBps,destPort,protocol,startDayOfMonth as 'Day of the Month' from attacks", con)
 
 	#export data to csv
 	data_month.to_csv(reports_path +'database_'+cust_id+'_'+str(month)+'_'+str(year)+'.csv', encoding='utf-8', index=False)

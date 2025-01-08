@@ -121,8 +121,7 @@ do
 
 	if [ $collect_data == "true" ]; then
 		
-		php collectAll.php -- -upper=$cur_day.$cur_month.$cur_year -range="-1 day" -id="$cust_id"	
-
+		python3 script_files/collector.py $cust_id daily
 	fi
 done
 
@@ -153,16 +152,21 @@ do
 
 	####################### Generate CSV Data #################################
 
-	if [ $gen_python_csv_data == "true" ]; then
-		echo "Generating csv data"
-		if [ "$cur_day" == 1 ] || [ "$cur_day" == 01 ]; then
-			python3 script_files/charts_and_tables_daily.py $cust_id $prev_month
-
-		else
-			python3 script_files/charts_and_tables_daily.py $cust_id $cur_month
-			
+	if [[ $gen_python_csv_data == "true" ]]; then
+	
+		if [[ "$cur_day" == 1 ]] || [ "$cur_day" == 01 ]; then
+			if [[ "$cur_month" == 1 ]] || [ "$cur_month" == 01 ]; then # 1st of the month and January
+				echo "Generating csv data for $prev_month $prev_year"
+				python3 script_files/charts_and_tables_daily.py $cust_id $prev_month $prev_year #this will generate csv for the previouis month
+			else
+				# 1st of the month not January
+				echo "Generating csv data for $prev_month $cur_year"
+				python3 script_files/charts_and_tables_daily.py $cust_id $prev_month $cur_year #this will generate csv for the previouis month
+			fi	
+		else # if day is not 1
+			echo "Generating csv data for $cur_month $cur_year"
+			python3 script_files/charts_and_tables_daily.py $cust_id $cur_month $cur_year #this will generate csv for the previouis month
 		fi
-		echo "Python  csv data generated"
 
 	fi
 	
