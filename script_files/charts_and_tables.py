@@ -17,6 +17,7 @@ from datetime import datetime
 start_time = time.time()
 cust_id = sys.argv[1]
 last_month = sys.argv[2]
+year = sys.argv[3]
 
 db_path = f'./database_files/'+cust_id+'/'
 tmp_path = f'./tmp_files/'+cust_id+'/'
@@ -110,9 +111,9 @@ if not os.path.exists('./report_files'):
 if not os.path.exists(reports_path):
 	os.mkdir(reports_path)
 
-#delete files inside tmp_files directory
-for file in os.listdir(tmp_path):
-	os.remove(tmp_path+file)
+# #delete files inside tmp_files directory
+# for file in os.listdir(tmp_path):
+# 	os.remove(tmp_path+file)
 
 
 def AbuseIPDBGEO(ip):

@@ -82,28 +82,28 @@ def email_body(cust_id):
 
         prevmon_exists = False
 
-        if currentmonth != 1:
-                con1 = sqlite3.connect(path_d + 'database_'+cust_id+'_'+str(currentmonth)+'.sqlite')
+        if currentmonth != 1: # if the report is not for the first month of the year.
+                con1 = sqlite3.connect(path_d + 'database_'+cust_id+'_'+str(currentmonth)+ '_' + str(currentyear)+ '.sqlite')
                 data_month =      pd.read_sql_query(f"SELECT deviceName,packetBandwidth,name,packetCount,ruleName,category,sourceAddress,destAddress,startTime,endTime,startDate,attackIpsId,maxAttackPacketRatePps,maxAttackRateBps from attacks", con1)
                 con1.close()
 
                 #if file exists
-                if os.path.isfile(path_d + 'database_'+cust_id+'_'+str(prevmonth)+'.sqlite'):
+                if os.path.isfile(path_d + 'database_'+cust_id+'_'+str(prevmonth)+ '_' + str(currentyear)+ '.sqlite'):
                         prevmon_exists = True
-                        con2 = sqlite3.connect(path_d + 'database_'+cust_id+'_'+str(prevmonth)+'.sqlite')
+                        con2 = sqlite3.connect(path_d + 'database_'+cust_id+'_'+str(prevmonth)+ '_' + str(currentyear)+ '.sqlite')
                         data_month_prev = pd.read_sql_query(f"SELECT deviceName,packetBandwidth,name,packetCount,ruleName,category,sourceAddress,destAddress,startTime,endTime,startDate,attackIpsId,maxAttackPacketRatePps,maxAttackRateBps from attacks", con2)
                         con2.close()
 
 
-        else:
+        else: 
 
-                con1 = sqlite3.connect(path_d + 'database_'+cust_id+'_'+str(currentmonth)+'.sqlite')
+                con1 = sqlite3.connect(path_d + 'database_'+cust_id+'_'+str(currentmonth)+ '_' + str(currentyear)+ '.sqlite')
                 data_month = pd.read_sql_query(f"SELECT deviceName,packetBandwidth,name,packetCount,ruleName,category,sourceAddress,destAddress,startTime,endTime,startDate,attackIpsId,maxAttackPacketRatePps,maxAttackRateBps from attacks", con1)
                 con1.close()
 
-                if os.path.isfile(path_d + 'database_'+cust_id+'_'+str(12)+'.sqlite'):
+                if os.path.isfile(path_d + 'database_'+cust_id+'_'+str(12)+ '_' + str(prevyear)+ '.sqlite'):
                         prevmon_exists=True
-                        con2 = sqlite3.connect(path_d + 'database_'+cust_id+'_'+str(12)+'.sqlite')
+                        con2 = sqlite3.connect(path_d + 'database_'+cust_id+'_'+str(12)+ '_' + str(prevyear)+ '.sqlite')
                         data_month_prev = pd.read_sql_query(f"SELECT deviceName,packetBandwidth,name,packetCount,ruleName,category,sourceAddress,destAddress,startTime,endTime,startDate,attackIpsId,maxAttackPacketRatePps,maxAttackRateBps from attacks", con2)
                         con2.close()
 

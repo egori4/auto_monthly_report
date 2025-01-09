@@ -210,11 +210,13 @@ class Vision:
 			if type_traffic_utilization:
 				data.append({
 					'Date': timestamp,
-					'excluded': row['row']['excluded'],
-					'discards': row['row']['discards'],
 					'trafficValue': row['row']['trafficValue'],
-					'challengeIng': row['row']['challengeIng']
+					'discards': row['row']['discards'],
+					'challengeIng': row['row']['challengeIng'],
+					'excluded': row['row']['excluded']
+
 				})
+				
 			elif type_cps:
 				data.append({
 					'Date': timestamp,
@@ -261,7 +263,7 @@ class Vision:
 				# Write the updated data back to the CSV file
 				with open(filename, 'w', newline='') as csvfile:
 					if type_traffic_utilization:
-						fieldnames = ['Date', 'excluded', 'discards', 'trafficValue', 'challengeIng']
+						fieldnames = ['Date', 'trafficValue','discards','challengeIng','excluded']
 					elif type_cps:
 						fieldnames = ['Date', 'connectionPerSecond']
 					elif type_cec:
@@ -278,7 +280,7 @@ class Vision:
 				# This will overwrite the data in the file
 				with open(filename, 'w', newline='') as csvfile:
 					if type_traffic_utilization:
-						fieldnames = ['Date', 'excluded', 'discards', 'trafficValue', 'challengeIng']
+						fieldnames = ['Date', 'trafficValue','discards','challengeIng','excluded']
 					elif type_cps:
 						fieldnames = ['Date', 'connectionPerSecond']
 					elif type_cec:
@@ -295,7 +297,7 @@ class Vision:
 			# This will overwrite the data
 			with open(filename, 'w', newline='') as csvfile:
 				if type_traffic_utilization:
-					fieldnames = ['Date', 'excluded', 'discards', 'trafficValue', 'challengeIng']
+					fieldnames = ['Date', 'trafficValue','discards','challengeIng','excluded']
 				elif type_cps:
 					fieldnames = ['Date', 'connectionPerSecond']
 				elif type_cec:
@@ -328,10 +330,22 @@ class Vision:
 			
 			try:
 				response_json = response.json()
+
+				# If Null in rows, filter out these rows
+
+				filtered_response_json = {
+					"metaData": response_json["metaData"],
+					"data": [
+						row for row in response_json["data"] 
+						if not any(value is None for value in row["row"].values())
+					],
+					"dataMap": response_json["dataMap"]
+				}
+
 				with open(raw_data_path + f"traffic_{units}_raw.json", "w", encoding="utf-8") as json_file:
-					json.dump(response_json, json_file, indent=4)  # Save JSON with indentation
+					json.dump(filtered_response_json, json_file, indent=4)  # Save JSON with indentation
 				print(f"Response body saved as pretty JSON in traffic_{units}_raw.json")
-				return response_json
+				return filtered_response_json
 
 			except json.JSONDecodeError:
 				print("Response is not in JSON format, skipping JSON file save.")

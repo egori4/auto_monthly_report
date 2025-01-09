@@ -167,12 +167,21 @@ do
 
 	####################### Generate CSV Data #################################
 
-	if [ $gen_python_csv_data == "true" ]; then
-		echo "Generating csv data"
-		python3 script_files/charts_and_tables.py $cust_id $prev_month
-		echo "Python  csv data generated"
+
+	if [[ $gen_python_csv_data == "true" ]]; then
+	
+		if [[ "$cur_month" == 1 ]] || [ "$cur_month" == 01 ]; then # Now is January case
+			echo "Generating csv data for $prev_month $prev_year"
+			python3 script_files/charts_and_tables.py $cust_id $prev_month $prev_year #this will generate csv for the previouis month
+		else
+			# Non January case
+			echo "Generating csv data for $prev_month $cur_year"
+			python3 script_files/charts_and_tables.py $cust_id $prev_month $cur_year #this will generate csv for the previouis month
+		fi	
 
 	fi
+
+
 	####################### Modify CSV Data #################################
 	
 	
@@ -214,17 +223,17 @@ do
 	######################### Analyze Trends ######################
 
 	if [[ "$analyze_trends" == "true" ]]; then
-
-		if [[ "$cur_month" != 01 ]] && [ "$cur_month" != 1 ]; then
-			echo "Analyzing trends for $prev_month $cur_year"
-			python3 script_files/analyze_trends.py $cust_id $prev_month $cur_year #this will generate appendix for the previouis month
-		else
-			echo "Analyzing trends for $prev_month $prev_year"
-			python3 script_files/analyze_trends.py $cust_id $prev_month $prev_year #this will generate appendix for the previouis month
-		fi
-		
+	
+			if [[ "$cur_month" == 1 ]] || [ "$cur_month" == 01 ]; then # Case for the month of January
+				echo "Analyzing trends for $prev_month $prev_year"
+				python3 script_files/analyze_trends.py $cust_id $prev_month $prev_year #this will generate trends for the previouis month
+			else
+				# Case if current month is not January
+				echo "Analyzing trends for $prev_month $cur_year"
+				python3 script_files/analyze_trends.py $cust_id $prev_month $cur_year #this will generate trends for the previouis month
+			fi
 	fi
-
+	
 done
 
 
