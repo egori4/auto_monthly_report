@@ -135,7 +135,7 @@ for cust_id in "${cust_list[@]}"
 do
 	if [ $collect_data == "true" ]; then
 		echo "Collecting Data from Vision"
-		python3 script_files/collector.py $cust_id monthly
+		python3 script_files/collector.py $cust_id monthly $cur_month $cur_day $cur_year
 	fi
 done
 

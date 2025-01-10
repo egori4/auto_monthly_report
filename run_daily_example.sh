@@ -121,7 +121,7 @@ do
 
 	if [ $collect_data == "true" ]; then
 		
-		python3 script_files/collector.py $cust_id daily
+		python3 script_files/collector.py $cust_id daily $cur_month $cur_day $cur_year
 	fi
 done
 
