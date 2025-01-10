@@ -546,16 +546,16 @@ class Vision:
 		if daily:
 
 			if self.today_day_number == 1 and self.today_month_number != 1: # This is a case for not Jan 1st
-				db_file = db_files_path + f'database_{cust_id}_{self.today_month_number -1}_{self.today_year}.sqlite'
+				db_file = db_files_path + f'database_{cust_id}_{self.today_month_number -1:02}_{self.today_year}.sqlite'
 				print(db_file)
 
 
 			elif self.today_day_number == 1 and self.today_month_number == 1: # This is a case for  Jan 1st
-				db_file = db_files_path + f'database_{cust_id}_{12}_{self.today_year -1}.sqlite'
+				db_file = db_files_path + f'database_{cust_id}_{12}_{self.today_year -1:02}.sqlite'
 				print(db_file)
 
 			else:
-				db_file = db_files_path + f'database_{cust_id}_{self.today_month_number}_{self.today_year}.sqlite'
+				db_file = db_files_path + f'database_{cust_id}_{self.today_month_number:02}_{self.today_year}.sqlite'
 				print(db_file)
 			
 			
@@ -692,7 +692,7 @@ class Vision:
 
 		if monthly:
 			if self.today_month_number != 1: # This is a case for not Jan month
-				db_file = db_files_path + f'database_{cust_id}_{self.today_month_number -1}_{self.today_year}.sqlite'
+				db_file = db_files_path + f'database_{cust_id}_{self.today_month_number -1:02}_{self.today_year}.sqlite'
 				print(db_file)
 
 
