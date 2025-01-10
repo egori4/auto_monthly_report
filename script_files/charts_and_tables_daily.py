@@ -105,9 +105,9 @@ if not os.path.exists('./report_files'):
 if not os.path.exists(reports_path):
 	os.mkdir(reports_path)
 
-#delete files inside tmp_files directory
-for file in os.listdir(tmp_path):
-	os.remove(tmp_path+file)
+# #delete files inside tmp_files directory
+# for file in os.listdir(tmp_path):
+# 	os.remove(tmp_path+file)
 
 
 def AbuseIPDBGEO(ip):
