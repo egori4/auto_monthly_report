@@ -642,7 +642,7 @@ class Vision:
 
 				cursor.execute('''
 				INSERT INTO attacks (deviceName, startDate, endDate, name, actionType, ruleName, sourceAddress, destAddress, sourcePort, destPort, protocol, threatGroup, category, attackIpsId, duration, risk, startTime, endTime, month, year, startDayOfMonth, endDayOfMonth, vlanTag, packetCount, packetBandwidth, averageAttackPacketRatePps, averageAttackRateBps, maxAttackRateBps, maxAttackPacketRatePps, lastPeriodBandwidth, poId, radwareId, direction, geoLocation, activationId, packetType, physicalPort, lastPeriodPacketRate, originalStartDate)
-				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 				''', (
 					entry["row"]["deviceIp"], 
 					start_date.strftime('%Y-%m-%d %H:%M:%S'), 
@@ -782,7 +782,7 @@ class Vision:
 
 				cursor.execute('''
 				INSERT INTO attacks (deviceName, startDate, endDate, name, actionType, ruleName, sourceAddress, destAddress, sourcePort, destPort, protocol, threatGroup, category, attackIpsId, duration, risk, startTime, endTime, month, year, startDayOfMonth, endDayOfMonth, vlanTag, packetCount, packetBandwidth, averageAttackPacketRatePps, averageAttackRateBps, maxAttackRateBps, maxAttackPacketRatePps, lastPeriodBandwidth, poId, radwareId, direction, geoLocation, activationId, packetType, physicalPort, lastPeriodPacketRate, originalStartDate)
-				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 				''', (
 					entry["row"]["deviceIp"], 
 					start_date.strftime('%Y-%m-%d %H:%M:%S'), 
