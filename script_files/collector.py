@@ -580,7 +580,6 @@ class Vision:
 					threatGroup TEXT NOT NULL,
 					category TEXT NOT NULL,
 					attackIpsId TEXT NOT NULL,
-					status TEXT NOT NULL,
 					duration INTEGER NOT NULL,
 					risk TEXT NOT NULL,
 					startTime INTEGER NOT NULL,
@@ -642,7 +641,7 @@ class Vision:
 
 
 				cursor.execute('''
-				INSERT INTO attacks (deviceName, startDate, endDate, name, actionType, ruleName, sourceAddress, destAddress, sourcePort, destPort, protocol, threatGroup, category, attackIpsId, status, duration, risk, startTime, endTime, month, year, startDayOfMonth, endDayOfMonth, vlanTag, packetCount, packetBandwidth, averageAttackPacketRatePps, averageAttackRateBps, maxAttackRateBps, maxAttackPacketRatePps, lastPeriodBandwidth, poId, radwareId, direction, geoLocation, activationId, packetType, physicalPort, lastPeriodPacketRate, originalStartDate)
+				INSERT INTO attacks (deviceName, startDate, endDate, name, actionType, ruleName, sourceAddress, destAddress, sourcePort, destPort, protocol, threatGroup, category, attackIpsId, duration, risk, startTime, endTime, month, year, startDayOfMonth, endDayOfMonth, vlanTag, packetCount, packetBandwidth, averageAttackPacketRatePps, averageAttackRateBps, maxAttackRateBps, maxAttackPacketRatePps, lastPeriodBandwidth, poId, radwareId, direction, geoLocation, activationId, packetType, physicalPort, lastPeriodPacketRate, originalStartDate)
 				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 				''', (
 					entry["row"]["deviceIp"], 
@@ -659,7 +658,6 @@ class Vision:
 					entry["row"]["threatGroup"], 
 					entry["row"]["category"], 
 					entry["row"]["attackIpsId"], 
-					entry["row"]["status"], 
 					entry["row"]["duration"], 
 					entry["row"]["risk"], 
 					entry["row"]["startTime"], 
@@ -721,7 +719,6 @@ class Vision:
 					threatGroup TEXT NOT NULL,
 					category TEXT NOT NULL,
 					attackIpsId TEXT NOT NULL,
-					status TEXT NOT NULL,
 					duration INTEGER NOT NULL,
 					risk TEXT NOT NULL,
 					startTime INTEGER NOT NULL,
@@ -784,7 +781,7 @@ class Vision:
 						# print(f'New start date: {start_date}')
 
 				cursor.execute('''
-				INSERT INTO attacks (deviceName, startDate, endDate, name, actionType, ruleName, sourceAddress, destAddress, sourcePort, destPort, protocol, threatGroup, category, attackIpsId, status, duration, risk, startTime, endTime, month, year, startDayOfMonth, endDayOfMonth, vlanTag, packetCount, packetBandwidth, averageAttackPacketRatePps, averageAttackRateBps, maxAttackRateBps, maxAttackPacketRatePps, lastPeriodBandwidth, poId, radwareId, direction, geoLocation, activationId, packetType, physicalPort, lastPeriodPacketRate, originalStartDate)
+				INSERT INTO attacks (deviceName, startDate, endDate, name, actionType, ruleName, sourceAddress, destAddress, sourcePort, destPort, protocol, threatGroup, category, attackIpsId, duration, risk, startTime, endTime, month, year, startDayOfMonth, endDayOfMonth, vlanTag, packetCount, packetBandwidth, averageAttackPacketRatePps, averageAttackRateBps, maxAttackRateBps, maxAttackPacketRatePps, lastPeriodBandwidth, poId, radwareId, direction, geoLocation, activationId, packetType, physicalPort, lastPeriodPacketRate, originalStartDate)
 				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 				''', (
 					entry["row"]["deviceIp"], 
@@ -801,7 +798,6 @@ class Vision:
 					entry["row"]["threatGroup"], 
 					entry["row"]["category"], 
 					entry["row"]["attackIpsId"], 
-					entry["row"]["status"], 
 					entry["row"]["duration"], 
 					entry["row"]["risk"], 
 					entry["row"]["startTime"], 
