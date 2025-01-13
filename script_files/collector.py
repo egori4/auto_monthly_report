@@ -23,9 +23,9 @@ except:
 	print('Error: Second argument is not set. Second argument must be either "daily" (data collection for the previous day) or "monthly" (data collection for the previous month). Example:\r\n\r\n collector.py CUSTOMER_NAME monthly')
 	sys.exit()
 
-cur_month = sys.argv[3]
-cur_day = sys.argv[4]
-cur_year = sys.argv[5]
+cur_month = int(sys.argv[3])
+cur_day = int(sys.argv[4])
+cur_year = int(sys.argv[5])
 
 raw_data_path = f"./raw_data_files/{cust_id}/"
 tmp_files_path = f"./tmp_files/{cust_id}/"
@@ -48,11 +48,11 @@ try:
 	selected_entry = next((entry for entry in customers_json_dic if entry.get("id") == cust_id), None)
 	
 	if selected_entry:
-		username = customers_json_dic[0]['user']
-		password = customers_json_dic[0]['pass']
-		vision_ip = customers_json_dic[0]['visions'][0]['ip']
-		excluded_attacks = customers_json_dic[0]['exclude']
-		dps = customers_json_dic[0]['visions'][0]['dps']
+		username = selected_entry['user']
+		password = selected_entry['pass']
+		vision_ip = selected_entry['visions'][0]['ip']
+		excluded_attacks = selected_entry['exclude']
+		dps = selected_entry['visions'][0]['dps']
 
 		# Print the extracted values
 		# print("User:", username)
@@ -92,7 +92,7 @@ class Vision:
 
 		# To manipulate the desired date, replace day = 1 with the desired day or month with desired month , e.g self.today_date = datetime.today().replace(month=2) )
 		self.today_date = datetime.today().replace(month=cur_month,day=cur_day,year=cur_year)
-		
+
 		print(f'Today date is {self.today_date}')
 
 		self.today_day_number = self.today_date.day
