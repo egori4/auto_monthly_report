@@ -585,7 +585,7 @@ if __name__ == '__main__':
 
 	# Total events, packets and bandwidth trends (blue bars charts)
 	events_total_bar_chart = convert_csv_to_list_of_lists(charts_tables_path + 'epm_total_bar.csv')
-	events_total_bar_move_text = trends_move_total(events_total_bar_chart, 'events') 
+	events_total_bar_move_text = trends_move_total(events_total_bar_chart, 'events')
 
 	packets_total_bar = convert_csv_to_list_of_lists(charts_tables_path + 'ppm_total_bar.csv')
 	packets_total_bar = convert_packets_units(packets_total_bar, pkt_units)
@@ -610,6 +610,10 @@ if __name__ == '__main__':
 	bw_trends = convert_bw_units(bw_trends, bw_units)
 	bw_trends_move = trends_move(bw_trends, bw_units)
 	bw_table = csv_to_html_table(charts_tables_path + 'bpm_table_lm.csv',bw_units)
+
+
+	total_attacks_days_bar_chart = convert_csv_to_list_of_lists(charts_tables_path + 'total_attack_time_bar.csv')
+
 
 	################################################# Analyze deeper top category ##########################################################
 
@@ -844,7 +848,7 @@ if __name__ == '__main__':
 			var policy_ppm_data = google.visualization.arrayToDataTable({policy_packets_trends_chart });
 			var policy_bpm_data = google.visualization.arrayToDataTable({policy_bw_trends_chart });
 
-			
+			var total_attacks_days_data = google.visualization.arrayToDataTable({total_attacks_days_bar_chart});
 
 			
 			var traffic_options = {{
@@ -904,6 +908,13 @@ if __name__ == '__main__':
 			  title: 'Total Events trends',
 			  bar: {{groupWidth: "95%"}},
 			  legend: {{position: 'none'}},
+			  hAxis: {{
+				title: 'Months',
+				}},
+			  vAxis: {{
+				title: 'Events count',
+				minValue: 0,
+				}},
 			  width: '100%'
 			}};
 
@@ -1057,6 +1068,18 @@ if __name__ == '__main__':
 			}};
 
 
+			var total_attacks_days_options = {{
+			  title: 'Total Attack Time in days',
+			  bar: {{groupWidth: "95%"}},
+			  hAxis: {{
+				title: 'Months',
+				}},
+			  vAxis: {{
+				title: 'Days',
+				}},
+			  legend: {{position: 'bottom'}},
+			  width: '100%'
+			}};
 
 			var traffic_chart = new google.visualization.AreaChart(document.getElementById('traffic_chart_div'));
 
@@ -1090,7 +1113,8 @@ if __name__ == '__main__':
 			var policy_epm_chart = new google.visualization.AreaChart(document.getElementById('policy_epm_chart_div'));
 			var policy_ppm_chart = new google.visualization.AreaChart(document.getElementById('policy_ppm_chart_div'));
 			var policy_bpm_chart = new google.visualization.AreaChart(document.getElementById('policy_bpm_chart_div'));
-			
+
+			var total_attacks_days_chart = new google.visualization.ColumnChart(document.getElementById('total_attacks_days_chart_div'));		
 
 			// Create checkboxes for each chart
 			createCheckboxes('epm_chart_div', {events_trends}, function(selectedCategories) {{
@@ -1148,11 +1172,6 @@ if __name__ == '__main__':
 				bpm_by_device_chart.draw(filteredDataTable, bpm_by_device_options);
 			}});
 
-			
-
-
-			
-
 			createCheckboxes('sip_epm_chart_div', {sip_events_trends_chart}, function(selectedCategories) {{
 				var filteredData = filterDataByCategories({sip_events_trends_chart}, selectedCategories);
 				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
@@ -1170,9 +1189,6 @@ if __name__ == '__main__':
 				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
 				sip_bpm_chart.draw(filteredDataTable, sip_bpm_options);
 			}});
-
-			
-
 
 			createCheckboxes('policy_epm_chart_div', {policy_events_trends_chart}, function(selectedCategories) {{
 				var filteredData = filterDataByCategories({policy_events_trends_chart}, selectedCategories);
@@ -1228,6 +1244,8 @@ if __name__ == '__main__':
 			policy_epm_chart.draw(policy_epm_data, policy_epm_options);
 			policy_ppm_chart.draw(policy_ppm_data, policy_ppm_options);
 			policy_bpm_chart.draw(policy_bpm_data, policy_bpm_options);
+
+			total_attacks_days_chart.draw(total_attacks_days_data, total_attacks_days_options);
 
 			
 
@@ -1485,6 +1503,10 @@ if __name__ == '__main__':
 	  }}
 
 	  #policy_bpm_chart_div {{
+		height: 50vh;
+	  }}
+
+	  #total_attacks_days_chart_div {{
 		height: 50vh;
 	  }}
 
@@ -2105,7 +2127,13 @@ if __name__ == '__main__':
 					{sip_bw_table}
 				</div>
 			</td>
-		  </tr>	  
+		  </tr>
+
+		  <tr>
+		  	<td colspan="3">
+			<div id="total_attacks_days_chart_div">
+			</td>
+		  </tr> 
 
 
 		</tbody>

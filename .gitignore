@@ -30,3 +30,4 @@ database_previous
 json_files/MonthlyReport.json
 radware_report_daily_cron.log
 radware_report_monthly_cron.log
+raw_data_files/
