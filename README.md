@@ -244,6 +244,10 @@ V9.2.2 (1/25/2024)
 - Minor grammatical corrections to email body text
 - Added new chart - "Total attack time in days"
 
+10.3.1 (1/14/2025)
+- Monthly HTML - removed units from titles, added axis descriptions
+- Added bar charts numbers call outs (annotation)
+- Added 3 bar charts events, packets, bandwidth by device this month
 ===========================================================================================================================
 Instructions how to deploy as a docker container (on Vision example):
  

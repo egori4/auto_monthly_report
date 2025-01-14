@@ -585,14 +585,33 @@ if __name__ == '__main__':
 
 	# Total events, packets and bandwidth trends (blue bars charts)
 	events_total_bar_chart = convert_csv_to_list_of_lists(charts_tables_path + 'epm_total_bar.csv')
+	# Add labels annotations to the bar charts
+	events_total_bar_chart[0].append({'role': 'annotation'})
+	# Add the third column (annotation) to each row
+	for row in events_total_bar_chart[1:]:
+		row.append(int(row[1]))  
+
 	events_total_bar_move_text = trends_move_total(events_total_bar_chart, 'events')
 
 	packets_total_bar = convert_csv_to_list_of_lists(charts_tables_path + 'ppm_total_bar.csv')
 	packets_total_bar = convert_packets_units(packets_total_bar, pkt_units)
+	# Add labels annotations to the bar charts
+	packets_total_bar[0].append({'role': 'annotation'})
+	# Add the third column (annotation) to each row
+	for row in packets_total_bar[1:]:
+		row.append(int(row[1])) 
+
 	pakets_total_bar_move = trends_move_total(packets_total_bar, ' packets(' + pkt_units + ')')
 
 	bw_total_bar = convert_csv_to_list_of_lists(charts_tables_path + 'bpm_total_bar.csv')
 	bw_total_bar = convert_bw_units(bw_total_bar, bw_units)
+
+	# Add labels annotations to the bar charts
+	bw_total_bar[0].append({'role': 'annotation'})
+	# Add the third column (annotation) to each row
+	for row in bw_total_bar[1:]:
+		row.append(int(row[1])) 
+
 	bw_total_bar_move = trends_move_total(bw_total_bar, bw_units) 
 
 	################################################# Events, packets and bandwidth trends by Attack name sorted by the last month ##########################################################
@@ -768,6 +787,36 @@ if __name__ == '__main__':
 	bw_by_device_trends_move_text = trends_move(bw_by_device_trends_chart_data, bw_units)
 	bw_by_device_table = csv_to_html_table(charts_tables_path + 'device_bpm_table_lm.csv',bw_units)
 
+
+
+	# Total events by device this month (blue bars charts)
+	device_epm_chart_this_month = convert_csv_to_list_of_lists(charts_tables_path + 'device_epm_chart_this_month.csv')
+	# Add labels annotations to the bar charts
+	device_epm_chart_this_month[0].append({'role': 'annotation'})
+	# Add the third column (annotation) to each row
+	for row in device_epm_chart_this_month[1:]:
+		row.append(int(row[1]))  
+
+	# Malicious packets by device this month (blue bars charts)
+	device_ppm_chart_this_month = convert_csv_to_list_of_lists(charts_tables_path + 'device_ppm_chart_this_month.csv')
+	device_ppm_chart_this_month = convert_packets_units(device_ppm_chart_this_month, pkt_units)
+
+	# Add labels annotations to the bar charts
+	device_ppm_chart_this_month[0].append({'role': 'annotation'})
+	# Add the third column (annotation) to each row
+	for row in device_ppm_chart_this_month[1:]:
+		row.append(int(row[1]))  
+
+	# Malicious bandwidth by device this month (blue bars charts)
+	device_bpm_chart_this_month = convert_csv_to_list_of_lists(charts_tables_path + 'device_ppm_chart_this_month.csv')
+	device_bpm_chart_this_month = convert_bw_units(device_bpm_chart_this_month, bw_units)
+
+	# Add labels annotations to the bar charts
+	device_bpm_chart_this_month[0].append({'role': 'annotation'})
+	# Add the third column (annotation) to each row
+	for row in device_bpm_chart_this_month[1:]:
+		row.append(int(row[1]))  
+
 	################################################# Top source IP(bw is Megabytes) ##########################################################		
 	sip_events_trends_chart = convert_csv_to_list_of_lists(charts_tables_path + 'sip_epm_chart_lm.csv')
 	sip_events_trends_move_text = trends_move(sip_events_trends_chart, 'events')
@@ -840,6 +889,10 @@ if __name__ == '__main__':
 			var ppm_by_device_data = google.visualization.arrayToDataTable({packets_by_device_trends_chart_data});
 			var bpm_by_device_data = google.visualization.arrayToDataTable({bw_by_device_trends_chart_data});
 
+			var device_epm_chart_this_month_data = google.visualization.arrayToDataTable({device_epm_chart_this_month});
+			var device_ppm_chart_this_month_data = google.visualization.arrayToDataTable({device_ppm_chart_this_month});
+			var device_bpm_chart_this_month_data = google.visualization.arrayToDataTable({device_bpm_chart_this_month});
+
 			var sip_epm_data = google.visualization.arrayToDataTable({sip_events_trends_chart});
 			var sip_ppm_data = google.visualization.arrayToDataTable({sip_packets_trends_chart});
 			var sip_bpm_data = google.visualization.arrayToDataTable({sip_bw_trends_chart});
@@ -860,18 +913,31 @@ if __name__ == '__main__':
 			}};
 
 			var maxpps_per_day_options = {{
-			  title: 'Highest PPS rate attack of the day, last month (packet units as is)',
-			  vAxis: {{minValue: 0}},
-			  hAxis: {{ticks: maxpps_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
+			  title: 'Highest attack of the day (PPS), last month',
+			  vAxis: {{
+				minValue: 0,
+				title: 'Attack rate PPS'
+				}},
+			  hAxis: {{
+				title: 'Day of the Month',
+				ticks: maxpps_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1
+				
+				}},
 			  isStacked: false,
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
 			}};
 
 			var maxbps_per_day_options = {{
-			  title: 'Highest BPS rate attack of the day, last month (units {bps_units_desc})',
-			  vAxis: {{minValue: 0}},
-			  hAxis: {{ticks: maxbps_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
+			  title: 'Highest attack of the day ({bps_units_desc}), last month',
+			  vAxis: {{
+				minValue: 0,
+				title: 'Attack rate {bps_units_desc}'
+				}},
+			  hAxis: {{
+				ticks: maxbps_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1,
+				title: 'Day of the Month'
+				}},
 			  isStacked: false,
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
@@ -879,26 +945,43 @@ if __name__ == '__main__':
 
 			var events_per_day_options = {{
 			  title: 'Events per day, last month',
-			  vAxis: {{minValue: 0}},
-			  hAxis: {{ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
-			  isStacked: false,
-			  legend: {{position: 'top', maxLines: 5}},
-			  width: '100%'
-			}};
-
-			var bandwidth_per_day_options = {{
-			  title: 'Malicious bandwidth per day, last month (units {bw_units})',
-			  vAxis: {{minValue: 0}},
-			  hAxis: {{ticks: bandwidth_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
+			  vAxis: {{
+				minValue: 0,
+				title: 'Number of events'
+				}},
+			  hAxis: {{
+				ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1,
+				title: 'Day of the Month'
+				}},
 			  isStacked: false,
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
 			}};
 
 			var packets_per_day_options = {{
-			  title: 'Malicious packets per day, last month (units {pkt_units})',
-			  vAxis: {{minValue: 0}},
-			  hAxis: {{ticks: packets_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
+			  title: 'Cumulative sum of malicious packets per day, last month',
+			  vAxis: {{
+				minValue: 0,
+				title: 'Units {pkt_units}'}},
+			  hAxis: {{
+				ticks: packets_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1,
+				title: 'Day of the Month'
+				}},
+			  isStacked: false,
+			  legend: {{position: 'top', maxLines: 5}},
+			  width: '100%'
+			}};
+
+			var bandwidth_per_day_options = {{
+			  title: 'Cumulative sum of malicious bandwidth per day, last month',
+			  vAxis: {{
+				minValue: 0,
+				title: 'Units {bw_units}'
+				}},
+			  hAxis: {{
+				ticks: bandwidth_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1,
+				title: 'Day of the Month'
+				}},
 			  isStacked: false,
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
@@ -907,34 +990,57 @@ if __name__ == '__main__':
 			var epm_total_options = {{
 			  title: 'Total Events trends',
 			  bar: {{groupWidth: "95%"}},
-			  legend: {{position: 'none'}},
+			  legend: {{position: 'bottom'}},
 			  hAxis: {{
 				title: 'Months',
 				}},
 			  vAxis: {{
-				title: 'Events count',
-				minValue: 0,
+				title: 'Number of events',
+				minValue: 0
 				}},
 			  width: '100%'
 			}};
 
 			var ppm_total_options = {{
-			  title: 'Total Malicious Packets count trends (units {pkt_units})',
+			  title: 'Total Malicious Packets count trends',
 			  bar: {{groupWidth: "95%"}},
-			  legend: {{position: 'none'}},
+			  legend: {{
+				position: 'bottom'
+				}},
+			  hAxis: {{
+				title: 'Months',
+				}},
+			  vAxis: {{
+				title: 'Malicious packets (units {pkt_units})',
+				minValue: 0
+				}},
 			  width: '100%'
 			}};
 
 			var bpm_total_options = {{
-			  title: 'Total Malicious bandwidth sum trends (units {bw_units})',
+			  title: 'Total Malicious bandwidth sum trends',
 			  bar: {{groupWidth: "95%"}},
-			  legend: {{position: 'none'}},
+			  legend: {{
+				position: 'bottom'
+				}},
+			  hAxis: {{
+				title: 'Months',
+				}},
+			  vAxis: {{
+				title: 'Malicious bandwidth (units {bw_units})',
+				minValue: 0
+				}},
 			  width: '100%'
 			}};
 
 			var epm_options = {{
 			  title: 'Security Events trends - TopN by last month',
-			  vAxis: {{minValue: 0}},
+			  vAxis: {{
+				minValue: 0,
+				title: 'Number of events'}},
+			  hAxis: {{
+				title: 'Months',
+				}},
 			  isStacked: false,
 			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
@@ -942,8 +1048,13 @@ if __name__ == '__main__':
 			}};
 
 			var ppm_options = {{
-			  title: 'Malicious Packets trends (units {pkt_units}) - TopN by last month',
-			  vAxis: {{minValue: 0}},
+			  title: 'Malicious Packets trends - TopN by last month',
+			  vAxis: {{
+				minValue: 0,
+				title: 'Malicious packets (units {pkt_units})'}},
+			  hAxis: {{
+				title: 'Months',
+				}},
 			  isStacked: false,
 			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
@@ -951,8 +1062,13 @@ if __name__ == '__main__':
 			}};
 
 			var bpm_options = {{
-			  title: 'Malicious Bandwidth trends (units {bw_units}) - TopN by last month',
-			  vAxis: {{minValue: 0}},
+			  title: 'Malicious Bandwidth trends - TopN by last month',
+			  vAxis: {{
+				minValue: 0,
+				title: 'Malicious bandwidth (units {bw_units})'}},
+			  hAxis: {{
+				title: 'Months',
+				}},
 			  isStacked: false,
 			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
@@ -961,7 +1077,12 @@ if __name__ == '__main__':
 
 			var epm_options_alltimehigh = {{
 			  title: 'Security Events trends - TopN all time high',
-			  vAxis: {{minValue: 0}},
+			  vAxis: {{
+				minValue: 0,
+				title: 'Number of events'}},
+			  hAxis: {{
+				title: 'Months',
+				}},
 			  isStacked: false,
 			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
@@ -969,8 +1090,13 @@ if __name__ == '__main__':
 			}};
 
 			var ppm_options_alltimehigh = {{
-			  title: 'Malicious Packets trends (units {pkt_units}) - TopN all time high',
-			  vAxis: {{minValue: 0}},
+			  title: 'Malicious Packets trends - TopN all time high',
+			  vAxis: {{
+				minValue: 0,
+				title: 'Malicious packets (units {pkt_units})'}},
+			  hAxis: {{
+				title: 'Months',
+				}},
 			  isStacked: false,
 			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
@@ -978,8 +1104,13 @@ if __name__ == '__main__':
 			}};
 
 			var bpm_options_alltimehigh = {{
-			  title: 'Malicious Bandwidth trends (units {bw_units}) - TopN all time high',
-			  vAxis: {{minValue: 0}},
+			  title: 'Malicious Bandwidth trends - TopN all time high',
+			  vAxis: {{
+				minValue: 0,
+				title: 'Malicious bandwidth (units {bw_units})'}},
+			  hAxis: {{
+				title: 'Months',
+				}},
 			  isStacked: false,
 			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
@@ -988,7 +1119,12 @@ if __name__ == '__main__':
 
 			var epm_by_device_options = {{
 			  title: 'Events by device trends',
-			  vAxis: {{minValue: 0}},
+			  vAxis: {{
+				minValue: 0,
+				title: 'Number of events'}},
+			  hAxis: {{
+				title: 'Months',
+				}},
 			  isStacked: false,
 			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
@@ -996,8 +1132,13 @@ if __name__ == '__main__':
 			}};
 
 			var ppm_by_device_options = {{
-			  title: 'Packets by device trends (units {pkt_units})',
-			  vAxis: {{minValue: 0}},
+			  title: 'Packets by device trends',
+			  vAxis: {{
+				minValue: 0,
+				title: 'Malicious packets (units {pkt_units})'}},
+			  hAxis: {{
+				title: 'Months',
+				}},
 			  isStacked: false,
 			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
@@ -1005,17 +1146,76 @@ if __name__ == '__main__':
 			}};
 
 			var bpm_by_device_options = {{
-			  title: 'Malicious Bandwidth by device trends (units {bw_units})',
-			  vAxis: {{minValue: 0}},
+			  title: 'Malicious Bandwidth by device trends',
+			  vAxis: {{
+				minValue: 0,
+				title: 'Malicious bandwidth (units {bw_units})'}},
+			  hAxis: {{
+				title: 'Months',
+				}},
 			  isStacked: false,
 			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
 			}};
 
+			
+			var device_epm_chart_this_month_options = {{
+			  title: 'Number of Events by device - this Month',
+			  bar: {{groupWidth: "95%"}},
+			  legend: {{position: 'bottom'}},
+			  hAxis: {{
+				title: 'Device',
+				}},
+			  vAxis: {{
+				title: 'Number of events',
+				minValue: 0
+				}},
+			  width: '100%'
+			}};
+
+			var device_ppm_chart_this_month_options = {{
+			  title: 'Malicious Packets by device - this Month',
+			  bar: {{groupWidth: "95%"}},
+			  legend: {{
+				position: 'bottom'
+				}},
+			  hAxis: {{
+				title: 'Device',
+				}},
+			  vAxis: {{
+				title: 'Malicious packets (units {pkt_units})',
+				minValue: 0
+				}},
+			  width: '100%'
+			}};
+
+			var device_bpm_chart_this_month_options = {{
+			  title: 'Malicious bandwidth by device - this Month',
+			  bar: {{groupWidth: "95%"}},
+			  legend: {{
+				position: 'bottom'
+				}},
+			  hAxis: {{
+				title: 'Device',
+				}},
+			  vAxis: {{
+				title: 'Malicious bandwidth (units {bw_units})',
+				minValue: 0
+				}},
+			  width: '100%'
+			}};
+
+
+
 			var sip_epm_options = {{
 			  title: 'Security Events trends by source IP',
-			  vAxis: {{minValue: 0}},
+			  vAxis: {{
+				minValue: 0,
+				title: 'Number of events'}},
+			  hAxis: {{
+				title: 'Months',
+				}},
 			  isStacked: false,
 			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
@@ -1023,8 +1223,13 @@ if __name__ == '__main__':
 			}};
 
 			var sip_ppm_options = {{
-			  title: 'Malicious Packets trends (units {pkt_units}) by source IP',
-			  vAxis: {{minValue: 0}},
+			  title: 'Malicious Packets trends - by source IP',
+			  vAxis: {{
+				minValue: 0,
+				title: 'Malicious packets (units {pkt_units})'}},
+			  hAxis: {{
+				title: 'Months',
+				}},
 			  isStacked: false,
 			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
@@ -1032,8 +1237,13 @@ if __name__ == '__main__':
 			}};
 
 			var sip_bpm_options = {{
-			  title: 'Malicious Bandwidth trends (Megabytes) by source IP',
-			  vAxis: {{minValue: 0}},
+			  title: 'Malicious Bandwidth trends - by source IP',
+			  vAxis: {{
+				minValue: 0,
+				title: 'Malicious bandwidth (units Megabytes)'}},
+			  hAxis: {{
+				title: 'Months',
+				}},
 			  isStacked: false,
 			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
@@ -1042,7 +1252,12 @@ if __name__ == '__main__':
 
 			var policy_epm_options = {{
 			  title: 'Security Events trends by Policy',
-			  vAxis: {{minValue: 0}},
+			  vAxis: {{
+				minValue: 0,
+				title: 'Number of events'}},
+			  hAxis: {{
+				title: 'Months',
+				}},
 			  isStacked: false,
 			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
@@ -1050,8 +1265,13 @@ if __name__ == '__main__':
 			}};
 
 			var policy_ppm_options = {{
-			  title: 'Malicious Packets trends (units {pkt_units}) by Policy',
-			  vAxis: {{minValue: 0}},
+			  title: 'Malicious Packets trends - by Policy',
+			  vAxis: {{
+				minValue: 0,
+				title: 'Malicious packets (units {pkt_units})'}},
+			  hAxis: {{
+				title: 'Months',
+				}},
 			  isStacked: false,
 			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
@@ -1059,8 +1279,13 @@ if __name__ == '__main__':
 			}};
 
 			var policy_bpm_options = {{
-			  title: 'Malicious Bandwidth trends (units {bw_units}) by Policy',
-			  vAxis: {{minValue: 0}},
+			  title: 'Malicious Bandwidth trends - by Policy',
+			  vAxis: {{
+				minValue: 0,
+				title: 'Malicious bandwidth (units {bw_units})'}},
+			  hAxis: {{
+				title: 'Months',
+				}},
 			  isStacked: false,
 			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
@@ -1071,11 +1296,12 @@ if __name__ == '__main__':
 			var total_attacks_days_options = {{
 			  title: 'Total Attack Time in days',
 			  bar: {{groupWidth: "95%"}},
+
+			  vAxis: {{
+				title: 'Duration in Days',
+				}},
 			  hAxis: {{
 				title: 'Months',
-				}},
-			  vAxis: {{
-				title: 'Days',
 				}},
 			  legend: {{position: 'bottom'}},
 			  width: '100%'
@@ -1101,6 +1327,10 @@ if __name__ == '__main__':
 			var epm_chart_alltimehigh = new google.visualization.AreaChart(document.getElementById('epm_chart_div_alltimehigh'));
 			var ppm_chart_alltimehigh = new google.visualization.AreaChart(document.getElementById('ppm_chart_div_alltimehigh'));
 			var bpm_chart_alltimehigh = new google.visualization.AreaChart(document.getElementById('bpm_chart_div_alltimehigh'));
+
+			var device_epm_chart_this_month_chart = new google.visualization.ColumnChart(document.getElementById('device_epm_chart_this_month_div'));
+			var device_ppm_chart_this_month_chart = new google.visualization.ColumnChart(document.getElementById('device_ppm_chart_this_month_div'));
+			var device_bpm_chart_this_month_chart = new google.visualization.ColumnChart(document.getElementById('device_bpm_chart_this_month_div'));
 
 			var epm_by_device_chart = new google.visualization.AreaChart(document.getElementById('epm_by_device_chart_div'));
 			var ppm_by_device_chart = new google.visualization.AreaChart(document.getElementById('ppm_by_device_chart_div'));
@@ -1236,6 +1466,10 @@ if __name__ == '__main__':
 			epm_by_device_chart.draw(epm_by_device_data, epm_by_device_options);
 			ppm_by_device_chart.draw(ppm_by_device_data, ppm_by_device_options);
 			bpm_by_device_chart.draw(bpm_by_device_data, bpm_by_device_options);
+
+			device_epm_chart_this_month_chart.draw(device_epm_chart_this_month_data, device_epm_chart_this_month_options);
+			device_ppm_chart_this_month_chart.draw(device_ppm_chart_this_month_data, device_ppm_chart_this_month_options);
+			device_bpm_chart_this_month_chart.draw(device_bpm_chart_this_month_data, device_bpm_chart_this_month_options);
 
 			sip_epm_chart.draw(sip_epm_data, sip_epm_options);
 			sip_ppm_chart.draw(sip_ppm_data, sip_ppm_options);
@@ -1413,23 +1647,23 @@ if __name__ == '__main__':
 
 	  
 	  #maxpps_per_day_chart_div {{
-		height: 20vh;
+		height: 25vh;
 	  }}
 
 	  #maxbps_per_day_chart_div {{
-		height: 20vh;
+		height: 25vh;
 	  }}
 
 	  #events_per_day_chart_div {{
-		height: 20vh;
+		height: 25vh;
 	  }}
 
 	  #bandwidth_per_day_chart_div {{
-		height: 20vh;
+		height: 25vh;
 	  }}
 
 	  #packets_per_day_chart_div {{
-		height: 20vh;
+		height: 25vh;
 	  }}
 
 	  #epm_total_chart_div {{
@@ -1482,6 +1716,18 @@ if __name__ == '__main__':
 		height: 50vh;
 	  }}
 
+	  #device_epm_chart_this_month_div {{
+		height: 50vh;
+	  }}
+
+	  #device_ppm_chart_this_month_div {{
+		height: 50vh;
+	  }}
+
+	  #device_bpm_chart_this_month_div {{
+		height: 50vh;
+	  }}
+	  
 	  #sip_epm_chart_div {{
 		height: 50vh;
 	  }}
@@ -1958,7 +2204,11 @@ if __name__ == '__main__':
 		  
 
 
-
+		  <tr>
+			<td><div id="device_epm_chart_this_month_div" style="height: 600px;"></td>
+			<td><div id="device_ppm_chart_this_month_div" style="height: 600px;"></td>
+			<td><div id="device_bpm_chart_this_month_div" style="height: 600px;"></td>
+		  </tr>
 
 
 

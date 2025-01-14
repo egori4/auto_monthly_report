@@ -175,7 +175,9 @@ def gen_charts_data(db_path):
 		f.write('Month, Total Malicious Bandwidth')
 
 	with open(tmp_path + 'total_attack_time_bar.csv', 'w') as f:
-			f.write('Month, Total attack time(days)')
+		f.write('Month, Total attack time(days)')
+
+
 
 	# loop through files by file creation date oldest first order
 	for file in sorted(os.listdir(db_path), key=lambda x: os.path.getmtime(db_path+x)):#,reverse=True): # december corner case
@@ -351,6 +353,33 @@ def gen_charts_data(db_path):
 				csv_file.close
 				###################################################################
 
+
+				########Get total events by device this month and write to csv#########
+				cur.execute("select deviceName as 'Device Name', count(1) as 'Total Events' from attacks group by deviceName order by count(*) desc")
+
+				device_epm_this_month = cur.fetchall()
+				with open(tmp_path + 'device_epm_chart_this_month.csv', 'w', newline='') as f:
+					writer = csv.writer(f)
+					writer.writerow(['Device', 'Number of Events'])
+					writer.writerows(device_epm_this_month)
+
+				########Get malicious packets by device this month and write to csv#########
+				cur.execute("select deviceName as 'Device Name', sum(packetCount) as 'Total Events' from attacks group by deviceName order by sum(packetCount) desc")
+
+				device_ppm_this_month = cur.fetchall()
+				with open(tmp_path + 'device_ppm_chart_this_month.csv', 'w', newline='') as f:
+					writer = csv.writer(f)
+					writer.writerow(['Device', 'Malicious Packets'])
+					writer.writerows(device_ppm_this_month)
+
+				########Get malicious bandwidth by device this month and write to csv#########
+				cur.execute("select deviceName as 'Device Name', sum(packetBandwidth) as 'Total Events' from attacks group by deviceName order by sum(packetBandwidth) desc")
+
+				device_bpm_this_month = cur.fetchall()
+				with open(tmp_path + 'device_bpm_chart_this_month.csv', 'w', newline='') as f:
+					writer = csv.writer(f)
+					writer.writerow(['Device', 'Malicious Bandwidth'])
+					writer.writerows(device_bpm_this_month)
 
 			########Get total events count this month and write to csv#########
 			cur.execute("select month as Month,count(1) as \'Total Events\' from attacks")
