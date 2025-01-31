@@ -115,7 +115,8 @@ def convert_packets_units(data, pkt_units=None):
 				elif pkt_units == "Thousands":
 					value = value/1000
 				else:
-					print(f'Packet units is not set or invalid packets unit is set under "pkt_units" variable in the script. Please set it to "Millions" or "Billions" ')
+					pass
+					# print(f'Packet units is not set or invalid packets unit is set under "pkt_units" variable in the script. Please set it to "Millions" or "Billions" ')
 				
 				#if value float convert to integer
 				if isinstance(value, float):
@@ -587,8 +588,11 @@ if __name__ == '__main__':
 	events_total_bar_chart = convert_csv_to_list_of_lists(charts_tables_path + 'epm_total_bar.csv')
 	# Add labels annotations to the bar charts
 	events_total_bar_chart[0].append({'role': 'annotation'})
+	events_total_bar_chart_max = 0
 	# Add the third column (annotation) to each row
 	for row in events_total_bar_chart[1:]:
+		if row[1] > events_total_bar_chart_max: # Find the maximum value for the y-axis
+			events_total_bar_chart_max = int(row[1]*1.1)
 		row.append(int(row[1]))  
 
 	events_total_bar_move_text = trends_move_total(events_total_bar_chart, 'events')
@@ -597,8 +601,11 @@ if __name__ == '__main__':
 	packets_total_bar = convert_packets_units(packets_total_bar, pkt_units)
 	# Add labels annotations to the bar charts
 	packets_total_bar[0].append({'role': 'annotation'})
+	packets_total_bar_max = 0
 	# Add the third column (annotation) to each row
 	for row in packets_total_bar[1:]:
+		if row[1] > packets_total_bar_max: # Find the maximum value for the y-axis
+			packets_total_bar_max = int(row[1]*1.1)
 		row.append(int(row[1])) 
 
 	pakets_total_bar_move = trends_move_total(packets_total_bar, ' packets(' + pkt_units + ')')
@@ -608,8 +615,11 @@ if __name__ == '__main__':
 
 	# Add labels annotations to the bar charts
 	bw_total_bar[0].append({'role': 'annotation'})
+	bw_total_bar_max = 0
 	# Add the third column (annotation) to each row
 	for row in bw_total_bar[1:]:
+		if row[1] > bw_total_bar_max: # Find the maximum value for the y-axis
+			bw_total_bar_max = int(row[1]*1.1)
 		row.append(float(row[1])) 
 
 	bw_total_bar_move = trends_move_total(bw_total_bar, bw_units) 
@@ -634,8 +644,11 @@ if __name__ == '__main__':
 	total_attacks_days_bar_chart = convert_csv_to_list_of_lists(charts_tables_path + 'total_attack_time_bar.csv')
 	# Add labels annotations to the bar charts
 	total_attacks_days_bar_chart[0].append({'role': 'annotation'})
+	total_attacks_days_bar_chart_max = 0
 	# Add the third column (annotation) to each row
 	for row in total_attacks_days_bar_chart[1:]:
+		if row[1] > total_attacks_days_bar_chart_max: # Find the maximum value for the y-axis
+			total_attacks_days_bar_chart_max = int(row[1]*1.1)
 		row.append(float(row[1]))  
 
 
@@ -799,10 +812,16 @@ if __name__ == '__main__':
 
 	# Add labels annotations to the bar charts and replace IPs with names
 	device_epm_chart_this_month[0].append({'role': 'annotation'})
+
+	device_epm_chart_this_month_max = 0
+
 	# Add the third column (annotation) to each row
 	for row in device_epm_chart_this_month[1:]:
+		if row[1] > device_epm_chart_this_month_max: # Find the maximum value for the y-axis
+			device_epm_chart_this_month_max = int(row[1]*1.1)
 		row[0] = defensepros.get(row[0], row[0])  # Keep IP if no match found
-		row.append(int(row[1]))  
+		row.append(int(row[1]))
+		
 
 	# Malicious packets by device this month (blue bars charts)
 	device_ppm_chart_this_month = convert_csv_to_list_of_lists(charts_tables_path + 'device_ppm_chart_this_month.csv')
@@ -810,10 +829,13 @@ if __name__ == '__main__':
 
 	# Add labels annotations to the bar charts and replace IPs with names
 	device_ppm_chart_this_month[0].append({'role': 'annotation'})
+	device_ppm_chart_this_month_max = 0
 	# Add the third column (annotation) to each row
 	for row in device_ppm_chart_this_month[1:]:
+		if row[1] > device_ppm_chart_this_month_max: # Find the maximum value for the y-axis
+			device_ppm_chart_this_month_max = int(row[1]*1.1)
 		row[0] = defensepros.get(row[0], row[0])  	# Replace IPs with names # Keep IP if no match found
-		row.append(int(row[1]))  
+		row.append(int(row[1]))  # Populate annotataion column with the same value as the data column
 
 	# Malicious bandwidth by device this month (blue bars charts)
 	device_bpm_chart_this_month = convert_csv_to_list_of_lists(charts_tables_path + 'device_bpm_chart_this_month.csv')
@@ -821,8 +843,11 @@ if __name__ == '__main__':
 
 	# Add labels annotations to the bar charts and replace IPs with names
 	device_bpm_chart_this_month[0].append({'role': 'annotation'})
+	device_bpm_chart_this_month_max = 0
 	# Add the third column (annotation) to each row
 	for row in device_bpm_chart_this_month[1:]:
+		if row[1] > device_bpm_chart_this_month_max: # Find the maximum value for the y-axis
+			device_bpm_chart_this_month_max = int(row[1]*1.1)
 		row[0] = defensepros.get(row[0], row[0])  	# Replace IPs with names # Keep IP if no match found
 		row.append(float(row[1]))  
 
@@ -1010,7 +1035,8 @@ if __name__ == '__main__':
 				}},
 			  vAxis: {{
 				title: 'Number of events',
-				minValue: 0
+				minValue: 0,
+				maxValue: {events_total_bar_chart_max}
 				}},
 			  annotations: {{
             	alwaysOutside: true
@@ -1029,7 +1055,8 @@ if __name__ == '__main__':
 				}},
 			  vAxis: {{
 				title: 'Malicious packets (units {pkt_units})',
-				minValue: 0
+				minValue: 0,
+				maxValue: {packets_total_bar_max}
 				}},
 			  annotations: {{
             	alwaysOutside: true
@@ -1048,7 +1075,8 @@ if __name__ == '__main__':
 				}},
 			  vAxis: {{
 				title: 'Malicious bandwidth (units {bw_units})',
-				minValue: 0
+				minValue: 0,
+				maxValue: {bw_total_bar_max}
 				}},
 			  annotations: {{
             	alwaysOutside: true
@@ -1192,7 +1220,8 @@ if __name__ == '__main__':
 				}},
 			  vAxis: {{
 				title: 'Number of events',
-				minValue: 0
+				minValue: 0,
+				maxValue: {device_epm_chart_this_month_max}
 				}},
 			  annotations: {{
             	alwaysOutside: true
@@ -1211,7 +1240,8 @@ if __name__ == '__main__':
 				}},
 			  vAxis: {{
 				title: 'Malicious packets (units {pkt_units})',
-				minValue: 0
+				minValue: 0,
+				maxValue: {device_ppm_chart_this_month_max}
 				}},
 			  annotations: {{
             	alwaysOutside: true
@@ -1230,10 +1260,11 @@ if __name__ == '__main__':
 				}},
 			  vAxis: {{
 				title: 'Malicious bandwidth (units {bw_units})',
-				minValue: 0
+				minValue: 0,
+				maxValue: {device_bpm_chart_this_month_max}
 				}},
 			  annotations: {{
-            	alwaysOutside: true
+				alwaysOutside: true
 				}},
 			  width: '100%'
 			}};
@@ -1331,7 +1362,8 @@ if __name__ == '__main__':
 
 			  vAxis: {{
 				title: 'Sum of Attack Duration in Days',
-				minValue: 0
+				minValue: 0,
+				maxValue: {total_attacks_days_bar_chart_max}
 				}},
 			  hAxis: {{
 				title: 'Months',

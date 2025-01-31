@@ -259,6 +259,10 @@ V9.2.2 (1/25/2024)
 	- Set minimum point to 0
 	- Added callouts outside
 
+10.3.3 (1/31/2025)
+- Added max values calculations for bar charts and added extra room for bar charts callouts at the top of the charts
+- Changed units for Source IP packets to None
+
 ===========================================================================================================================
 Instructions how to deploy as a docker container (on Vision example):
  
