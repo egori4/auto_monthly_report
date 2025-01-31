@@ -610,7 +610,7 @@ if __name__ == '__main__':
 	bw_total_bar[0].append({'role': 'annotation'})
 	# Add the third column (annotation) to each row
 	for row in bw_total_bar[1:]:
-		row.append(int(row[1])) 
+		row.append(float(row[1])) 
 
 	bw_total_bar_move = trends_move_total(bw_total_bar, bw_units) 
 
@@ -636,7 +636,7 @@ if __name__ == '__main__':
 	total_attacks_days_bar_chart[0].append({'role': 'annotation'})
 	# Add the third column (annotation) to each row
 	for row in total_attacks_days_bar_chart[1:]:
-		row.append(int(row[1]))  
+		row.append(float(row[1]))  
 
 
 	################################################# Analyze deeper top category ##########################################################
@@ -824,7 +824,7 @@ if __name__ == '__main__':
 	# Add the third column (annotation) to each row
 	for row in device_bpm_chart_this_month[1:]:
 		row[0] = defensepros.get(row[0], row[0])  	# Replace IPs with names # Keep IP if no match found
-		row.append(int(row[1]))  
+		row.append(float(row[1]))  
 
 	################################################# Top source IP(bw is Megabytes) ##########################################################		
 	sip_events_trends_chart = convert_csv_to_list_of_lists(charts_tables_path + 'sip_epm_chart_lm.csv')
