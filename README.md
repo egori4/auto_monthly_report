@@ -248,6 +248,17 @@ V9.2.2 (1/25/2024)
 - Monthly HTML - removed units from titles, added axis descriptions
 - Added bar charts numbers call outs (annotation)
 - Added 3 bar charts events, packets, bandwidth by device this month
+
+10.3.2 (1/31/2025)
+- Traffic utilization - added legends to axis y and x. 
+- Bar charts - annotations are inside, explicitly popped out outside, made bars narrower
+- Fixed Device bars bandwidth wrong values
+- Added Device bars translation IP to Device Name
+- Duration in days chart
+	- Resized wide chart to be the same size as other charts, aligned center. 
+	- Set minimum point to 0
+	- Added callouts outside
+
 ===========================================================================================================================
 Instructions how to deploy as a docker container (on Vision example):
  

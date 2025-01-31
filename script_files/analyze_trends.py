@@ -632,6 +632,11 @@ if __name__ == '__main__':
 
 
 	total_attacks_days_bar_chart = convert_csv_to_list_of_lists(charts_tables_path + 'total_attack_time_bar.csv')
+	# Add labels annotations to the bar charts
+	total_attacks_days_bar_chart[0].append({'role': 'annotation'})
+	# Add the third column (annotation) to each row
+	for row in total_attacks_days_bar_chart[1:]:
+		row.append(int(row[1]))  
 
 
 	################################################# Analyze deeper top category ##########################################################
@@ -791,30 +796,34 @@ if __name__ == '__main__':
 
 	# Total events by device this month (blue bars charts)
 	device_epm_chart_this_month = convert_csv_to_list_of_lists(charts_tables_path + 'device_epm_chart_this_month.csv')
-	# Add labels annotations to the bar charts
+
+	# Add labels annotations to the bar charts and replace IPs with names
 	device_epm_chart_this_month[0].append({'role': 'annotation'})
 	# Add the third column (annotation) to each row
 	for row in device_epm_chart_this_month[1:]:
+		row[0] = defensepros.get(row[0], row[0])  # Keep IP if no match found
 		row.append(int(row[1]))  
 
 	# Malicious packets by device this month (blue bars charts)
 	device_ppm_chart_this_month = convert_csv_to_list_of_lists(charts_tables_path + 'device_ppm_chart_this_month.csv')
 	device_ppm_chart_this_month = convert_packets_units(device_ppm_chart_this_month, pkt_units)
 
-	# Add labels annotations to the bar charts
+	# Add labels annotations to the bar charts and replace IPs with names
 	device_ppm_chart_this_month[0].append({'role': 'annotation'})
 	# Add the third column (annotation) to each row
 	for row in device_ppm_chart_this_month[1:]:
+		row[0] = defensepros.get(row[0], row[0])  	# Replace IPs with names # Keep IP if no match found
 		row.append(int(row[1]))  
 
 	# Malicious bandwidth by device this month (blue bars charts)
-	device_bpm_chart_this_month = convert_csv_to_list_of_lists(charts_tables_path + 'device_ppm_chart_this_month.csv')
+	device_bpm_chart_this_month = convert_csv_to_list_of_lists(charts_tables_path + 'device_bpm_chart_this_month.csv')
 	device_bpm_chart_this_month = convert_bw_units(device_bpm_chart_this_month, bw_units)
 
-	# Add labels annotations to the bar charts
+	# Add labels annotations to the bar charts and replace IPs with names
 	device_bpm_chart_this_month[0].append({'role': 'annotation'})
 	# Add the third column (annotation) to each row
 	for row in device_bpm_chart_this_month[1:]:
+		row[0] = defensepros.get(row[0], row[0])  	# Replace IPs with names # Keep IP if no match found
 		row.append(int(row[1]))  
 
 	################################################# Top source IP(bw is Megabytes) ##########################################################		
@@ -906,7 +915,12 @@ if __name__ == '__main__':
 			
 			var traffic_options = {{
 			  title: 'Traffic utilization, last month',
-			  vAxis: {{minValue: 0}},
+			  vAxis: {{
+				title: 'Traffic Volume (Mbps)',
+				minValue: 0}},
+			  hAxis: {{
+				title: 'Date and time',
+				}},
 			  isStacked: false,
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
@@ -989,7 +1003,7 @@ if __name__ == '__main__':
 
 			var epm_total_options = {{
 			  title: 'Total Events trends',
-			  bar: {{groupWidth: "95%"}},
+			  bar: {{groupWidth: "70%"}},
 			  legend: {{position: 'bottom'}},
 			  hAxis: {{
 				title: 'Months',
@@ -998,12 +1012,15 @@ if __name__ == '__main__':
 				title: 'Number of events',
 				minValue: 0
 				}},
+			  annotations: {{
+            	alwaysOutside: true
+				}},
 			  width: '100%'
 			}};
 
 			var ppm_total_options = {{
 			  title: 'Total Malicious Packets count trends',
-			  bar: {{groupWidth: "95%"}},
+			  bar: {{groupWidth: "70%"}},
 			  legend: {{
 				position: 'bottom'
 				}},
@@ -1014,12 +1031,15 @@ if __name__ == '__main__':
 				title: 'Malicious packets (units {pkt_units})',
 				minValue: 0
 				}},
+			  annotations: {{
+            	alwaysOutside: true
+				}},
 			  width: '100%'
 			}};
 
 			var bpm_total_options = {{
 			  title: 'Total Malicious bandwidth sum trends',
-			  bar: {{groupWidth: "95%"}},
+			  bar: {{groupWidth: "70%"}},
 			  legend: {{
 				position: 'bottom'
 				}},
@@ -1029,6 +1049,9 @@ if __name__ == '__main__':
 			  vAxis: {{
 				title: 'Malicious bandwidth (units {bw_units})',
 				minValue: 0
+				}},
+			  annotations: {{
+            	alwaysOutside: true
 				}},
 			  width: '100%'
 			}};
@@ -1162,7 +1185,7 @@ if __name__ == '__main__':
 			
 			var device_epm_chart_this_month_options = {{
 			  title: 'Number of Events by device - this Month',
-			  bar: {{groupWidth: "95%"}},
+			  bar: {{groupWidth: "70%"}},
 			  legend: {{position: 'bottom'}},
 			  hAxis: {{
 				title: 'Device',
@@ -1171,12 +1194,15 @@ if __name__ == '__main__':
 				title: 'Number of events',
 				minValue: 0
 				}},
+			  annotations: {{
+            	alwaysOutside: true
+				}},
 			  width: '100%'
 			}};
 
 			var device_ppm_chart_this_month_options = {{
 			  title: 'Malicious Packets by device - this Month',
-			  bar: {{groupWidth: "95%"}},
+			  bar: {{groupWidth: "70%"}},
 			  legend: {{
 				position: 'bottom'
 				}},
@@ -1187,12 +1213,15 @@ if __name__ == '__main__':
 				title: 'Malicious packets (units {pkt_units})',
 				minValue: 0
 				}},
+			  annotations: {{
+            	alwaysOutside: true
+				}},
 			  width: '100%'
 			}};
 
 			var device_bpm_chart_this_month_options = {{
-			  title: 'Malicious bandwidth by device - this Month',
-			  bar: {{groupWidth: "95%"}},
+			  title: 'Malicious Bandwidth by device - this Month',
+			  bar: {{groupWidth: "70%"}},
 			  legend: {{
 				position: 'bottom'
 				}},
@@ -1202,6 +1231,9 @@ if __name__ == '__main__':
 			  vAxis: {{
 				title: 'Malicious bandwidth (units {bw_units})',
 				minValue: 0
+				}},
+			  annotations: {{
+            	alwaysOutside: true
 				}},
 			  width: '100%'
 			}};
@@ -1295,15 +1327,19 @@ if __name__ == '__main__':
 
 			var total_attacks_days_options = {{
 			  title: 'Total Attack Time in days',
-			  bar: {{groupWidth: "95%"}},
+			  bar: {{groupWidth: "70%"}},
 
 			  vAxis: {{
-				title: 'Duration in Days',
+				title: 'Sum of Attack Duration in Days',
+				minValue: 0
 				}},
 			  hAxis: {{
 				title: 'Months',
 				}},
 			  legend: {{position: 'bottom'}},
+			  annotations: {{
+            	alwaysOutside: true
+				}},
 			  width: '100%'
 			}};
 
@@ -2083,16 +2119,50 @@ if __name__ == '__main__':
 		  </tr>	  
 
 
-
-
-
-
 		  <tr>
 			<td><div id="epm_chart_div_alltimehigh" style="height: 600px;"></td>
 			<td><div id="ppm_chart_div_alltimehigh" style="height: 600px;"></td>
 			<td><div id="bpm_chart_div_alltimehigh" style="height: 600px;"></td>
 		  </tr>
 
+		  <tr>
+			<td><div id="device_epm_chart_this_month_div" style="height: 600px;"></td>
+			<td><div id="device_ppm_chart_this_month_div" style="height: 600px;"></td>
+			<td><div id="device_bpm_chart_this_month_div" style="height: 600px;"></td>
+		  </tr>	
+
+		  <tr>
+			<td colspan="3" style="border-bottom: 0;">
+				<!-- Button container for centering -->
+				<div class="button-container" align="center">
+					<button class="toggle-btn" data-original-text="Number of Security Events per Month" onclick="toggleTable('SecurityEventsDevicePerMonth', this)">Number of Security Events per Month</button>
+				
+
+					<button align="center" class="toggle-btn" data-original-text="Malicious Packets per Month" onclick="toggleTable('PacketsDevicePerMonth', this)">Malicious Packets per Month</button>
+
+					<button class="toggle-btn" data-original-text="Malicious Bandwidth per Month" onclick="toggleTable('BWDevicePerMonth', this)">Malicious Bandwidth per Month</button>
+				</div>
+
+
+		  		<div id="SecurityEventsDevicePerMonth" class="collapsible-content" style="text-align: left;">
+				  <h4 align="center">Security Events by device table</h4>
+					{events_by_device_table}
+				</div>
+
+		  		<div id="PacketsDevicePerMonth" class="collapsible-content" style="text-align: left;">
+				  <h4 align="center">Malicious packets by device table (units {pkt_units})</h4>
+					{packets_by_device_table}
+				</div>
+				
+		  		<div id="BWDevicePerMonth" class="collapsible-content" style="text-align: left;">
+				  <h4 align="center">alicious Bandwidth by device table (units {bw_units})</h4>
+					{bw_by_device_table}
+				</div>
+
+
+
+			</td>
+		  </tr>	  
 
 		  <tr>
 			<td><div id="epm_by_device_chart_div" style="height: 600px;"></td>
@@ -2167,48 +2237,13 @@ if __name__ == '__main__':
 
 			</td>
 
-		  </tr>		
-
-		  <tr>
-			<td colspan="3" style="border-bottom: 0;">
-				<!-- Button container for centering -->
-				<div class="button-container" align="center">
-					<button class="toggle-btn" data-original-text="Number of Security Events per Month" onclick="toggleTable('SecurityEventsDevicePerMonth', this)">Number of Security Events per Month</button>
-				
-
-					<button align="center" class="toggle-btn" data-original-text="Malicious Packets per Month" onclick="toggleTable('PacketsDevicePerMonth', this)">Malicious Packets per Month</button>
-
-					<button class="toggle-btn" data-original-text="Malicious Bandwidth per Month" onclick="toggleTable('BWDevicePerMonth', this)">Malicious Bandwidth per Month</button>
-				</div>
+		  </tr>	
 
 
-		  		<div id="SecurityEventsDevicePerMonth" class="collapsible-content" style="text-align: left;">
-				  <h4 align="center">Security Events by device table</h4>
-					{events_by_device_table}
-				</div>
-
-		  		<div id="PacketsDevicePerMonth" class="collapsible-content" style="text-align: left;">
-				  <h4 align="center">Malicious packets by device table (units {pkt_units})</h4>
-					{packets_by_device_table}
-				</div>
-				
-		  		<div id="BWDevicePerMonth" class="collapsible-content" style="text-align: left;">
-				  <h4 align="center">alicious Bandwidth by device table (units {bw_units})</h4>
-					{bw_by_device_table}
-				</div>
-
-
-
-			</td>
-		  </tr>	  
 		  
 
 
-		  <tr>
-			<td><div id="device_epm_chart_this_month_div" style="height: 600px;"></td>
-			<td><div id="device_ppm_chart_this_month_div" style="height: 600px;"></td>
-			<td><div id="device_bpm_chart_this_month_div" style="height: 600px;"></td>
-		  </tr>
+
 
 
 
@@ -2380,8 +2415,12 @@ if __name__ == '__main__':
 		  </tr>
 
 		  <tr>
-		  	<td colspan="3">
+		  	<td>
+			</td>
+		  	<td>
 			<div id="total_attacks_days_chart_div">
+			</td>
+		  	<td>
 			</td>
 		  </tr> 
 
