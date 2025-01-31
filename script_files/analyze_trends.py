@@ -101,7 +101,7 @@ def convert_strings_to_numbers(data):
 			converted_data.append(converted_row)
 	return converted_data
 
-def convert_packets_units(data, pkt_units):
+def convert_packets_units(data, pkt_units=None):
 	converted_data = []
 	for row in data:
 		converted_row = []
@@ -115,7 +115,7 @@ def convert_packets_units(data, pkt_units):
 				elif pkt_units == "Thousands":
 					value = value/1000
 				else:
-					print(f'Invalid packets unit is set under "pkt_units" variable in the script. Please set it to "Millions" or "Billions" ')
+					print(f'Packet units is not set or invalid packets unit is set under "pkt_units" variable in the script. Please set it to "Millions" or "Billions" ')
 				
 				#if value float convert to integer
 				if isinstance(value, float):
@@ -832,7 +832,7 @@ if __name__ == '__main__':
 	sip_events_trends_table = csv_to_html_table(charts_tables_path + 'sip_epm_table_lm.csv')
 
 	sip_packets_trends_chart = convert_csv_to_list_of_lists(charts_tables_path + 'sip_ppm_chart_lm.csv')
-	sip_packets_trends_chart = convert_packets_units(sip_packets_trends_chart, pkt_units)
+	sip_packets_trends_chart = convert_packets_units(sip_packets_trends_chart, pkt_units=None)
 	sip_packets_trends_move_text = trends_move(sip_packets_trends_chart, ' packets(' + pkt_units + ')')
 	sip_packets_table = csv_to_html_table(charts_tables_path + 'sip_ppm_table_lm.csv',bw_units=None, pkt_units=None)
 
@@ -1258,7 +1258,7 @@ if __name__ == '__main__':
 			  title: 'Malicious Packets trends - by source IP',
 			  vAxis: {{
 				minValue: 0,
-				title: 'Malicious packets (units {pkt_units})'}},
+				title: 'Malicious packets'}},
 			  hAxis: {{
 				title: 'Months',
 				}},
