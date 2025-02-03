@@ -523,37 +523,10 @@ def email_body(cust_id):
                                 <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px;">{events_text}</p>
                                 <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px;">{pkts_text}</p>
                                 <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px;">{bw_text}</p>
-                                                        <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px;"><h4>Top #1 attack of the month by total packet count (cumulative) </h4></p>
-                                <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px;">{html_attack_cat_packetCount}<br>
-                                                                                                                                          {html_attack_name_packetCount}<br>
-                                                                                                                                          {html_src_ip_packetCount}<br>
-                                                                                                                                          {html_dst_ip_packetCount}<br>
-                                                                                                                                          {html_attack_start_packetCount}<br>
-                                                                                                                                          {html_attack_pkt_packetCount}<br>
-                                                                                                                                          {html_attack_bw_packetCount}<br>
-                                                                                                                                          {html_attack_maxpps_packetCount}<br>
-                                                                                                                                          {html_attack_maxbps_packetCount}<br>
-                                                                                                                                          {html_device_packetCount}<br>
-                                                                                                                                          {html_policy_packetCount}<br>
-                                                                                                                                          {html_dur_packetCount}<br>
-                                                                                                                                          {html_attack_id_packetCount}</p>
+   
+                                
 
-                                                        <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px;"><h4>Top #1 attack by total attack traffic in GB(cumulative):</h4></p>
-                                <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px;">{html_attack_cat_packetBandwidth}<br>
-                                                                                                                                          {html_attack_name_packetBandwidth}<br>
-                                                                                                                                          {html_src_ip_packetBandwidth}<br>
-                                                                                                                                          {html_dst_ip_packetBandwidth}<br>
-                                                                                                                                          {html_attack_start_packetBandwidth}<br>
-                                                                                                                                          {html_attack_pkt_packetBandwidth}<br>
-                                                                                                                                          {html_attack_bw_packetBandwidth}<br>
-                                                                                                                                          {html_attack_maxpps_packetBandwidth}<br>
-                                                                                                                                          {html_attack_maxbps_packetBandwidth}<br>
-                                                                                                                                          {html_device_packetBandwidth}<br>
-                                                                                                                                          {html_policy_packetBandwidth}<br>
-                                                                                                                                          {html_dur_packetBandwidth}<br>
-                                                                                                                                          {html_attack_id_packetBandwidth}</p>
-
-                                                        <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px;"><h4>Top #1 attack by max Gbps rate:</h4></p>
+                                <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px;"><h4>Top #1 attack by max Gbps rate:</h4></p>
                                 <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px;">{html_attack_cat_maxAttackRateBps}<br>
                                                                                                                                           {html_attack_name_maxAttackRateBps}<br>
                                                                                                                                           {html_src_ip_maxAttackRateBps}<br>
@@ -568,7 +541,7 @@ def email_body(cust_id):
                                                                                                                                           {html_dur_maxAttackRateBps}<br>
                                                                                                                                           {html_attack_id_maxAttackRateBps}</p>
 
-                                                        <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px;"><h4>Top #1 attack by max PPS rate:</h4></p>
+                                <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px;"><h4>Top #1 attack by max PPS rate:</h4></p>
                                 <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px;">{html_attack_cat_maxAttackPacketRatePps}<br>
                                                                                                                                           {html_attack_name_maxAttackPacketRatePps}<br>
                                                                                                                                           {html_src_ip_maxAttackPacketRatePps}<br>
