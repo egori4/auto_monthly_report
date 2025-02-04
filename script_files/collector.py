@@ -4,13 +4,16 @@ import json
 import os
 import time
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta,timezone
 import calendar
 import csv
 import sqlite3
+import urllib3
 
 daily = False
 monthly = False
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 cust_id = sys.argv[1]
 
@@ -52,8 +55,14 @@ try:
 		password = selected_entry['pass']
 		vision_ip = selected_entry['visions'][0]['ip']
 		excluded_attacks = selected_entry['exclude']
-		dps = selected_entry['visions'][0]['dps']
+		dps = selected_entry['visions'][0]['dps'] # This is a list of DefensePro IPs
+		defensepros = selected_entry['defensepros'] # This is a list of DefensePro IPs and DefensePro names
+		bw_units = selected_entry['variables']['bwUnitDaily']
 
+		try:
+			window = selected_entry['variables']['window']
+		except:
+			window = 86400
 		# Print the extracted values
 		# print("User:", username)
 		# print("Password:", password)
@@ -67,16 +76,7 @@ except json.JSONDecodeError as e:
 except (KeyError, IndexError) as e:
 	print("Error extracting data:", e)
 
-
-customers_json = json.loads(open("./config_files/customers.json", "r").read())
-for cust_config_block in customers_json:
-	if cust_config_block['id'].lower() == cust_id.lower():
-		defensepros = cust_config_block['defensepros']
-
-		bw_units = cust_config_block['variables']['bwUnitDaily']
-		#Can be configured "Gigabytes", "Terabytes" or "Megabytes"
-
-
+#####################################################################################################################
 
 class Vision:
 
@@ -91,7 +91,7 @@ class Vision:
 		print('Connecting to Vision')
 
 		# To manipulate the desired date, replace day = 1 with the desired day or month with desired month , e.g self.today_date = datetime.today().replace(month=2) )
-		self.today_date = datetime.today().replace(month=cur_month,day=cur_day,year=cur_year)
+		self.today_date = datetime.today().replace(month=cur_month,day=cur_day,year=cur_year)#,tzinfo=timezone.utc)
 
 		print(f'Today date is {self.today_date}')
 
@@ -160,6 +160,8 @@ class Vision:
 		if monthly:
 			# Monthly Report Time Variables
 			# First day of the previous month at 00:00:00
+
+
 			first_day_of_prev_month = (today_date.replace(day=1) - timedelta(days=1)).replace(day=1, hour=0, minute=0, second=0, microsecond=0)
 			start_time_lower = int(first_day_of_prev_month.timestamp())*1000
 
@@ -409,7 +411,7 @@ class Vision:
 			raise Exception(error_message)
 		
 
-	def create_forensics_post_payload(self):
+	def create_forensics_post_payload(self,start_time_lower,end_time_upper):
 
 		query = {
 			"criteria": [],
@@ -431,8 +433,8 @@ class Vision:
 		time_filter = {
 			"type": "timeFilter",
 			"field": "endTime",
-			"lower": f"{v.start_time_lower}",
-			"upper": f"{v.end_time_upper}",
+			"lower": f"{start_time_lower}",
+			"upper": f"{end_time_upper}",
 			"includeLower": True,
 			"includeUpper": True
 		}
@@ -477,26 +479,31 @@ class Vision:
 		query['criteria'].append(or_filters)
 		return query
 
-	def get_forensics(self):
+	def get_forensics(self,start_time_lower,end_time_upper):
 
 		print(
 		f"Pulling forensics data. Time range: "
-		f"{time.strftime('%d-%b-%Y %H:%M:%S', time.localtime(v.start_time_lower/1000))} - "
-		f"{time.strftime('%d-%b-%Y %H:%M:%S', time.localtime(v.end_time_upper/1000))}"
+		f"{time.strftime('%d-%b-%Y %H:%M:%S', time.localtime(start_time_lower/1000))} - "
+		f"{time.strftime('%d-%b-%Y %H:%M:%S', time.localtime(end_time_upper/1000))}"
 			)
 		
 		api_url = f'https://{self.ip}/mgmt/monitor/reporter/reports-ext/ATTACK'
 
 
-		post_payload = self.create_forensics_post_payload()
-		current_page = 0
-		total_hits = 0
+		
 		all_data = []
 		metaData = None  # To store metaData from the first response
 	
 
-		while True:
-			post_payload["pagination"]["page"] = current_page
+		while start_time_lower < end_time_upper:
+			d1 = start_time_lower # This is the start time of the window
+			d2 = start_time_lower + (window *1000) # This is the end time of the window
+			# print(d1,d2)
+			# print(datetime.fromtimestamp(d1/1000, tz=timezone.utc).strftime('%Y-%m-%d %H:%M:%S'))
+			# print(datetime.fromtimestamp(d2/1000, tz=timezone.utc).strftime('%Y-%m-%d %H:%M:%S'))
+		  
+			post_payload = self.create_forensics_post_payload(d1,d2)
+
 			response = self._post(api_url, json.dumps(post_payload))
 
 
@@ -508,13 +515,8 @@ class Vision:
 						all_data.extend(response_json["data"])  # Append the current page's data
 						if not metaData:
 							metaData = response_json.get("metaData", {})  # Get metaData only once
-						total_hits += len(response_json["data"])
-
-						# Stop if the current page has fewer results than the page size
-						if len(response_json["data"]) < post_payload["pagination"]["size"]:
-							break  # No more data to fetch
-						
-						current_page += 1  # Move to the next page
+						print("-", end="", flush=True)  # Print a dash for each call
+						start_time_lower += (window *1000)
 
 
 					else:
@@ -768,7 +770,9 @@ class Vision:
 				start_date = datetime.fromtimestamp(int(entry["row"]["startTime"])/ 1000)
 				orig_start_date = start_date
 				end_date = datetime.fromtimestamp(int(entry["row"]["endTime"])/ 1000)
-				
+
+
+				`##################################################################################	
 								# Calculate the month and year 2 months ago
 				if self.today_month_number > 2:
 					two_months_ago_month = self.today_month_number - 2
@@ -784,6 +788,8 @@ class Vision:
 					else: # This is a case for 2nd of January
 						start_date = start_date.replace(day= 1, month=12, hour=0, minute=0, second=0)
 						# print(f'New start date: {start_date}')
+				##################################################################################
+
 
 				cursor.execute('''
 				INSERT INTO attacks (deviceName, startDate, endDate, name, actionType, ruleName, sourceAddress, destAddress, sourcePort, destPort, protocol, threatGroup, category, attackIpsId, duration, risk, startTime, endTime, month, year, startDayOfMonth, endDayOfMonth, vlanTag, packetCount, packetBandwidth, averageAttackPacketRatePps, averageAttackRateBps, maxAttackRateBps, maxAttackPacketRatePps, lastPeriodBandwidth, poId, radwareId, direction, geoLocation, activationId, packetType, physicalPort, lastPeriodPacketRate, originalStartDate)
@@ -849,7 +855,7 @@ traffic_pps_raw = v.ams_stats_dashboards_call(units = "pps", report_type="Traffi
 v.write_traffic_stats_to_csv(traffic_bps_raw, tmp_files_path + 'traffic_pps.csv')
 
 # # Get Forensics data
-forensics_raw = v.get_forensics()
+forensics_raw = v.get_forensics(v.start_time_lower,v.end_time_upper)
 v.compile_to_sqldb()
 
 # Get connections per second stats
