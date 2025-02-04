@@ -9,6 +9,7 @@ cust_id = sys.argv[1]
 month = sys.argv[2]
 year = sys.argv[3]
 
+############################# Extract variables from customers.json file #############################
 
 customers_json = json.loads(open("./config_files/customers.json", "r").read())
 
@@ -42,16 +43,24 @@ for cust_config_block in customers_json:
 			bps_unit = 1000000000
 			bps_units_desc = 'Gbps'
 
+		try:
+			if cust_config_block['variables']['barChartsAnnotations'].lower() == 'false':
+				bar_charts_annotations = False
+			else:
+				bar_charts_annotations = True
+		except:
+			bar_charts_annotations = True
+
+###############################################################################################
 # Paths
 charts_tables_path = f"./tmp_files/{cust_id}/"
 reports_path = f"./report_files/{cust_id}/"
 db_path = f'./database_files/{cust_id}/'
 run_file = 'run.sh'
-
+########################################### Extracting variables from run.sh file #########################
 
 with open (run_file) as f:
 	for line in f:
-	#find line starting with top_n
 		if line.startswith('db_from_forensics'):
 			#print value after = sign
 			db_from_forensics = (line.split('=')[1].replace('\n','').replace('"','')).lower()
@@ -61,6 +70,7 @@ with open (run_file) as f:
 				db_from_forensics = False
 			continue
 
+########################################### Functions ####################################################
 def convert_csv_to_list_of_lists(filename):
 	# Open csv file and convert to list of lists function
 	data = []
@@ -587,26 +597,30 @@ if __name__ == '__main__':
 	# Total events, packets and bandwidth trends (blue bars charts)
 	events_total_bar_chart = convert_csv_to_list_of_lists(charts_tables_path + 'epm_total_bar.csv')
 	# Add labels annotations to the bar charts
-	events_total_bar_chart[0].append({'role': 'annotation'})
 	events_total_bar_chart_max = 0
-	# Add the third column (annotation) to each row
-	for row in events_total_bar_chart[1:]:
-		if row[1] > events_total_bar_chart_max: # Find the maximum value for the y-axis
-			events_total_bar_chart_max = int(row[1]*1.1)
-		row.append(int(row[1]))  
+	if bar_charts_annotations:
+		events_total_bar_chart[0].append({'role': 'annotation'})
+		
+		# Add the third column (annotation) to each row
+		for row in events_total_bar_chart[1:]:
+			if row[1] > events_total_bar_chart_max: # Find the maximum value for the y-axis
+				events_total_bar_chart_max = int(row[1]*1.1)
+			row.append(int(row[1]))  
 
 	events_total_bar_move_text = trends_move_total(events_total_bar_chart, 'events')
 
 	packets_total_bar = convert_csv_to_list_of_lists(charts_tables_path + 'ppm_total_bar.csv')
 	packets_total_bar = convert_packets_units(packets_total_bar, pkt_units)
+
 	# Add labels annotations to the bar charts
-	packets_total_bar[0].append({'role': 'annotation'})
 	packets_total_bar_max = 0
-	# Add the third column (annotation) to each row
-	for row in packets_total_bar[1:]:
-		if row[1] > packets_total_bar_max: # Find the maximum value for the y-axis
-			packets_total_bar_max = int(row[1]*1.1)
-		row.append(int(row[1])) 
+	if bar_charts_annotations:
+		packets_total_bar[0].append({'role': 'annotation'})
+		# Add the third column (annotation) to each row
+		for row in packets_total_bar[1:]:
+			if row[1] > packets_total_bar_max: # Find the maximum value for the y-axis
+				packets_total_bar_max = int(row[1]*1.1)
+			row.append(int(row[1])) 
 
 	pakets_total_bar_move = trends_move_total(packets_total_bar, ' packets(' + pkt_units + ')')
 
@@ -614,13 +628,15 @@ if __name__ == '__main__':
 	bw_total_bar = convert_bw_units(bw_total_bar, bw_units)
 
 	# Add labels annotations to the bar charts
-	bw_total_bar[0].append({'role': 'annotation'})
 	bw_total_bar_max = 0
-	# Add the third column (annotation) to each row
-	for row in bw_total_bar[1:]:
-		if row[1] > bw_total_bar_max: # Find the maximum value for the y-axis
-			bw_total_bar_max = int(row[1]*1.1)
-		row.append(float(row[1])) 
+
+	if bar_charts_annotations:
+		bw_total_bar[0].append({'role': 'annotation'})
+		# Add the third column (annotation) to each row
+		for row in bw_total_bar[1:]:
+			if row[1] > bw_total_bar_max: # Find the maximum value for the y-axis
+				bw_total_bar_max = int(row[1]*1.1)
+			row.append(float(row[1])) 
 
 	bw_total_bar_move = trends_move_total(bw_total_bar, bw_units) 
 
@@ -642,14 +658,17 @@ if __name__ == '__main__':
 
 
 	total_attacks_days_bar_chart = convert_csv_to_list_of_lists(charts_tables_path + 'total_attack_time_bar.csv')
+
 	# Add labels annotations to the bar charts
-	total_attacks_days_bar_chart[0].append({'role': 'annotation'})
 	total_attacks_days_bar_chart_max = 0
-	# Add the third column (annotation) to each row
-	for row in total_attacks_days_bar_chart[1:]:
-		if row[1] > total_attacks_days_bar_chart_max: # Find the maximum value for the y-axis
-			total_attacks_days_bar_chart_max = int(row[1]*1.1)
-		row.append(float(row[1]))  
+
+	if bar_charts_annotations:
+		total_attacks_days_bar_chart[0].append({'role': 'annotation'})
+		# Add the third column (annotation) to each row
+		for row in total_attacks_days_bar_chart[1:]:
+			if row[1] > total_attacks_days_bar_chart_max: # Find the maximum value for the y-axis
+				total_attacks_days_bar_chart_max = int(row[1]*1.1)
+			row.append(float(row[1]))  
 
 
 	################################################# Analyze deeper top category ##########################################################
@@ -811,45 +830,57 @@ if __name__ == '__main__':
 	device_epm_chart_this_month = convert_csv_to_list_of_lists(charts_tables_path + 'device_epm_chart_this_month.csv')
 
 	# Add labels annotations to the bar charts and replace IPs with names
-	device_epm_chart_this_month[0].append({'role': 'annotation'})
+
 
 	device_epm_chart_this_month_max = 0
 
 	# Add the third column (annotation) to each row
+	if bar_charts_annotations:
+		device_epm_chart_this_month[0].append({'role': 'annotation'})
+
 	for row in device_epm_chart_this_month[1:]:
-		if row[1] > device_epm_chart_this_month_max: # Find the maximum value for the y-axis
-			device_epm_chart_this_month_max = int(row[1]*1.1)
 		row[0] = defensepros.get(row[0], row[0])  # Keep IP if no match found
-		row.append(int(row[1]))
+
+		if bar_charts_annotations:
+			if row[1] > device_epm_chart_this_month_max: # Find the maximum value for the y-axis
+				device_epm_chart_this_month_max = int(row[1]*1.1)
+			row.append(int(row[1]))
 		
 
 	# Malicious packets by device this month (blue bars charts)
 	device_ppm_chart_this_month = convert_csv_to_list_of_lists(charts_tables_path + 'device_ppm_chart_this_month.csv')
 	device_ppm_chart_this_month = convert_packets_units(device_ppm_chart_this_month, pkt_units)
 
-	# Add labels annotations to the bar charts and replace IPs with names
-	device_ppm_chart_this_month[0].append({'role': 'annotation'})
 	device_ppm_chart_this_month_max = 0
+	# Add labels annotations to the bar charts and replace IPs with names
+	if bar_charts_annotations:
+		device_ppm_chart_this_month[0].append({'role': 'annotation'})
+	
 	# Add the third column (annotation) to each row
+	
 	for row in device_ppm_chart_this_month[1:]:
-		if row[1] > device_ppm_chart_this_month_max: # Find the maximum value for the y-axis
-			device_ppm_chart_this_month_max = int(row[1]*1.1)
 		row[0] = defensepros.get(row[0], row[0])  	# Replace IPs with names # Keep IP if no match found
-		row.append(int(row[1]))  # Populate annotataion column with the same value as the data column
+		if bar_charts_annotations:
+			if row[1] > device_ppm_chart_this_month_max: # Find the maximum value for the y-axis
+				device_ppm_chart_this_month_max = int(row[1]*1.1)
+			row.append(int(row[1]))  # Populate annotataion column with the same value as the data column
 
 	# Malicious bandwidth by device this month (blue bars charts)
 	device_bpm_chart_this_month = convert_csv_to_list_of_lists(charts_tables_path + 'device_bpm_chart_this_month.csv')
 	device_bpm_chart_this_month = convert_bw_units(device_bpm_chart_this_month, bw_units)
 
 	# Add labels annotations to the bar charts and replace IPs with names
-	device_bpm_chart_this_month[0].append({'role': 'annotation'})
 	device_bpm_chart_this_month_max = 0
+	if bar_charts_annotations:
+		device_bpm_chart_this_month[0].append({'role': 'annotation'})
+		
 	# Add the third column (annotation) to each row
 	for row in device_bpm_chart_this_month[1:]:
-		if row[1] > device_bpm_chart_this_month_max: # Find the maximum value for the y-axis
-			device_bpm_chart_this_month_max = int(row[1]*1.1)
 		row[0] = defensepros.get(row[0], row[0])  	# Replace IPs with names # Keep IP if no match found
-		row.append(float(row[1]))  
+		if bar_charts_annotations:
+			if row[1] > device_bpm_chart_this_month_max: # Find the maximum value for the y-axis
+				device_bpm_chart_this_month_max = int(row[1]*1.1)
+			row.append(float(row[1]))  
 
 	################################################# Top source IP(bw is Megabytes) ##########################################################		
 	sip_events_trends_chart = convert_csv_to_list_of_lists(charts_tables_path + 'sip_epm_chart_lm.csv')
@@ -1066,12 +1097,14 @@ if __name__ == '__main__':
 
 			var bpm_total_options = {{
 			  title: 'Total Malicious bandwidth sum trends',
-			  bar: {{groupWidth: "70%"}},
+			  bar: {{
+				groupWidth: "70%"
+				}},
 			  legend: {{
 				position: 'bottom'
 				}},
 			  hAxis: {{
-				title: 'Months',
+				title: 'Months'
 				}},
 			  vAxis: {{
 				title: 'Malicious bandwidth (units {bw_units})',
@@ -1090,7 +1123,7 @@ if __name__ == '__main__':
 				minValue: 0,
 				title: 'Number of events'}},
 			  hAxis: {{
-				title: 'Months',
+				title: 'Months'
 				}},
 			  isStacked: false,
 			  focusTarget: 'category',
@@ -1104,7 +1137,7 @@ if __name__ == '__main__':
 				minValue: 0,
 				title: 'Malicious packets (units {pkt_units})'}},
 			  hAxis: {{
-				title: 'Months',
+				title: 'Months'
 				}},
 			  isStacked: false,
 			  focusTarget: 'category',
@@ -1212,7 +1245,7 @@ if __name__ == '__main__':
 
 			
 			var device_epm_chart_this_month_options = {{
-			  title: 'Number of Events by device - this Month',
+			  title: 'Number of Events by device - this Month (Top N)',
 			  bar: {{groupWidth: "70%"}},
 			  legend: {{position: 'bottom'}},
 			  hAxis: {{
@@ -1230,7 +1263,7 @@ if __name__ == '__main__':
 			}};
 
 			var device_ppm_chart_this_month_options = {{
-			  title: 'Malicious Packets by device - this Month',
+			  title: 'Malicious Packets by device - this Month (Top N)',
 			  bar: {{groupWidth: "70%"}},
 			  legend: {{
 				position: 'bottom'
@@ -1250,7 +1283,7 @@ if __name__ == '__main__':
 			}};
 
 			var device_bpm_chart_this_month_options = {{
-			  title: 'Malicious Bandwidth by device - this Month',
+			  title: 'Malicious Bandwidth by device - this Month (Top N)',
 			  bar: {{groupWidth: "70%"}},
 			  legend: {{
 				position: 'bottom'

@@ -263,6 +263,11 @@ V9.2.2 (1/25/2024)
 - Added max values calculations for bar charts and added extra room for bar charts callouts at the top of the charts
 - Changed units for Source IP packets to None
 
+10.3.4 (2/4/2025)
+- Added bar charts annotations(callouts) configurable variable under customers.json section "variables" (see customers.json example)
+	"barChartsAnnotations": "true"
+- Added Top N devices only under 3 bar charts by device
+
 ===========================================================================================================================
 Instructions how to deploy as a docker container (on Vision example):
  

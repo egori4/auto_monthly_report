@@ -357,7 +357,7 @@ def gen_charts_data(db_path):
 				########Get total events by device this month and write to csv#########
 				cur.execute("select deviceName as 'Device Name', count(1) as 'Total Events' from attacks group by deviceName order by count(*) desc")
 
-				device_epm_this_month = cur.fetchall()
+				device_epm_this_month = cur.fetchall()[:top_n]
 				with open(tmp_path + 'device_epm_chart_this_month.csv', 'w', newline='') as f:
 					writer = csv.writer(f)
 					writer.writerow(['Device', 'Number of Events'])
@@ -366,7 +366,7 @@ def gen_charts_data(db_path):
 				########Get malicious packets by device this month and write to csv#########
 				cur.execute("select deviceName as 'Device Name', sum(packetCount) as 'Total Events' from attacks group by deviceName order by sum(packetCount) desc")
 
-				device_ppm_this_month = cur.fetchall()
+				device_ppm_this_month = cur.fetchall()[:top_n]
 				with open(tmp_path + 'device_ppm_chart_this_month.csv', 'w', newline='') as f:
 					writer = csv.writer(f)
 					writer.writerow(['Device', 'Malicious Packets'])
@@ -375,7 +375,7 @@ def gen_charts_data(db_path):
 				########Get malicious bandwidth by device this month and write to csv#########
 				cur.execute("select deviceName as 'Device Name', sum(packetBandwidth) as 'Total Events' from attacks group by deviceName order by sum(packetBandwidth) desc")
 
-				device_bpm_this_month = cur.fetchall()
+				device_bpm_this_month = cur.fetchall()[:top_n]
 				with open(tmp_path + 'device_bpm_chart_this_month.csv', 'w', newline='') as f:
 					writer = csv.writer(f)
 					writer.writerow(['Device', 'Malicious Bandwidth'])
