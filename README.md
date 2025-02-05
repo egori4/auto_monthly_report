@@ -240,6 +240,35 @@ V9.2.2 (1/25/2024)
 10.2 (11/19/24)
 - Changed detailed information tables as buttons under the tables (monthly report)
 
+10.3 (1/13/2025)
+- Minor grammatical corrections to email body text
+- Added new chart - "Total attack time in days"
+
+10.3.1 (1/14/2025)
+- Monthly HTML - removed units from titles, added axis descriptions
+- Added bar charts numbers call outs (annotation)
+- Added 3 bar charts events, packets, bandwidth by device this month
+
+10.3.2 (1/31/2025)
+- Traffic utilization - added legends to axis y and x. 
+- Bar charts - annotations are inside, explicitly popped out outside, made bars narrower
+- Fixed Device bars bandwidth wrong values
+- Added Device bars translation IP to Device Name
+- Duration in days chart
+	- Resized wide chart to be the same size as other charts, aligned center. 
+	- Set minimum point to 0
+	- Added callouts outside
+
+10.3.3 (1/31/2025)
+- Added max values calculations for bar charts and added extra room for bar charts callouts at the top of the charts
+- Changed units for Source IP packets to None
+
+10.3.4 (2/4/2025)
+- Added bar charts annotations(callouts) configurable variable under customers.json section "variables" (see customers.json example)
+	"barChartsAnnotations": "true"
+- Added Top N devices only under 3 bar charts by device
+
+
 11.0 (12/30/24)
 - Added collecting traffic utilization and forensics with python instead of php
 !Must update run.sh and run_daily.sh from run_sh_example.sh and run_daily_example.sh respectively

@@ -22,7 +22,8 @@
 			"bwUnitDaily": "MegaBytes",
 			"decimals": 2,
 			"pktDecimals": 2,
-			"bwDecimals": 2
+			"bwDecimals": 2,
+			"barChartsAnnotations": "false"
 		},
 		"user": "radware",
 		"pass": "radware",
