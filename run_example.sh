@@ -14,12 +14,12 @@ cust_list=(Customer-name)	#space separated list of customer IDs, do not use unde
 
 ##################### Report Range #################################################################
 
-cur_month=$(date +'%m') # This sets the month to the current month by default, so the data will be collected and report will be generatd for the previous month. If the data needs to be collected for the different month, set the numberic value. For example if set to 4 (April), the script will collect and generate report for March.
-#cur_month=1
+cur_day=$(date +'%d')
 
+cur_month=$(date +'%m') # This sets the month to the current month by default, so the data will be collected and report will be generatd for the previous $report_range. If the data needs to be collected for the different month, set the numberic value. For example if set to 4 (April), the script will collect and generate report for March.
+# cur_month=3
 cur_year=$(date +%Y)
-#cur_year=2024
-
+# cur_year=2024
 prev_year=$(expr $cur_year - 1)
 
 if [[ "$cur_month" != 01 ]] && [ "$cur_month" != 1 ]; then
@@ -38,7 +38,7 @@ fi
 if (( "$prev_month" >= 1 && "$prev_month" <= 9 )); then
     # Add a leading zero if the number is between 1 and 9
     prev_month=$(printf "%02d" "$prev_month")
-    #echo "Formatted current month: $prev_month"
+    #echo "Formatted Prev month: $prev_month"
 fi
 
 abuseipdb=true
@@ -93,7 +93,7 @@ smtp_list=(user1@mail.com user2@mail.com) #space separated list of email address
 
 
 
-#######################Proxy variables##############################################################
+#######################Proxy variables (optional) ##############################################################
 is_http_proxy=false
 is_https_proxy=false
 

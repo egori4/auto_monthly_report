@@ -102,10 +102,17 @@ class Vision:
 		# print(f'Today is {self.today_day_number} and yesterday was {self.previous_day_number}')
 
 		self.today_month_number = self.today_date.month
+
+		if self.today_month_number == 1:
+			self.prev_month_number = 12  # Wrap around to December
+		else:
+			self.prev_month_number = self.today_month_number - 1
+
 		self.today_year = self.today_date.year
 
 		self.start_time_lower, self.end_time_upper = self.generate_report_times(self.today_date)
 
+		self.days_in_prev_month = calendar.monthrange(self.today_year, self.prev_month_number)[1]
 		
 		print('Collecting DefensePro device list')		
 		self.device_list = self.get_device_list()
@@ -479,7 +486,7 @@ class Vision:
 		query['criteria'].append(or_filters)
 		return query
 
-	def get_forensics(self,start_time_lower,end_time_upper):
+	def get_forensics(self,start_time_lower,end_time_upper,days_in_prev_month):
 
 		print(
 		f"Pulling forensics data. Time range: "
@@ -487,6 +494,15 @@ class Vision:
 		f"{time.strftime('%d-%b-%Y %H:%M:%S', time.localtime(end_time_upper/1000))}"
 			)
 		
+		################# Progress bar ############################
+		if monthly:
+			total_calls = days_in_prev_month * 24
+		if daily:
+			total_calls = 24
+		bar_length = 50  # Length of the progress bar
+		completed_calls = 0  # Track successful API calls
+		###########################################################
+
 		api_url = f'https://{self.ip}/mgmt/monitor/reporter/reports-ext/ATTACK'
 
 
@@ -515,7 +531,17 @@ class Vision:
 						all_data.extend(response_json["data"])  # Append the current page's data
 						if not metaData:
 							metaData = response_json.get("metaData", {})  # Get metaData only once
-						print("-", end="", flush=True)  # Print a dash for each call
+
+						# print("-", end="", flush=True)  # Print a dash for each call
+
+						# Progress bar
+						completed_calls += 1
+						percent = (completed_calls / total_calls) * 100
+						filled_length = int(bar_length * completed_calls // total_calls)
+						bar = "=" * filled_length + "-" * (bar_length - filled_length)
+						sys.stdout.write(f"\r[{bar}] {percent:.2f}%")
+						sys.stdout.flush()
+	
 						start_time_lower += (window *1000)
 
 
@@ -543,7 +569,7 @@ class Vision:
 	
 		with open(raw_data_path + "forensics_raw.json", "w", encoding="utf-8") as json_file:
 			json.dump(final_response, json_file, indent=4)  # Save JSON with indentation
-		print("Response body saved as pretty JSON in forensics_raw.json")
+		print("\n\nResponse body saved as pretty JSON in forensics_raw.json")
 		return final_response
 	
 	def compile_to_sqldb(self):
@@ -753,8 +779,6 @@ class Vision:
 				  	originalStartDate DATE NOT NULL)
 				''')
 			
-			print(self.today_month_number)
-
 			if self.today_month_number != 1: # This is a case for not January month
 				# Clear the table content for the previous month
 				cursor.execute(f'DELETE FROM attacks where month = {self.today_month_number -1}')
@@ -772,9 +796,9 @@ class Vision:
 				end_date = datetime.fromtimestamp(int(entry["row"]["endTime"])/ 1000)
 
 
-				`##################################################################################	
-								# Calculate the month and year 2 months ago
-				if self.today_month_number > 2:
+				#################################################################################	
+				
+				if self.today_month_number > 2: #Calculate the month and year 2 months ago
 					two_months_ago_month = self.today_month_number - 2
 				else:
 					two_months_ago_month = self.today_month_number + 10  # Wrap around (12 months in a year)
@@ -855,7 +879,7 @@ traffic_pps_raw = v.ams_stats_dashboards_call(units = "pps", report_type="Traffi
 v.write_traffic_stats_to_csv(traffic_bps_raw, tmp_files_path + 'traffic_pps.csv')
 
 # # Get Forensics data
-forensics_raw = v.get_forensics(v.start_time_lower,v.end_time_upper)
+forensics_raw = v.get_forensics(v.start_time_lower,v.end_time_upper,v.days_in_prev_month)
 v.compile_to_sqldb()
 
 # Get connections per second stats
