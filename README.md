@@ -273,6 +273,19 @@ V9.2.2 (1/25/2024)
 - Added collecting traffic utilization and forensics with python instead of php
 !Must update run.sh and run_daily.sh from run_sh_example.sh and run_daily_example.sh respectively
 !Must rename sqlite db files to include year. Example rename "database_EA_12.sqlite" to "database_EA_04_2024.sqlite"
+
+V11.1 (2/15/2025)
+
+- Rebuilt data collection instead of pagination with chunking time range into chunks of 1 hour
+- Created new traffic utilization per device combined chart
+- Created new attacks per device combined chart
+- Various fixes and optimizations
+
+New Functionality/ideas to add more charts
+	Add pps/cec/cps charts similarly to bps
+	Add MAX daily bps/pps/cec/cps max values graph per day
+
+
 ===========================================================================================================================
 Instructions how to deploy as a docker container (on Vision example):
  

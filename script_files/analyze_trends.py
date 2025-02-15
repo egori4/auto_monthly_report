@@ -580,9 +580,9 @@ if __name__ == '__main__':
 
 	# Traffic utilization
 	if db_from_forensics:
-		traffic_trends = [['Date,Traffic Utilization(Mbps),Blocked traffic,Excluded traffic']]
+		traffic_per_device_combined_trends_bps = [['Date,Traffic Utilization(Mbps),Blocked traffic,Excluded traffic']]
 	else:
-		traffic_trends = convert_csv_to_list_of_lists(charts_tables_path + 'traffic.csv')
+		traffic_per_device_combined_trends_bps = convert_csv_to_list_of_lists(charts_tables_path + 'traffic_per_device_bps.csv')
 	
 	# Events per day count
 	events_per_day_trends = convert_csv_to_list_of_lists(charts_tables_path + 'events_per_day_last_month.csv')
@@ -929,20 +929,13 @@ if __name__ == '__main__':
 
 		  function drawChart() {{
 		  
-			var rawTrafficData = {traffic_trends}
+			// Convert epoch timestamps to Date objects before passing to Google Charts
+			var raw_traffic_per_device_combined_trends_bps_data = {traffic_per_device_combined_trends_bps}.map(row => {{
+				return [new Date(row[0]), ...row.slice(1)]; // Convert first column, keep others unchanged
+			}});
 
-			var chartTrafficData = rawTrafficData.map(function(row, index) {{
-          		if (index === 0) {{
-            		// If it's the header row, return as is
-            		return row;
-          		}} else {{
-            		// Convert the epoch time (row[0]) to Date object
-            		return [new Date(row[0]), row[1], row[2], row[3], row[4]];
-          		}}
-        	}});
-		  
-			var traffic_data = google.visualization.arrayToDataTable(chartTrafficData);
-
+			var traffic_per_device_combined_trends_bps_data = google.visualization.arrayToDataTable(raw_traffic_per_device_combined_trends_bps_data);
+			
 			var maxpps_per_day_data = google.visualization.arrayToDataTable({maxpps_per_day_trends});
 			var maxbps_per_day_data = google.visualization.arrayToDataTable({maxbps_per_day_trends});
 
@@ -981,24 +974,26 @@ if __name__ == '__main__':
 			var total_attacks_days_data = google.visualization.arrayToDataTable({total_attacks_days_bar_chart});
 
 			
-			var traffic_options = {{
-			  title: 'Traffic utilization, last month',
-			  vAxis: {{
-				title: 'Traffic Volume (Mbps)',
-				minValue: 0}},
-			  hAxis: {{
-				title: 'Date and time',
-				}},
-			  isStacked: false,
-			  legend: {{position: 'top', maxLines: 5}},
-			  width: '100%',
-			  explorer: {{
-				actions: ['dragToZoom', 'rightClickToReset'],
-				axis: 'horizontal',
-				maxZoomIn: 0.01,
-				maxZoomOut: 4
-			}}
-			}};
+			var traffic_per_device_combined_trends_bps_options = {{
+				title: 'Traffic utilization per device combined',
+				vAxis: {{
+					title: 'Traffic Volume (Mbps)',
+					minValue: 0
+					}},
+				hAxis: {{
+					title: 'Date and time'
+					}},
+				isStacked: false,
+				focusTarget: 'category',
+				legend: {{position: 'top', maxLines: 5}},
+				width: '100%',
+				explorer: {{
+					actions: ['dragToZoom', 'rightClickToReset'],
+					axis: 'horizontal',
+					maxZoomIn: 0.01,
+					maxZoomOut: 20
+					}}
+				}};
 
 			var maxpps_per_day_options = {{
 			  title: 'Highest attack of the day (PPS), last month',
@@ -1426,7 +1421,7 @@ if __name__ == '__main__':
 			  width: '100%'
 			}};
 
-			var traffic_chart = new google.visualization.AreaChart(document.getElementById('traffic_chart_div'));
+			var traffic_per_device_combined_trends_bps_chart = new google.visualization.AreaChart(document.getElementById('traffic_per_device_combined_trends_bps_chart_div'));
 
 			var maxpps_per_day_chart = new google.visualization.AreaChart(document.getElementById('maxpps_per_day_chart_div'));
 			var maxbps_per_day_chart = new google.visualization.AreaChart(document.getElementById('maxbps_per_day_chart_div'));
@@ -1464,6 +1459,13 @@ if __name__ == '__main__':
 			var policy_bpm_chart = new google.visualization.AreaChart(document.getElementById('policy_bpm_chart_div'));
 
 			var total_attacks_days_chart = new google.visualization.ColumnChart(document.getElementById('total_attacks_days_chart_div'));		
+
+            // Create checkboxes for Traffic utilization per device combined
+            createCheckboxes('traffic_per_device_combined_trends_bps_chart_div', raw_traffic_per_device_combined_trends_bps_data, function(selectedCategories) {{
+                var filteredData = filterDataByCategories(raw_traffic_per_device_combined_trends_bps_data, selectedCategories);
+                var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
+                traffic_per_device_combined_trends_bps_chart.draw(filteredDataTable, traffic_per_device_combined_trends_bps_options);
+            }});
 
 			// Create checkboxes for each chart
 			createCheckboxes('epm_chart_div', {events_trends}, function(selectedCategories) {{
@@ -1561,7 +1563,7 @@ if __name__ == '__main__':
 
 			// Draw initial charts
 
-			traffic_chart.draw(traffic_data, traffic_options);
+			traffic_per_device_combined_trends_bps_chart.draw(traffic_per_device_combined_trends_bps_data, traffic_per_device_combined_trends_bps_options);
 
 			maxpps_per_day_chart.draw(maxpps_per_day_data, maxpps_per_day_options);
 			maxbps_per_day_chart.draw(maxbps_per_day_data, maxbps_per_day_options);
@@ -1603,6 +1605,9 @@ if __name__ == '__main__':
 			
 
 			// Add radio button toggles for stacked/non-stacked
+
+            addStackedToggle('traffic_per_device_combined_trends_bps_chart_div', traffic_per_device_combined_trends_bps_chart, traffic_per_device_combined_trends_bps_data, traffic_per_device_combined_trends_bps_options);
+
 			addStackedToggle('epm_chart_div', epm_chart, epm_data, epm_options);
 			addStackedToggle('ppm_chart_div', ppm_chart, ppm_data, ppm_options);
 			addStackedToggle('bpm_chart_div', bpm_chart, bpm_data, bpm_options);
@@ -1686,8 +1691,15 @@ if __name__ == '__main__':
 			nonStackedRadio.type = 'radio';
 			nonStackedRadio.name = 'stackedToggle_' + containerId;
 			nonStackedRadio.value = 'non-stacked';
-			stackedRadio.checked = false;
-			nonStackedRadio.checked = true;
+			 // Set radio button checked state based on the initial options.isStacked value
+			 if (options.isStacked) {{
+			     stackedRadio.checked = true;
+			     nonStackedRadio.checked = false;
+			 }} else {{
+			     stackedRadio.checked = false;
+			     nonStackedRadio.checked = true;
+			 }}
+
 			nonStackedRadio.onchange = function() {{
 				options.isStacked = false;
 				chart.draw(data, options);
@@ -1760,8 +1772,8 @@ if __name__ == '__main__':
       }}
   
 	  
-	  #traffic_chart_div {{
-		height: 40vh;
+	  #traffic_per_device_combined_trends_bps_chart_div {{
+		height: 20vh;
 	  }}
 
 	  
@@ -1951,11 +1963,12 @@ if __name__ == '__main__':
 			</td>
 		  </tr>
 
-		  <tr>
-		  	<td colspan="3">
-			<div id="traffic_chart_div">
-			</td>
-		  </tr>
+          <tr>
+            <td colspan="3" style="border-bottom: 0;">
+            <h4>Traffic utilization per device combined</h4>
+            <div id="traffic_per_device_combined_trends_bps_chart_div" style="height: 400px;">
+            </td>
+          </tr> 
 
 		  <tr>
 		  	<td colspan="3" style="border-bottom: 0;">

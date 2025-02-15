@@ -46,8 +46,14 @@ with open (run_file) as f:
 			top_n = int(line.split('=')[1].replace('\n',''))
 			continue
 
-
-
+		if line.startswith('db_from_forensics'):
+			#print value after = sign
+			db_from_forensics = (line.split('=')[1].replace('\n','').replace('"','')).lower()
+			if db_from_forensics == 'true':
+				db_from_forensics = True
+			else:
+				db_from_forensics = False
+			continue
 
 
 # Paths
@@ -599,6 +605,14 @@ if __name__ == '__main__':
 	bandwidth_per_day_trends = convert_csv_to_list_of_lists(charts_tables_path + 'bandwidth_per_day_last_month.csv')
 
 
+	# Traffic utilization
+	if db_from_forensics:
+		traffic_per_device_combined_trends_bps = [['Date,Traffic Utilization(Mbps),Blocked traffic,Excluded traffic']]
+		attacks_per_device_combined_trends_bps = [['Date,Traffic Utilization(Mbps),Blocked traffic,Excluded traffic']]
+
+	else:
+		traffic_per_device_combined_trends_bps = convert_csv_to_list_of_lists(charts_tables_path + 'traffic_per_device_bps.csv')
+		attacks_per_device_combined_trends_bps = convert_csv_to_list_of_lists(charts_tables_path + 'attacks_per_device_bps.csv')
 
 
 	################################################# Events, packets and bandwidth trends by Attack name sorted by the last month ##########################################################
@@ -834,7 +848,35 @@ if __name__ == '__main__':
 		  google.charts.load('current', {{'packages':['corechart']}});
 		  google.charts.setOnLoadCallback(drawChart);
 
+
+
+
 		  function drawChart() {{
+		  
+			
+			
+			// Convert epoch timestamps to Date objects before passing to Google Charts
+			var raw_traffic_per_device_combined_trends_bps_data = {traffic_per_device_combined_trends_bps}.map(row => {{
+				return [new Date(row[0]), ...row.slice(1)]; // Convert first column, keep others unchanged
+			}});
+
+			// Convert epoch timestamps to Date objects before passing to Google Charts
+			var raw_attacks_per_device_combined_trends_bps_data = {attacks_per_device_combined_trends_bps}.map(row => {{
+				return [new Date(row[0]), ...row.slice(1)]; // Convert first column, keep others unchanged
+			}});
+
+			var traffic_per_device_combined_trends_bps_data = google.visualization.arrayToDataTable(raw_traffic_per_device_combined_trends_bps_data);
+	
+			var attacks_per_device_combined_trends_bps_data = google.visualization.arrayToDataTable(raw_attacks_per_device_combined_trends_bps_data);
+
+			// Function to generate an array of the same red color for all series for attacks data
+			function generateSameRedColor(numColors) {{
+				return Array(numColors).fill('rgb(200, 0, 0)'); // All red
+			}}
+
+			// Determine the number of series dynamically for attack data for red coloring
+			let numSeries = attacks_per_device_combined_trends_bps_data.getNumberOfColumns() - 1; // Exclude timestamp column
+			let redColors = generateSameRedColor(numSeries);
 
 			var maxpps_per_day_data = google.visualization.arrayToDataTable({maxpps_per_day_trends});
 			var maxbps_per_day_data = google.visualization.arrayToDataTable({maxbps_per_day_trends});
@@ -859,7 +901,49 @@ if __name__ == '__main__':
 			var policy_packets_per_day_data = google.visualization.arrayToDataTable({policy_packets_trends_chart });
 			var policy_bandwidth_per_day_data = google.visualization.arrayToDataTable({policy_bw_trends_chart });
 
-			
+			var traffic_per_device_combined_trends_bps_options = {{
+				title: 'Traffic utilization per device combined',
+				vAxis: {{
+					title: 'Traffic Volume (Mbps)',
+					minValue: 0
+					}},
+				hAxis: {{
+					title: 'Date and time'
+					}},
+				isStacked: false,
+				focusTarget: 'category',
+				legend: {{position: 'top', maxLines: 5}},
+				width: '100%',
+				explorer: {{
+					actions: ['dragToZoom', 'rightClickToReset'],
+					axis: 'horizontal',
+					maxZoomIn: 0.01,
+					maxZoomOut: 20
+					}}
+				}};
+
+			var attacks_per_device_combined_trends_bps_options = {{
+				title: 'All Attacks per device combined',
+				vAxis: {{
+					title: 'Attack Volume (Mbps)',
+					minValue: 0
+					}},
+				hAxis: {{
+					title: 'Date and time'
+					}},
+				isStacked: true,
+				colors: redColors,
+				focusTarget: 'category',
+				legend: {{position: 'top', maxLines: 5}},
+				width: '100%',
+				explorer: {{
+					actions: ['dragToZoom', 'rightClickToReset'],
+					axis: 'horizontal',
+					maxZoomIn: 0.01,
+					maxZoomOut: 20
+					}}
+				}};
+
 			var maxpps_per_day_options = {{
 			  title: 'Highest PPS rate attack of the day, last month (packet units as is)',
 			  vAxis: {{minValue: 0}},
@@ -904,9 +988,6 @@ if __name__ == '__main__':
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
 			}};
-
-
-
 
 			var attack_events_per_day_options = {{
 			  title: 'Security Events trends - TopN by last day',
@@ -1060,7 +1141,9 @@ if __name__ == '__main__':
 			  width: '100%'
 			}};
 
-			
+			var traffic_per_device_combined_trends_bps_chart = new google.visualization.AreaChart(document.getElementById('traffic_per_device_combined_trends_bps_chart_div'));
+			var attacks_per_device_combined_trends_bps_chart = new google.visualization.AreaChart(document.getElementById('attacks_per_device_combined_trends_bps_chart_div'));
+
 			var maxpps_per_day_chart = new google.visualization.AreaChart(document.getElementById('maxpps_per_day_chart_div'));
 			var maxbps_per_day_chart = new google.visualization.AreaChart(document.getElementById('maxbps_per_day_chart_div'));
 
@@ -1084,6 +1167,19 @@ if __name__ == '__main__':
 			var policy_packets_per_day_chart = new google.visualization.AreaChart(document.getElementById('policy_packets_per_day_chart_div'));
 			var policy_bandwidth_per_day_chart = new google.visualization.AreaChart(document.getElementById('policy_bandwidth_per_day_chart_div'));
 
+            // Create checkboxes for Traffic utilization per device combined
+            createCheckboxes('traffic_per_device_combined_trends_bps_chart_div', raw_traffic_per_device_combined_trends_bps_data, function(selectedCategories) {{
+                var filteredData = filterDataByCategories(raw_traffic_per_device_combined_trends_bps_data, selectedCategories);
+                var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
+                traffic_per_device_combined_trends_bps_chart.draw(filteredDataTable, traffic_per_device_combined_trends_bps_options);
+            }});
+
+            // Create checkboxes for Attacks per device combined
+            createCheckboxes('attacks_per_device_combined_trends_bps_chart_div', raw_attacks_per_device_combined_trends_bps_data, function(selectedCategories) {{
+                var filteredData = filterDataByCategories(raw_attacks_per_device_combined_trends_bps_data, selectedCategories);
+                var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
+                attacks_per_device_combined_trends_bps_chart.draw(filteredDataTable, attacks_per_device_combined_trends_bps_options);
+            }});
 
 			// Create checkboxes for each chart
 			createCheckboxes('events_per_day_chart_div_alltimehigh', {events_trends_alltimehigh}, function(selectedCategories) {{
@@ -1104,10 +1200,6 @@ if __name__ == '__main__':
 				bandwidth_per_day_chart_alltimehigh.draw(filteredDataTable, bandwidth_per_day_options_alltimehigh);
 			}});
 
-
-			
-
-
 			createCheckboxes('events_per_day_by_device_chart_div', {events_by_device_trends_chart_data}, function(selectedCategories) {{
 				var filteredData = filterDataByCategories({events_by_device_trends_chart_data}, selectedCategories);
 				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
@@ -1125,9 +1217,6 @@ if __name__ == '__main__':
 				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
 				bandwidth_per_day_by_device_chart.draw(filteredDataTable, bandwidth_per_day_by_device_options);
 			}});
-
-
-
 
 			createCheckboxes('sip_events_per_day_chart_div', {sip_events_trends_chart}, function(selectedCategories) {{
 				var filteredData = filterDataByCategories({sip_events_trends_chart}, selectedCategories);
@@ -1147,8 +1236,6 @@ if __name__ == '__main__':
 				sip_bandwidth_per_day_chart.draw(filteredDataTable, sip_bandwidth_per_day_options);
 			}});
 
-
-
 			createCheckboxes('policy_events_per_day_chart_div', {policy_events_trends_chart}, function(selectedCategories) {{
 				var filteredData = filterDataByCategories({policy_events_trends_chart}, selectedCategories);
 				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
@@ -1167,6 +1254,9 @@ if __name__ == '__main__':
 				policy_bandwidth_per_day_chart.draw(filteredDataTable, policy_bandwidth_per_day_options);
 			}});
 
+
+			traffic_per_device_combined_trends_bps_chart.draw(traffic_per_device_combined_trends_bps_data, traffic_per_device_combined_trends_bps_options);
+			attacks_per_device_combined_trends_bps_chart.draw(attacks_per_device_combined_trends_bps_data, attacks_per_device_combined_trends_bps_options);
 
 			maxpps_per_day_chart.draw(maxpps_per_day_data, maxpps_per_day_options);
 			maxbps_per_day_chart.draw(maxbps_per_day_data, maxbps_per_day_options);
@@ -1194,6 +1284,11 @@ if __name__ == '__main__':
 			
 
 			// Add radio button toggles for stacked/non-stacked
+
+
+            addStackedToggle('traffic_per_device_combined_trends_bps_chart_div', traffic_per_device_combined_trends_bps_chart, traffic_per_device_combined_trends_bps_data, traffic_per_device_combined_trends_bps_options);
+            addStackedToggle('attacks_per_device_combined_trends_bps_chart_div', attacks_per_device_combined_trends_bps_chart, attacks_per_device_combined_trends_bps_data, attacks_per_device_combined_trends_bps_options);
+
 			addStackedToggle('events_per_day_chart_div_alltimehigh', events_per_day_chart_alltimehigh, events_per_day_data_alltimehigh, events_per_day_options_alltimehigh);
 			addStackedToggle('packets_per_day_chart_div_alltimehigh', packets_per_day_chart_alltimehigh, packets_per_day_data_alltimehigh, packets_per_day_options_alltimehigh);
 			addStackedToggle('bandwidth_per_day_chart_div_alltimehigh', bandwidth_per_day_chart_alltimehigh, bandwidth_per_day_data_alltimehigh, bandwidth_per_day_options_alltimehigh);
@@ -1272,8 +1367,16 @@ if __name__ == '__main__':
 			nonStackedRadio.type = 'radio';
 			nonStackedRadio.name = 'stackedToggle_' + containerId;
 			nonStackedRadio.value = 'non-stacked';
-			stackedRadio.checked = false;
-			nonStackedRadio.checked = true;
+
+			 // Set radio button checked state based on the initial options.isStacked value
+			 if (options.isStacked) {{
+			     stackedRadio.checked = true;
+			     nonStackedRadio.checked = false;
+			 }} else {{
+			     stackedRadio.checked = false;
+			     nonStackedRadio.checked = true;
+			 }}
+
 			nonStackedRadio.onchange = function() {{
 				options.isStacked = false;
 				chart.draw(data, options);
@@ -1344,7 +1447,14 @@ if __name__ == '__main__':
         word-wrap: break-word; /* Allow text to break onto the next line if needed */
       }}
   
-	  
+	  #traffic_per_device_combined_trends_bps_chart_div {{
+		height: 20vh;
+	  }}
+
+	  #attacks_per_device_combined_trends_bps_chart_div {{
+		height: 20vh;
+	  }}  
+	    
 	  #maxpps_per_day_chart_div {{
 		height: 20vh;
 	  }}
@@ -1366,8 +1476,6 @@ if __name__ == '__main__':
 	  #packets_per_day_chart_div {{
 		height: 20vh;
 	  }}
-
-	
 
 
 	  #attack_packets_per_day_chart_div {{
@@ -1507,6 +1615,19 @@ if __name__ == '__main__':
 			</td>
 		  </tr>
 
+          <tr>
+            <td colspan="3" style="border-bottom: 0;">
+            <h4>Traffic utilization per device combined</h4>
+            <div id="traffic_per_device_combined_trends_bps_chart_div" style="height: 400px;">
+            </td>
+          </tr> 
+
+          <tr>
+            <td colspan="3" style="border-bottom: 0;">
+            <h4>All Attacks per device combined</h4>
+            <div id="attacks_per_device_combined_trends_bps_chart_div" style="height: 400px;">
+            </td>
+          </tr> 
 
 		  <tr>
 		  	<td colspan="3" style="border-bottom: 0;">

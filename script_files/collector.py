@@ -34,6 +34,17 @@ raw_data_path = f"./raw_data_files/{cust_id}/"
 tmp_files_path = f"./tmp_files/{cust_id}/"
 db_files_path = f"./database_files/{cust_id}/"
 
+################################# !!! Temp config for testing  ##################
+
+offline = False
+
+# open json file and read it and set variable traffic_bps_per_device
+with open(raw_data_path + "traffic_per_device_bps_raw.json", "r") as json_file:
+	traffic_bps_per_device = json.load(json_file)
+
+######################################################################
+
+
 # Check if the directory exists, and create it if it doesn't
 if not os.path.exists(raw_data_path):
     os.makedirs(raw_data_path)
@@ -55,18 +66,15 @@ try:
 		password = selected_entry['pass']
 		vision_ip = selected_entry['visions'][0]['ip']
 		excluded_attacks = selected_entry['exclude']
-		dps = selected_entry['visions'][0]['dps'] # This is a list of DefensePro IPs
-		defensepros = selected_entry['defensepros'] # This is a list of DefensePro IPs and DefensePro names
+		dp_ips_string = selected_entry['visions'][0]['dps'] # This is all DefensePro IPs (string)
+		dp_ip_to_name_dict = selected_entry['defensepros'] # This is a dictionary of DefensePro IPs and DefensePro names
 		bw_units = selected_entry['variables']['bwUnitDaily']
 
 		try:
 			window = selected_entry['variables']['window']
 		except:
-			window = 86400
-		# Print the extracted values
-		# print("User:", username)
-		# print("Password:", password)
-		# print("Visions IP:", vision_ip)
+			window = 86400 # this is in seconds (24 hours). This setting controls the period of time blocks for which the forensics data is pulled
+
 
 	else:
 		print(f"No data found for ID: {cust_id}")
@@ -87,8 +95,14 @@ class Vision:
 		self.sess = Session()
 		
 		self.sess.headers.update({"Content-Type": "application/json"})
-		self.login()
-		print('Connecting to Vision')
+
+		if not offline: # this is for testing purposes only, remove for production
+			print('Connecting to Vision')
+			self.login()
+
+			print('Collecting DefensePro device list')		
+			self.device_list = self.get_device_list()
+		
 
 		# To manipulate the desired date, replace day = 1 with the desired day or month with desired month , e.g self.today_date = datetime.today().replace(month=2) )
 		self.today_date = datetime.today().replace(month=cur_month,day=cur_day,year=cur_year)#,tzinfo=timezone.utc)
@@ -114,8 +128,6 @@ class Vision:
 
 		self.days_in_prev_month = calendar.monthrange(self.today_year, self.prev_month_number)[1]
 		
-		print('Collecting DefensePro device list')		
-		self.device_list = self.get_device_list()
 
 	def login(self):
 
@@ -321,6 +333,119 @@ class Vision:
 				writer.writerows(data)
 				print (f'Created {filename}')
 
+
+
+################Combined Traffic stats ######################
+	def write_per_device_combined_traffic_stats_to_csv(self,traffic_raw_response, filename):
+		"""
+		Parses the given response and writes the data to a CSV file, ensuring no overlapping timestamps.
+		"""
+
+		dps_list = dp_ips_string.split(',')
+
+		headers = ["Timestamp"] + sorted(dps_list)  # Start with timestamp
+		collected_data_dict = {}  # Dictionary to store per device aggregated data by timestamp
+
+
+		for ip in dps_list:
+			for entry in traffic_raw_response[ip]['data']:
+
+				row = entry['row']  # Extract 'row' dictionary
+				timestamp = row['timeStamp']
+
+
+				if filename == tmp_files_path + 'traffic_per_device_bps.csv':
+					value = float(row['trafficValue']) /1000 # Convert to number
+
+				elif filename == tmp_files_path + 'attacks_per_device_bps.csv':
+					value = float(row['discards']) /1000  # Convert to number
+
+				elif filename == tmp_files_path + 'cps_per_device.csv':
+					value = float(row['connectionPerSecond'])  # Convert to number
+
+				elif filename == tmp_files_path + 'cec_per_device.csv':
+					value = float(row['connectionsPerSecond'])  # Convert to number
+
+				# Store stats in time_series dictionary
+				if timestamp not in collected_data_dict:
+					collected_data_dict[timestamp] = {}
+
+				collected_data_dict[timestamp][ip] = value
+
+
+		# Read existing CSV, if it exists to prevent duplicating when appending new data
+		existing_data_dict = {}
+		if os.path.exists(filename):
+			with open(filename, "r") as csv_file:
+				reader = csv.reader(csv_file)
+				existing_headers = next(reader)  # Read headers
+				for row in reader:
+					timestamp = row[0]
+					existing_data_dict[timestamp] = {existing_headers[i]: float(row[i]) for i in range(1, len(row)) if row[i]}  # Convert values to float
+
+
+		# Merge new data, replacing overlapping timestamps
+		for timestamp, ip_data in collected_data_dict.items():
+			existing_data_dict[timestamp] = ip_data  # Replace or add new data
+
+		# Write the updated data back to the CSV file
+		if daily:
+			
+			if self.today_day_number == 2:
+				print('Daily report - today is 2nd of the month - creating new file, overwriting previous data')
+				# Final data will be only the new data, existing csv will be overwritten with new data only
+
+				final_data = [headers]  # Start with headers
+				for timestamp in sorted(collected_data_dict.keys()):
+					row = [timestamp] + [collected_data_dict[timestamp].get(ip, "") for ip in headers[1:]]  # Preserve order
+					final_data.append(row)
+				
+				final_data[0] = [dp_ip_to_name_dict.get(ip, ip) for ip in final_data[0]]  # Replace DP IP with DP name
+
+				# Overwrite the existing csv with new collected data only
+				with open(filename, "w", newline="") as csv_file:
+					writer = csv.writer(csv_file)
+					writer.writerows(final_data)
+
+				print(f"CSV file '{filename}' has been updated successfully.")
+
+			else:
+				print('Daily report - today is not the 2nd day of the month - merging new data with existing data in the csv')
+
+				# Final data will be the existing data + newly collected data
+				final_data = [headers]  # Start with headers
+				for timestamp in sorted(existing_data_dict.keys()):
+					row = [timestamp] + [existing_data_dict[timestamp].get(ip, "") for ip in headers[1:]]  # Preserve order
+					final_data.append(row)
+				
+				final_data[0] = [dp_ip_to_name_dict.get(ip, ip) for ip in final_data[0]]  # Replace DP IP with DP name
+
+				# Merging existing csv data with new collected data only
+				with open(filename, "w", newline="") as csv_file:
+					writer = csv.writer(csv_file)
+					writer.writerows(final_data)
+
+				print(f"CSV file '{filename}' has been updated successfully.")
+
+		elif monthly:
+
+			print('Monthly report  - creating new file')
+
+			# Final data will be only the new data, existing csv will be overwritten with new data only
+			final_data = [headers]  # Start with headers
+			for timestamp in sorted(collected_data_dict.keys()):
+				row = [timestamp] + [collected_data_dict[timestamp].get(ip, "") for ip in headers[1:]]  # Preserve order
+				final_data.append(row)
+			
+			final_data[0] = [dp_ip_to_name_dict.get(ip, ip) for ip in final_data[0]]  # Replace IP with name
+
+			# Overwrite the existing csv with new collected data only
+			with open(filename, "w", newline="") as csv_file:
+				writer = csv.writer(csv_file)
+				writer.writerows(final_data)
+
+			print(f"CSV file '{filename}' has been updated successfully.")
+
 	def ams_stats_dashboards_call(self, units="bps", uri = "/mgmt/vrm/monitoring/traffic/periodic/report", report_type="AMS Dasboard"):
 
 		api_url = f'https://{self.ip}' + uri
@@ -374,6 +499,90 @@ class Vision:
 			)
 			print(error_message)
 			raise Exception(error_message)
+		
+	def ams_stats_dashboards_per_device_call(self, units="bps", uri = "/mgmt/vrm/monitoring/traffic/periodic/report", report_type="AMS Dasboard"):
+
+		api_url = f'https://{self.ip}' + uri
+
+		data = {
+			"direction": "Inbound",
+			"timeInterval": {
+				"from": v.start_time_lower,
+				"to": v.end_time_upper
+			},
+
+		}
+
+		if units and units != "cps" and units != "cec":
+			data.update({"unit": units})
+
+		combined_response_json = {}
+
+		if dp_ips_string:
+			dps_list = dp_ips_string.split(',')
+			for dp in dps_list:
+				
+				data.update({"selectedDevices":  [
+					{
+						"deviceId": dp,
+						"networkPolicies": [],
+						"ports": []
+					}
+					]
+				})
+	
+
+
+
+				response = self._post(api_url, json.dumps(data))
+
+				if response.status_code == 200:
+					try:
+						response_json = response.json()
+
+						# If Null in rows, filter out these rows
+
+						filtered_response_json = {
+							"metaData": response_json["metaData"],
+							"data": [
+								row for row in response_json["data"] 
+								if not any(value is None for value in row["row"].values())
+							],
+							"dataMap": response_json["dataMap"]
+						}
+
+						combined_response_json[dp] = filtered_response_json
+
+						print(
+						f"Pulled {report_type} data for {dp} DefensePro. Time range: "
+						f"{time.strftime('%d-%b-%Y %H:%M:%S', time.localtime(v.start_time_lower/1000))} - "
+						f"{time.strftime('%d-%b-%Y %H:%M:%S', time.localtime(v.end_time_upper/1000))}"
+						)
+
+
+
+
+
+					except json.JSONDecodeError:
+						print("Response is not in JSON format, skipping JSON file save.")
+
+					# return response.json()
+				
+				else:
+					error_message = (
+						f"Error pulling attack rate data. Time range: "
+						f"{time.strftime('%d-%b-%Y %H:%M:%S', time.localtime(v.start_time_lower/1000))} - "
+						f"{time.strftime('%d-%b-%Y %H:%M:%S', time.localtime(v.end_time_upper/1000))}"
+					)
+					print(error_message)
+					raise Exception(error_message)
+
+
+		with open(raw_data_path + f"traffic_per_device_{units}_raw.json", "w", encoding="utf-8") as json_file:
+			json.dump(combined_response_json, json_file, indent=4)  # Save JSON with indentation
+		print(f"Response body saved as pretty JSON in traffic_{units}_raw.json")
+
+		return combined_response_json
 
 	def get_cps(self):
 
@@ -466,8 +675,8 @@ class Vision:
 			"filters": []
 		}
 
-		if dps:
-			dps_list = dps.split(',')
+		if dp_ips_string:
+			dps_list = dp_ips_string.split(',')
 			for dp in dps_list:
 				or_filters['filters'].append({
 					"type": "termFilter",
@@ -564,7 +773,7 @@ class Vision:
 
 		final_response = {
 			"data": all_data,
-			"metaData": metaData or {"totalHits": total_hits}
+			"metaData": metaData
 		}
 	
 		with open(raw_data_path + "forensics_raw.json", "w", encoding="utf-8") as json_file:
@@ -870,23 +1079,30 @@ class Vision:
 
 v = Vision(vision_ip, username, password)
 
-# Get AMS Traffic bandwidth BPS and write to csv
-traffic_bps_raw = v.ams_stats_dashboards_call(units = "bps", report_type="Traffic Utilization BPS")
-v.write_traffic_stats_to_csv(traffic_bps_raw, tmp_files_path + 'traffic.csv')
+# # Get combined AMS Traffic bandwidth BPS and write to csv
+# traffic_bps_raw = v.ams_stats_dashboards_call(units = "bps", report_type="Traffic Utilization BPS")
+# v.write_traffic_stats_to_csv(traffic_bps_raw, tmp_files_path + 'traffic.csv')
 
-# Get AMS Traffic bandwidth PPS and write to csv
-traffic_pps_raw = v.ams_stats_dashboards_call(units = "pps", report_type="Traffic Utilization PPS")
-v.write_traffic_stats_to_csv(traffic_bps_raw, tmp_files_path + 'traffic_pps.csv')
+# # Get combined AMS Traffic bandwidth PPS and write to csv
+# traffic_pps_raw = v.ams_stats_dashboards_call(units = "pps", report_type="Traffic Utilization PPS")
+# v.write_traffic_stats_to_csv(traffic_bps_raw, tmp_files_path + 'traffic_pps.csv')
+
+# # Get combined connections per second stats
+# cps_raw = v.ams_stats_dashboards_call(units = "cps", uri = '/mgmt/vrm/monitoring/traffic/cps', report_type="CPS")
+# v.write_traffic_stats_to_csv(cps_raw, tmp_files_path + 'traffic_cps.csv')
+
+# #Get combined concurrent established connections stats
+# cec_raw = v.ams_stats_dashboards_call(units = "cec", uri = '/mgmt/vrm/monitoring/traffic/concurrent-connections', report_type="Concurrent Established Connections")
+# v.write_traffic_stats_to_csv(cec_raw, tmp_files_path + 'traffic_cec.csv')
 
 # # Get Forensics data
-forensics_raw = v.get_forensics(v.start_time_lower,v.end_time_upper,v.days_in_prev_month)
-v.compile_to_sqldb()
+if not offline:
+	forensics_raw = v.get_forensics(v.start_time_lower,v.end_time_upper,v.days_in_prev_month)
+	v.compile_to_sqldb()
 
-# Get connections per second stats
-cps_raw = v.ams_stats_dashboards_call(units = "cps", uri = '/mgmt/vrm/monitoring/traffic/cps', report_type="CPS")
+	traffic_bps_per_device = v.ams_stats_dashboards_per_device_call(units = "bps", report_type="Traffic Utilization BPS")
 
-v.write_traffic_stats_to_csv(cps_raw, tmp_files_path + 'traffic_cps.csv')
+v.write_per_device_combined_traffic_stats_to_csv(traffic_bps_per_device, tmp_files_path + 'attacks_per_device_bps.csv')
+v.write_per_device_combined_traffic_stats_to_csv(traffic_bps_per_device, tmp_files_path + 'traffic_per_device_bps.csv')
 
-#Get concurrent established connections stats
-cec_raw = v.ams_stats_dashboards_call(units = "cec", uri = '/mgmt/vrm/monitoring/traffic/concurrent-connections', report_type="Concurrent Established Connections")
-v.write_traffic_stats_to_csv(cec_raw, tmp_files_path + 'traffic_cec.csv')
+
