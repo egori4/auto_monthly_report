@@ -663,10 +663,7 @@ class Vision:
 							combined_response_json[dp]["data"].extend(filtered_response_json["data"])
 							# Update maxValue logic
 							current_max_value = float(combined_response_json[dp].get("dataMap", {}).get("maxValue", {}).get("trafficValue", 0))
-							print(current_max_value)
 							new_max_value = float(filtered_response_json["dataMap"]["maxValue"]["trafficValue"])
-							
-							print(new_max_value)
 
 							if new_max_value > current_max_value:
 								combined_response_json[dp]["dataMap"]["maxValue"] = filtered_response_json["dataMap"]["maxValue"]
