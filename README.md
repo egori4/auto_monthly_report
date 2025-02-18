@@ -281,6 +281,10 @@ V11.1 (2/15/2025)
 - Created new attacks per device combined chart
 - Various fixes and optimizations
 
+V11.2 (2/18/2025)
+
+- Changed traffic volume collection in windows of 1h instead of 1 call to get better granularity
+
 New Functionality/ideas to add more charts
 	Add pps/cec/cps charts similarly to bps
 	Add MAX daily bps/pps/cec/cps max values graph per day

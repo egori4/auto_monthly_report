@@ -590,6 +590,121 @@ class Vision:
 		print(f"Response body saved as pretty JSON in traffic_{units}_raw.json")
 
 		return combined_response_json
+	
+	def ams_stats_dashboards_per_device_window_calls(self, start_time_lower, end_time_upper, units="bps", uri = "/mgmt/vrm/monitoring/traffic/periodic/report", report_type="AMS Dasboard"):
+
+		initial_start_time_lower = start_time_lower
+
+		api_url = f'https://{self.ip}' + uri
+
+		query = {
+			"direction": "Inbound",
+			"timeInterval": {
+				"from": start_time_lower,
+				"to": end_time_upper
+			},
+
+		}
+
+		if units and units != "cps" and units != "cec":
+			query.update({"unit": units})
+
+		combined_response_json = {}
+
+		if dp_ips_string:
+			dps_list = dp_ips_string.split(',')
+			for dp in dps_list:
+				
+				query.update({"selectedDevices":  [
+					{
+						"deviceId": dp,
+						"networkPolicies": [],
+						"ports": []
+					}
+					]
+				})
+
+
+				while start_time_lower < end_time_upper:
+					d1 = start_time_lower # This is the start time of the window
+					d2 = start_time_lower + (window *1000) # This is the end time of the window
+					# print(d1,d2)
+					# print(datetime.fromtimestamp(d1/1000, tz=timezone.utc).strftime('%Y-%m-%d %H:%M:%S'))
+					# print(datetime.fromtimestamp(d2/1000, tz=timezone.utc).strftime('%Y-%m-%d %H:%M:%S'))
+
+
+					query.update({"timeInterval": {
+						"from": d1,
+						"to": d2
+					},
+					})
+
+					response = self._post(api_url, json.dumps(query))
+
+					if response.status_code == 200:
+						try:
+							response_json = response.json()
+
+							# If Null in rows, filter out these rows
+
+							filtered_response_json = {
+								"metaData": response_json["metaData"],
+								"data": [
+									row for row in response_json["data"] 
+									if not any(value is None for value in row["row"].values())
+								],
+								"dataMap": response_json["dataMap"]
+							}
+							# Ensure dp exists in combined_response_json
+							if dp not in combined_response_json:
+								combined_response_json[dp] = {"data": [], "dataMap": {}}  # Initialize if missing
+
+
+							combined_response_json[dp]["data"].extend(filtered_response_json["data"])
+							# Update maxValue logic
+							current_max_value = float(combined_response_json[dp].get("dataMap", {}).get("maxValue", {}).get("trafficValue", 0))
+							print(current_max_value)
+							new_max_value = float(filtered_response_json["dataMap"]["maxValue"]["trafficValue"])
+							
+							print(new_max_value)
+
+							if new_max_value > current_max_value:
+								combined_response_json[dp]["dataMap"]["maxValue"] = filtered_response_json["dataMap"]["maxValue"]
+								# print(f"New max value found: {new_max_value}")
+
+							print(
+							f"Pulled {report_type} data for {dp} DefensePro. Time range:"
+							f"{time.strftime('%d-%b-%Y %H:%M:%S', time.localtime(d1/1000))} - "
+							f"{time.strftime('%d-%b-%Y %H:%M:%S', time.localtime(d2/1000))}"
+							)
+
+							start_time_lower += (window *1000)
+
+
+
+						except json.JSONDecodeError:
+							print("Response is not in JSON format, skipping JSON file save.")
+
+						# return response.json()
+					
+					else:
+						error_message = (
+							f"Error pulling attack rate data. Time range: "
+							f"{time.strftime('%d-%b-%Y %H:%M:%S', time.localtime(v.start_time_lower/1000))} - "
+							f"{time.strftime('%d-%b-%Y %H:%M:%S', time.localtime(v.end_time_upper/1000))}"
+						)
+						print(error_message)
+						raise Exception(error_message)
+
+
+				# Reset start time for next DP
+				start_time_lower = initial_start_time_lower
+
+		with open(raw_data_path + f"traffic_per_device_{units}_raw.json", "w", encoding="utf-8") as json_file:
+			json.dump(combined_response_json, json_file, indent=4)  # Save JSON with indentation
+		print(f"Response body saved as pretty JSON in traffic_{units}_raw.json")
+
+		return combined_response_json
 
 	def get_cps(self):
 
@@ -1106,7 +1221,8 @@ v = Vision(vision_ip, username, password)
 if not offline:
 	forensics_raw = v.get_forensics(v.start_time_lower,v.end_time_upper,v.days_in_prev_month)
 	v.compile_to_sqldb()
-	traffic_bps_per_device = v.ams_stats_dashboards_per_device_call(units = "bps", report_type="Traffic Utilization BPS")
+	# traffic_bps_per_device = v.ams_stats_dashboards_per_device_call(units = "bps", report_type="Traffic Utilization BPS")
+	traffic_bps_per_device = v.ams_stats_dashboards_per_device_window_calls(v.start_time_lower, v.end_time_upper, units = "bps", report_type="Traffic Utilization BPS")
 
 v.write_per_device_combined_traffic_stats_to_csv(traffic_bps_per_device, tmp_files_path + 'traffic_per_device_bps.csv')
 v.write_per_device_combined_traffic_stats_to_csv(traffic_bps_per_device, tmp_files_path + 'attacks_per_device_bps.csv')
