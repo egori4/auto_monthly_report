@@ -341,10 +341,12 @@ class Vision:
 		"""
 		Parses the given response and writes the data to a CSV file, ensuring no overlapping timestamps.
 		"""
-
 		dps_list = dp_ips_string.split(',')
+		dps_names = [dp_ip_to_name_dict.get(dp, dp) for dp in dps_list]
 
-		headers = ["Timestamp"] + sorted(dps_list)  # Start with timestamp
+		header_names = ["Timestamp"] + sorted(dps_names)  # Start with timestamp
+		header_ips = ["Timestamp"] + sorted(dps_list)  # Start with timestamp
+		
 		collected_data_dict = {}  # Dictionary to store per device aggregated data by timestamp
 
 
@@ -353,25 +355,23 @@ class Vision:
 
 				row = entry['row']  # Extract 'row' dictionary
 				timestamp = row['timeStamp']
-
-
 				if filename == tmp_files_path + 'traffic_per_device_bps.csv':
-					value = float(row['trafficValue']) /1000 # Convert to number
+					row_value = round(float(row['trafficValue']) / 1000, 2)
 
 				elif filename == tmp_files_path + 'attacks_per_device_bps.csv':
-					value = float(row['discards']) /1000  # Convert to number
+					row_value = round(float(row['discards']) / 1000, 2)
 
 				elif filename == tmp_files_path + 'cps_per_device.csv':
-					value = float(row['connectionPerSecond'])  # Convert to number
+					row_value = float(row['connectionPerSecond'])  # Convert to number
 
 				elif filename == tmp_files_path + 'cec_per_device.csv':
-					value = float(row['connectionsPerSecond'])  # Convert to number
+					row_value = float(row['connectionsPerSecond'])  # Convert to number
 
 				# Store stats in time_series dictionary
 				if timestamp not in collected_data_dict:
 					collected_data_dict[timestamp] = {}
 
-				collected_data_dict[timestamp][ip] = value
+				collected_data_dict[timestamp][ip] = row_value
 
 
 		# Read existing CSV, if it exists to prevent duplicating when appending new data
@@ -385,9 +385,16 @@ class Vision:
 					existing_data_dict[timestamp] = {existing_headers[i]: float(row[i]) for i in range(1, len(row)) if row[i]}  # Convert values to float
 
 
-		# Merge new data, replacing overlapping timestamps
+		# Merge new data, replacing overlapping timestamps.
 		for timestamp, ip_data in collected_data_dict.items():
 			existing_data_dict[timestamp] = ip_data  # Replace or add new data
+
+		# Translating new merged DP IP data to DP Name. (At this stage previous data has DP names, new data has DP IP's. )
+		existing_data_dict = {
+			timestamp: {dp_ip_to_name_dict.get(key, key): value for key, value in sub_dict.items()}
+			for timestamp, sub_dict in existing_data_dict.items()
+		}
+
 
 		# Write the updated data back to the CSV file
 		if daily:
@@ -396,9 +403,9 @@ class Vision:
 				print('Daily report - today is 2nd of the month - creating new file, overwriting previous data')
 				# Final data will be only the new data, existing csv will be overwritten with new data only
 
-				final_data = [headers]  # Start with headers
+				final_data = [header_ips]  # Start with headers
 				for timestamp in sorted(collected_data_dict.keys()):
-					row = [timestamp] + [collected_data_dict[timestamp].get(ip, "") for ip in headers[1:]]  # Preserve order
+					row = [timestamp] + [collected_data_dict[timestamp].get(ip, "") for ip in header_ips[1:]]  # Preserve order
 					final_data.append(row)
 				
 				final_data[0] = [dp_ip_to_name_dict.get(ip, ip) for ip in final_data[0]]  # Replace DP IP with DP name
@@ -414,12 +421,11 @@ class Vision:
 				print('Daily report - today is not the 2nd day of the month - merging new data with existing data in the csv')
 
 				# Final data will be the existing data + newly collected data
-				final_data = [headers]  # Start with headers
+				final_data = [header_names]  # Start with headers
 				for timestamp in sorted(existing_data_dict.keys()):
-					row = [timestamp] + [existing_data_dict[timestamp].get(ip, "") for ip in headers[1:]]  # Preserve order
+					row = [timestamp] + [existing_data_dict[timestamp].get(dp_name, "") for dp_name in header_names[1:]]
 					final_data.append(row)
 				
-				final_data[0] = [dp_ip_to_name_dict.get(ip, ip) for ip in final_data[0]]  # Replace DP IP with DP name
 
 				# Merging existing csv data with new collected data only
 				with open(filename, "w", newline="") as csv_file:
@@ -433,9 +439,9 @@ class Vision:
 			print('Monthly report  - creating new file')
 
 			# Final data will be only the new data, existing csv will be overwritten with new data only
-			final_data = [headers]  # Start with headers
+			final_data = [header_ips]  # Start with headers
 			for timestamp in sorted(collected_data_dict.keys()):
-				row = [timestamp] + [collected_data_dict[timestamp].get(ip, "") for ip in headers[1:]]  # Preserve order
+				row = [timestamp] + [collected_data_dict[timestamp].get(ip, "") for ip in header_ips[1:]]  # Preserve order\
 				final_data.append(row)
 			
 			final_data[0] = [dp_ip_to_name_dict.get(ip, ip) for ip in final_data[0]]  # Replace IP with name
@@ -1100,10 +1106,9 @@ v = Vision(vision_ip, username, password)
 if not offline:
 	forensics_raw = v.get_forensics(v.start_time_lower,v.end_time_upper,v.days_in_prev_month)
 	v.compile_to_sqldb()
-
 	traffic_bps_per_device = v.ams_stats_dashboards_per_device_call(units = "bps", report_type="Traffic Utilization BPS")
 
-v.write_per_device_combined_traffic_stats_to_csv(traffic_bps_per_device, tmp_files_path + 'attacks_per_device_bps.csv')
 v.write_per_device_combined_traffic_stats_to_csv(traffic_bps_per_device, tmp_files_path + 'traffic_per_device_bps.csv')
+v.write_per_device_combined_traffic_stats_to_csv(traffic_bps_per_device, tmp_files_path + 'attacks_per_device_bps.csv')
 
 
