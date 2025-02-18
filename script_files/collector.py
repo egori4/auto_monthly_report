@@ -593,6 +593,7 @@ class Vision:
 	
 	def ams_stats_dashboards_per_device_window_calls(self, start_time_lower, end_time_upper, units="bps", uri = "/mgmt/vrm/monitoring/traffic/periodic/report", report_type="AMS Dasboard"):
 
+		window = 3600
 		initial_start_time_lower = start_time_lower
 
 		api_url = f'https://{self.ip}' + uri
