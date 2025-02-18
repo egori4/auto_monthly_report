@@ -38,9 +38,10 @@ db_files_path = f"./database_files/{cust_id}/"
 
 offline = False
 
-# open json file and read it and set variable traffic_bps_per_device
-with open(raw_data_path + "traffic_per_device_bps_raw.json", "r") as json_file:
-	traffic_bps_per_device = json.load(json_file)
+if offline:
+	# open json file and read it and set variable traffic_bps_per_device
+	with open(raw_data_path + "traffic_per_device_bps_raw.json", "r") as json_file:
+		traffic_bps_per_device = json.load(json_file)
 
 ######################################################################
 
