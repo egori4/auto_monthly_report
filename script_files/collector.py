@@ -646,16 +646,24 @@ class Vision:
 						try:
 							response_json = response.json()
 
+							filtered_data = []
+
 							# If Null in rows, filter out these rows
 
+							for row in response_json["data"]:
+								if any(value is None for value in row["row"].values()):
+									print(f"Skipping row due to None values: {row}")  # Debugging output
+								else:
+									filtered_data.append(row)
+
+							# Construct filtered response JSON
 							filtered_response_json = {
 								"metaData": response_json["metaData"],
-								"data": [
-									row for row in response_json["data"] 
-									if not any(value is None for value in row["row"].values())
-								],
+								"data": filtered_data,
 								"dataMap": response_json["dataMap"]
 							}
+
+
 							# Ensure dp exists in combined_response_json
 							if dp not in combined_response_json:
 								combined_response_json[dp] = {"data": [], "dataMap": {}}  # Initialize if missing
