@@ -874,9 +874,15 @@ if __name__ == '__main__':
 				return Array(numColors).fill('rgb(200, 0, 0)'); // All red
 			}}
 
+			function generateSameBlueColor(numColors) {{
+				return Array(numColors).fill('rgb(50, 100, 200)'); // All dark blue
+			}}
+
 			// Determine the number of series dynamically for attack data for red coloring
 			let numSeries = attacks_per_device_combined_trends_bps_data.getNumberOfColumns() - 1; // Exclude timestamp column
 			let redColors = generateSameRedColor(numSeries);
+			let blueColors = generateSameBlueColor(numSeries);
+
 
 			var maxpps_per_day_data = google.visualization.arrayToDataTable({maxpps_per_day_trends});
 			var maxbps_per_day_data = google.visualization.arrayToDataTable({maxbps_per_day_trends});
@@ -911,6 +917,7 @@ if __name__ == '__main__':
 					title: 'Date and time'
 					}},
 				isStacked: false,
+				colors: blueColors,
 				focusTarget: 'category',
 				legend: {{position: 'top', maxLines: 5}},
 				width: '100%',

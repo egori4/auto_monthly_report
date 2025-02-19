@@ -36,12 +36,9 @@ db_files_path = f"./database_files/{cust_id}/"
 
 ################################# !!! Temp config for testing  ##################
 
-offline = False
+offline = False # Set to True to test without connecting to Vision
 
-if offline:
-	# open json file and read it and set variable traffic_bps_per_device
-	with open(raw_data_path + "traffic_per_device_bps_raw.json", "r") as json_file:
-		traffic_bps_per_device = json.load(json_file)
+
 
 ######################################################################
 
@@ -410,6 +407,15 @@ class Vision:
 				
 				final_data[0] = [dp_ip_to_name_dict.get(ip, ip) for ip in final_data[0]]  # Replace DP IP with DP name
 
+				# Remove rows with empty values for all devices (IRP communication issues or CC processing issue)
+				loss_rate = 0
+				for row in final_data:
+					if '' in row:
+						print(f"Removing row with empty values: {row} , {time.strftime('%d-%b-%Y %H:%M:%S', time.localtime(int(row[0])/1000))}")
+						loss_rate += 1
+						final_data.remove(row)
+				print(f"Removed {loss_rate} rows with empty values for all devices.")
+
 				# Overwrite the existing csv with new collected data only
 				with open(filename, "w", newline="") as csv_file:
 					writer = csv.writer(csv_file)
@@ -426,6 +432,14 @@ class Vision:
 					row = [timestamp] + [existing_data_dict[timestamp].get(dp_name, "") for dp_name in header_names[1:]]
 					final_data.append(row)
 				
+				# Remove rows with empty values for all devices (IRP communication issues or CC processing issue)
+				loss_rate = 0
+				for row in final_data:
+					if '' in row:
+						print(f"Removing row with empty values: {row} , {time.strftime('%d-%b-%Y %H:%M:%S', time.localtime(int(row[0])/1000))}")
+						loss_rate += 1
+						final_data.remove(row)
+				print(f"Removed {loss_rate} rows with empty values for all devices.")
 
 				# Merging existing csv data with new collected data only
 				with open(filename, "w", newline="") as csv_file:
@@ -445,6 +459,16 @@ class Vision:
 				final_data.append(row)
 			
 			final_data[0] = [dp_ip_to_name_dict.get(ip, ip) for ip in final_data[0]]  # Replace IP with name
+
+			# Remove rows with empty values for all devices (IRP communication issues or CC processing issue)
+			loss_rate = 0
+			for row in final_data:
+				if '' in row:
+					print(f"Removing row with empty values: {row} , {time.strftime('%d-%b-%Y %H:%M:%S', time.localtime(int(row[0])/1000))}")
+					loss_rate += 1
+					final_data.remove(row)
+
+			print(f"Removed {loss_rate} rows with empty values for all devices.")
 
 			# Overwrite the existing csv with new collected data only
 			with open(filename, "w", newline="") as csv_file:
@@ -651,9 +675,9 @@ class Vision:
 							# If Null in rows, filter out these rows
 
 							for row in response_json["data"]:
-								# if any(value is None for value in row["row"].values()):
-								# 	print(f"Skipping row due to None values: {row}")  # Debugging output
-								# else:
+								if any(value is None for value in row["row"].values()):
+									print(f"Skipping row due to None values: {row}")
+								else:
 									filtered_data.append(row)
 
 							# Construct filtered response JSON
@@ -1227,8 +1251,12 @@ v = Vision(vision_ip, username, password)
 if not offline:
 	forensics_raw = v.get_forensics(v.start_time_lower,v.end_time_upper,v.days_in_prev_month)
 	v.compile_to_sqldb()
-	# traffic_bps_per_device = v.ams_stats_dashboards_per_device_call(units = "bps", report_type="Traffic Utilization BPS")
 	traffic_bps_per_device = v.ams_stats_dashboards_per_device_window_calls(v.start_time_lower, v.end_time_upper, units = "bps", report_type="Traffic Utilization BPS")
+
+if offline:
+	# open json file and read it and set variable traffic_bps_per_device
+	with open(raw_data_path + "traffic_per_device_bps_raw.json", "r") as json_file:
+		traffic_bps_per_device = json.load(json_file)
 
 v.write_per_device_combined_traffic_stats_to_csv(traffic_bps_per_device, tmp_files_path + 'traffic_per_device_bps.csv')
 v.write_per_device_combined_traffic_stats_to_csv(traffic_bps_per_device, tmp_files_path + 'attacks_per_device_bps.csv')

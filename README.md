@@ -285,6 +285,11 @@ V11.2 (2/18/2025)
 
 - Changed traffic volume collection in windows of 1h instead of 1 call to get better granularity
 
+V11.3 (2/19/2025)
+- Added check for traffic volume - if any missing timestamps during data collection (IRP packet loss or CC processing issues) - those will be removed.
+  This is to avoid gaps in traffic
+- Changed color of traffic volume chart to shades of blue
+
 New Functionality/ideas to add more charts
 	Add pps/cec/cps charts similarly to bps
 	Add MAX daily bps/pps/cec/cps max values graph per day
