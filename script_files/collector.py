@@ -651,9 +651,9 @@ class Vision:
 							# If Null in rows, filter out these rows
 
 							for row in response_json["data"]:
-								if any(value is None for value in row["row"].values()):
-									print(f"Skipping row due to None values: {row}")  # Debugging output
-								else:
+								# if any(value is None for value in row["row"].values()):
+								# 	print(f"Skipping row due to None values: {row}")  # Debugging output
+								# else:
 									filtered_data.append(row)
 
 							# Construct filtered response JSON
