@@ -874,14 +874,19 @@ if __name__ == '__main__':
 				return Array(numColors).fill('rgb(200, 0, 0)'); // All red
 			}}
 
-			function generateSameBlueColor(numColors) {{
-				return Array(numColors).fill('rgb(50, 100, 200)'); // All dark blue
+			function generateGradientBlueColors(numColors) {{
+				return Array.from({{ length: numColors }}, (_, i) => {{
+					let blueIntensity = Math.max(120, 200 - i * 20); // Decrease blue intensity for contrast
+					let redComponent = Math.min(50 + i * 5, 80); // Slight increase in red for variety
+					let greenComponent = Math.min(100 + i * 5, 130); // Slight increase in green for contrast
+					return `rgb(${{redComponent}}, ${{greenComponent}}, ${{blueIntensity}})`;
+				}});
 			}}
 
 			// Determine the number of series dynamically for attack data for red coloring
 			let numSeries = attacks_per_device_combined_trends_bps_data.getNumberOfColumns() - 1; // Exclude timestamp column
 			let redColors = generateSameRedColor(numSeries);
-			let blueColors = generateSameBlueColor(numSeries);
+			let blueColors = generateGradientBlueColors(numSeries);
 
 
 			var maxpps_per_day_data = google.visualization.arrayToDataTable({maxpps_per_day_trends});

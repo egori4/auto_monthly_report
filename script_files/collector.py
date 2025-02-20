@@ -69,9 +69,14 @@ try:
 		bw_units = selected_entry['variables']['bwUnitDaily']
 
 		try:
-			window = selected_entry['variables']['window']
+			traffic_window = selected_entry['variables']['TrafficWindow']
 		except:
-			window = 86400 # this is in seconds (24 hours). This setting controls the period of time blocks for which the forensics data is pulled
+			traffic_window = 14400 # this is in seconds (4 hours). This setting controls the period of time blocks for which the traffic volume data is pulled
+
+		try:
+			forensics_window = selected_entry['variables']['ForensicsWindow']
+		except:
+			forensics_window = 3600 # this is in seconds (1 hours). This setting controls the period of time blocks for which the traffic volume data is pulled
 
 
 	else:
@@ -617,7 +622,6 @@ class Vision:
 	
 	def ams_stats_dashboards_per_device_window_calls(self, start_time_lower, end_time_upper, units="bps", uri = "/mgmt/vrm/monitoring/traffic/periodic/report", report_type="AMS Dasboard"):
 
-		window = 14400 # 4 hours in seconds
 		initial_start_time_lower = start_time_lower
 
 		api_url = f'https://{self.ip}' + uri
@@ -652,7 +656,7 @@ class Vision:
 
 				while start_time_lower < end_time_upper:
 					d1 = start_time_lower # This is the start time of the window
-					d2 = start_time_lower + (window *1000) # This is the end time of the window
+					d2 = start_time_lower + (traffic_window *1000) # This is the end time of the window
 					# print(d1,d2)
 					# print(datetime.fromtimestamp(d1/1000, tz=timezone.utc).strftime('%Y-%m-%d %H:%M:%S'))
 					# print(datetime.fromtimestamp(d2/1000, tz=timezone.utc).strftime('%Y-%m-%d %H:%M:%S'))
@@ -713,7 +717,7 @@ class Vision:
 							f"{time.strftime('%d-%b-%Y %H:%M:%S', time.localtime(d2/1000))}"
 							)
 
-							start_time_lower += (window *1000)
+							start_time_lower += (traffic_window *1000)
 
 
 
@@ -879,7 +883,7 @@ class Vision:
 
 		while start_time_lower < end_time_upper:
 			d1 = start_time_lower # This is the start time of the window
-			d2 = start_time_lower + (window *1000) # This is the end time of the window
+			d2 = start_time_lower + (forensics_window *1000) # This is the end time of the window
 			# print(d1,d2)
 			# print(datetime.fromtimestamp(d1/1000, tz=timezone.utc).strftime('%Y-%m-%d %H:%M:%S'))
 			# print(datetime.fromtimestamp(d2/1000, tz=timezone.utc).strftime('%Y-%m-%d %H:%M:%S'))
@@ -908,7 +912,7 @@ class Vision:
 						sys.stdout.write(f"\r[{bar}] {percent:.2f}%")
 						sys.stdout.flush()
 	
-						start_time_lower += (window *1000)
+						start_time_lower += (forensics_window *1000)
 
 
 					else:

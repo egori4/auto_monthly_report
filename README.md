@@ -290,6 +290,14 @@ V11.3 (2/19/2025)
   This is to avoid gaps in traffic
 - Changed color of traffic volume chart to shades of blue
 
+V11.4 (2/20/2025)
+- Added user configurable window size for collecting Forensics data and Traffic stats data under customers.json "variables" section
+	"TrafficWindow": 3600,
+	"ForensicsWindow": 3600,
+
+	These variables sets the timeframe window in seconds for which data will be collected. For example if set to 3600 seconds (1 hour) and daily report is requested - collection will execute 24 API calls to get 24 hours of data. If set to 14400 (4 hours) it will collect the data for 24 hours in 6 calls
+- Changed coloring scheme for traffic volume chart
+
 New Functionality/ideas to add more charts
 	Add pps/cec/cps charts similarly to bps
 	Add MAX daily bps/pps/cec/cps max values graph per day
