@@ -605,14 +605,45 @@ if __name__ == '__main__':
 	bandwidth_per_day_trends = convert_csv_to_list_of_lists(charts_tables_path + 'bandwidth_per_day_last_month.csv')
 
 
-	# Traffic utilization
+	# Traffic volume
 	if db_from_forensics:
 		traffic_per_device_combined_trends_bps = [['Date,Traffic Utilization(Mbps),Blocked traffic,Excluded traffic']]
 		attacks_per_device_combined_trends_bps = [['Date,Traffic Utilization(Mbps),Blocked traffic,Excluded traffic']]
 
 	else:
-		traffic_per_device_combined_trends_bps = convert_csv_to_list_of_lists(charts_tables_path + 'traffic_per_device_bps.csv')
+
+		##################Substract attack traffic from total traffic###########################	
+
+		# Load CSV files
+		traffic_csv = pd.read_csv(charts_tables_path + "traffic_per_device_bps.csv")
+		attacks_csv = pd.read_csv(charts_tables_path + "attacks_per_device_bps.csv")
+
+		# Ensure Timestamp is the index for easy matching
+		traffic_csv.set_index("Timestamp", inplace=True)
+		attacks_csv.set_index("Timestamp", inplace=True)
+
+		# Keep only timestamps that exist in both DataFrames (common rows)
+		traffic_csv = traffic_csv.loc[traffic_csv.index.intersection(attacks_csv.index)]
+
+		# Save filtered traffic data
+		traffic_csv.to_csv(reports_path + "traffic.csv", index=True)
+		attacks_csv.to_csv(reports_path + "attacks.csv", index=True)
+
+		# Subtract attacks from traffic, keeping original traffic columns
+		result = traffic_csv.sub(attacks_csv, fill_value=0)  # fill_value=0 ensures no NaN issues
+
+		# Save to new CSV
+		result.to_csv(charts_tables_path + "legit_traffic_without_attacks.csv")
+
+		print("Processing complete. Results saved to legit_traffic_without_attacks.csv")
+
+
+		# traffic_per_device_combined_trends_bps = convert_csv_to_list_of_lists(charts_tables_path + 'traffic_per_device_bps.csv')
+		traffic_per_device_combined_trends_bps = convert_csv_to_list_of_lists(charts_tables_path + 'legit_traffic_without_attacks.csv')
+
 		attacks_per_device_combined_trends_bps = convert_csv_to_list_of_lists(charts_tables_path + 'attacks_per_device_bps.csv')
+
+		cps_per_device_combined_trends = convert_csv_to_list_of_lists(charts_tables_path + 'cps_per_device.csv')
 
 
 	################################################# Events, packets and bandwidth trends by Attack name sorted by the last month ##########################################################
@@ -865,9 +896,10 @@ if __name__ == '__main__':
 				return [new Date(row[0]), ...row.slice(1)]; // Convert first column, keep others unchanged
 			}});
 
-			var traffic_per_device_combined_trends_bps_data = google.visualization.arrayToDataTable(raw_traffic_per_device_combined_trends_bps_data);
-	
-			var attacks_per_device_combined_trends_bps_data = google.visualization.arrayToDataTable(raw_attacks_per_device_combined_trends_bps_data);
+			// Convert epoch timestamps to Date objects before passing to Google Charts
+			var raw_cps_per_device_combined_trends_data = {cps_per_device_combined_trends}.map(row => {{
+				return [new Date(row[0]), ...row.slice(1)]; // Convert first column, keep others unchanged
+			}});
 
 			// Function to generate an array of the same red color for all series for attacks data
 			function generateSameRedColor(numColors) {{
@@ -883,11 +915,16 @@ if __name__ == '__main__':
 				}});
 			}}
 
-			// Determine the number of series dynamically for attack data for red coloring
+
+			var traffic_per_device_combined_trends_bps_data = google.visualization.arrayToDataTable(raw_traffic_per_device_combined_trends_bps_data);
+	
+			var attacks_per_device_combined_trends_bps_data = google.visualization.arrayToDataTable(raw_attacks_per_device_combined_trends_bps_data);
+			// Determine the number of series dynamically for attack data for coloring based on attack data
 			let numSeries = attacks_per_device_combined_trends_bps_data.getNumberOfColumns() - 1; // Exclude timestamp column
 			let redColors = generateSameRedColor(numSeries);
 			let blueColors = generateGradientBlueColors(numSeries);
 
+			var cps_per_device_combined_trends_data = google.visualization.arrayToDataTable(raw_cps_per_device_combined_trends_data);
 
 			var maxpps_per_day_data = google.visualization.arrayToDataTable({maxpps_per_day_trends});
 			var maxbps_per_day_data = google.visualization.arrayToDataTable({maxbps_per_day_trends});
@@ -913,7 +950,7 @@ if __name__ == '__main__':
 			var policy_bandwidth_per_day_data = google.visualization.arrayToDataTable({policy_bw_trends_chart });
 
 			var traffic_per_device_combined_trends_bps_options = {{
-				title: 'Traffic utilization per device combined',
+				title: 'Legitimate Traffic Volume per device combined',
 				vAxis: {{
 					title: 'Traffic Volume (Mbps)',
 					minValue: 0
@@ -929,7 +966,7 @@ if __name__ == '__main__':
 				explorer: {{
 					actions: ['dragToZoom', 'rightClickToReset'],
 					axis: 'horizontal',
-					maxZoomIn: 0.01,
+					maxZoomIn: 0.001,
 					maxZoomOut: 20
 					}}
 				}};
@@ -951,10 +988,34 @@ if __name__ == '__main__':
 				explorer: {{
 					actions: ['dragToZoom', 'rightClickToReset'],
 					axis: 'horizontal',
-					maxZoomIn: 0.01,
+					maxZoomIn: 0.001,
 					maxZoomOut: 20
 					}}
 				}};
+
+				
+			var cps_per_device_combined_trends_options = {{
+				title: 'Connecctions Per Seconds per device combined',
+				vAxis: {{
+					title: 'Connecctions Per Seconds per device combined',
+					minValue: 0
+					}},
+				hAxis: {{
+					title: 'Date and time'
+					}},
+				isStacked: false,
+				colors: blueColors,
+				focusTarget: 'category',
+				legend: {{position: 'top', maxLines: 5}},
+				width: '100%',
+				explorer: {{
+					actions: ['dragToZoom', 'rightClickToReset'],
+					axis: 'horizontal',
+					maxZoomIn: 0.001,
+					maxZoomOut: 20
+					}}
+				}};
+
 
 			var maxpps_per_day_options = {{
 			  title: 'Highest PPS rate attack of the day, last month (packet units as is)',
@@ -1155,6 +1216,9 @@ if __name__ == '__main__':
 
 			var traffic_per_device_combined_trends_bps_chart = new google.visualization.AreaChart(document.getElementById('traffic_per_device_combined_trends_bps_chart_div'));
 			var attacks_per_device_combined_trends_bps_chart = new google.visualization.AreaChart(document.getElementById('attacks_per_device_combined_trends_bps_chart_div'));
+			var cps_per_device_combined_trends_chart = new google.visualization.AreaChart(document.getElementById('cps_per_device_combined_trends_chart_div'));
+
+			
 
 			var maxpps_per_day_chart = new google.visualization.AreaChart(document.getElementById('maxpps_per_day_chart_div'));
 			var maxbps_per_day_chart = new google.visualization.AreaChart(document.getElementById('maxbps_per_day_chart_div'));
@@ -1191,6 +1255,13 @@ if __name__ == '__main__':
                 var filteredData = filterDataByCategories(raw_attacks_per_device_combined_trends_bps_data, selectedCategories);
                 var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
                 attacks_per_device_combined_trends_bps_chart.draw(filteredDataTable, attacks_per_device_combined_trends_bps_options);
+            }});
+
+            // Create checkboxes for CPS per device combined
+            createCheckboxes('cps_per_device_combined_trends_chart_div', raw_cps_per_device_combined_trends_data, function(selectedCategories) {{
+                var filteredData = filterDataByCategories(raw_cps_per_device_combined_trends, selectedCategories);
+                var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
+                cps_per_device_combined_trends_chart.draw(filteredDataTable, cps_per_device_combined_trends_options);
             }});
 
 			// Create checkboxes for each chart
@@ -1270,6 +1341,8 @@ if __name__ == '__main__':
 			traffic_per_device_combined_trends_bps_chart.draw(traffic_per_device_combined_trends_bps_data, traffic_per_device_combined_trends_bps_options);
 			attacks_per_device_combined_trends_bps_chart.draw(attacks_per_device_combined_trends_bps_data, attacks_per_device_combined_trends_bps_options);
 
+			cps_per_device_combined_trends_chart.draw(cps_per_device_combined_trends_data, cps_per_device_combined_trends_options);
+
 			maxpps_per_day_chart.draw(maxpps_per_day_data, maxpps_per_day_options);
 			maxbps_per_day_chart.draw(maxbps_per_day_data, maxbps_per_day_options);
 
@@ -1300,6 +1373,8 @@ if __name__ == '__main__':
 
             addStackedToggle('traffic_per_device_combined_trends_bps_chart_div', traffic_per_device_combined_trends_bps_chart, traffic_per_device_combined_trends_bps_data, traffic_per_device_combined_trends_bps_options);
             addStackedToggle('attacks_per_device_combined_trends_bps_chart_div', attacks_per_device_combined_trends_bps_chart, attacks_per_device_combined_trends_bps_data, attacks_per_device_combined_trends_bps_options);
+
+            addStackedToggle('cps_per_device_combined_trends_chart_div', cps_per_device_combined_trends_chart, cps_per_device_combined_trends_data, cps_per_device_combined_trends_options);
 
 			addStackedToggle('events_per_day_chart_div_alltimehigh', events_per_day_chart_alltimehigh, events_per_day_data_alltimehigh, events_per_day_options_alltimehigh);
 			addStackedToggle('packets_per_day_chart_div_alltimehigh', packets_per_day_chart_alltimehigh, packets_per_day_data_alltimehigh, packets_per_day_options_alltimehigh);
@@ -1466,7 +1541,11 @@ if __name__ == '__main__':
 	  #attacks_per_device_combined_trends_bps_chart_div {{
 		height: 20vh;
 	  }}  
-	    
+
+	  #cps_per_device_combined_trends_chart_div {{
+		height: 20vh;
+	  }}
+	  
 	  #maxpps_per_day_chart_div {{
 		height: 20vh;
 	  }}
@@ -1629,7 +1708,7 @@ if __name__ == '__main__':
 
           <tr>
             <td colspan="3" style="border-bottom: 0;">
-            <h4>Traffic utilization per device combined</h4>
+            <h4>Legitimate Traffic Volume per device combined</h4>
             <div id="traffic_per_device_combined_trends_bps_chart_div" style="height: 400px;">
             </td>
           </tr> 
@@ -1638,6 +1717,14 @@ if __name__ == '__main__':
             <td colspan="3" style="border-bottom: 0;">
             <h4>All Attacks per device combined</h4>
             <div id="attacks_per_device_combined_trends_bps_chart_div" style="height: 400px;">
+            </td>
+          </tr> 
+
+		  
+         <tr>
+            <td colspan="3" style="border-bottom: 0;">
+            <h4>Connections Per Second per device combined</h4>
+            <div id="cps_per_device_combined_trends_chart_div" style="height: 400px;">
             </td>
           </tr> 
 

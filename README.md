@@ -298,10 +298,15 @@ V11.4 (2/20/2025)
 	These variables sets the timeframe window in seconds for which data will be collected. For example if set to 3600 seconds (1 hour) and daily report is requested - collection will execute 24 API calls to get 24 hours of data. If set to 14400 (4 hours) it will collect the data for 24 hours in 6 calls
 - Changed coloring scheme for traffic volume chart
 
-New Functionality/ideas to add more charts
-	Add pps/cec/cps charts similarly to bps
-	Add MAX daily bps/pps/cec/cps max values graph per day
+V11.5 (2/26/2025)
+- Added substraction of the attack traffic from the total traffic volume - this way top chart show only legit traffic excluding attacks
+- Aggregated timestamps for non attacks.
+- Added Connections Per Seconds collection and chart
 
+New Functionality/ideas to add more charts
+
+	Add pps/cec charts similarly to bps
+	Add MAX daily bps/pps/cec/cps max values graph per day
 
 ===========================================================================================================================
 Instructions how to deploy as a docker container (on Vision example):
