@@ -305,7 +305,7 @@ V11.5 (2/26/2025)
 
 V11.5.1 (2/27/2025)
 - Fixed CPS device chart selection checkbox
-- Removed "combined" from Traffic BPS, Attacks and CPS charts
+- Removed "combined" from Traffic BPS, Attacks and CPS chart titles
 
 New Functionality/ideas to add more charts
 
