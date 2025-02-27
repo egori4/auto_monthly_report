@@ -1,1 +1,0 @@
-..\..\tools\chrome\chrome --headless --incognito --enable-logging --print-to-pdf="C:\home\mockba\Report_v5.0\report_files\TEST\output.pdf" file://C:\home\mockba\Report_v5.0\report_files\TEST\report.htm
