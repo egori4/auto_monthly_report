@@ -303,6 +303,10 @@ V11.5 (2/26/2025)
 - Aggregated timestamps for non attacks.
 - Added Connections Per Seconds collection and chart
 
+V11.5.1 (2/27/2025)
+- Fixed CPS device chart selection checkbox
+- Removed "combined" from Traffic BPS, Attacks and CPS charts
+
 New Functionality/ideas to add more charts
 
 	Add pps/cec charts similarly to bps

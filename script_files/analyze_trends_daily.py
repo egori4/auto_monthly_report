@@ -950,7 +950,7 @@ if __name__ == '__main__':
 			var policy_bandwidth_per_day_data = google.visualization.arrayToDataTable({policy_bw_trends_chart });
 
 			var traffic_per_device_combined_trends_bps_options = {{
-				title: 'Legitimate Traffic Volume per device combined',
+				title: 'Legitimate Traffic Volume per device',
 				vAxis: {{
 					title: 'Traffic Volume (Mbps)',
 					minValue: 0
@@ -972,7 +972,7 @@ if __name__ == '__main__':
 				}};
 
 			var attacks_per_device_combined_trends_bps_options = {{
-				title: 'All Attacks per device combined',
+				title: 'Attack volume per device',
 				vAxis: {{
 					title: 'Attack Volume (Mbps)',
 					minValue: 0
@@ -995,9 +995,9 @@ if __name__ == '__main__':
 
 				
 			var cps_per_device_combined_trends_options = {{
-				title: 'Connecctions Per Seconds per device combined',
+				title: 'Connecctions Per Seconds per device',
 				vAxis: {{
-					title: 'Connecctions Per Seconds per device combined',
+					title: 'Connecctions Per Seconds per device',
 					minValue: 0
 					}},
 				hAxis: {{
@@ -1259,7 +1259,7 @@ if __name__ == '__main__':
 
             // Create checkboxes for CPS per device combined
             createCheckboxes('cps_per_device_combined_trends_chart_div', raw_cps_per_device_combined_trends_data, function(selectedCategories) {{
-                var filteredData = filterDataByCategories(raw_cps_per_device_combined_trends, selectedCategories);
+                var filteredData = filterDataByCategories(raw_cps_per_device_combined_trends_data, selectedCategories);
                 var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
                 cps_per_device_combined_trends_chart.draw(filteredDataTable, cps_per_device_combined_trends_options);
             }});
