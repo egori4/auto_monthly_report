@@ -307,9 +307,20 @@ V11.5.1 (2/27/2025)
 - Fixed CPS device chart selection checkbox
 - Removed "combined" from Traffic BPS, Attacks and CPS chart titles
 
-New Functionality/ideas to add more charts
+V11.6 (2/27/2025)
+- PHP files cleanup
 
-	Add pps/cec charts similarly to bps
+V11.7 (In progress)
+- Added new CEC/PPS/PPS attacks charts
+- Moved charts to categorized BPS/PPS
+- Added logic for 403 error and reauthentication
+- Code optimization
+
+Next steps/Functionality/ideas to add more charts
+
+	Make security events vs attack events consistent in html(Glenn comment)
+	Add all new reports we have on daily to monthly
+	Add cosmetics
 	Add MAX daily bps/pps/cec/cps max values graph per day
 
 ===========================================================================================================================

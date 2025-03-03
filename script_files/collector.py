@@ -38,8 +38,6 @@ db_files_path = f"./database_files/{cust_id}/"
 
 offline = False # Set to True to test without connecting to Vision
 
-
-
 ######################################################################
 
 
@@ -85,9 +83,15 @@ try:
 			extra_timestamps = 4  # Number of granular  timestamps(each 15 sec) to keep before the attack and after the attack
 
 		try:
-			attack_threshold = selected_entry['variables']['AttackThreshold']
+			bps_attack_threshold = selected_entry['variables']['BpsAttackThreshold']
 		except:
-			attack_threshold = 100000  # Attack volume in Kbps to keep granular logging
+			bps_attack_threshold = 10000  # Attack volume in Kbps to keep granular logging
+
+		try:
+			pps_attack_threshold = selected_entry['variables']['PpsAttackThreshold']
+		except:
+			pps_attack_threshold = 10000  # Attack volume in Kbps to keep granular logging
+
 
 
 	else:
@@ -161,6 +165,38 @@ class Vision:
 
 
 	def _post(self, URL, requestData = ""):
+
+		max_retries = 3  # Number of retries for 403 errors
+
+		for attempt in range(max_retries):
+			try:
+				response = self.sess.post(url=URL, verify=False, data=requestData)
+
+				# Check if session expired (403 Forbidden)
+				if response.status_code == 403:
+					print(f"Attempt {attempt + 1}: Received 403 Forbidden. Refreshing session...")
+					self.login()  # Refresh session
+					
+					# Retry after logging in
+					response = self.sess.post(url=URL, verify=False, data=requestData)
+
+				# Raise an exception if the response is an error (except 403 which we handled or 200 OK)
+				response.raise_for_status()
+
+				return response  # Return the successful response
+
+			except (requests.exceptions.HTTPError, requests.exceptions.ConnectionError, requests.exceptions.SSLError,
+				requests.exceptions.Timeout, requests.exceptions.ConnectTimeout,
+				requests.exceptions.ReadTimeout) as err:
+				print(f"Request failed: {err}")
+				time.sleep(2 ** attempt)  # Exponential backoff before retry
+
+		print("Max retries reached. Request failed.")
+		return None  # Return None if all retries fail
+
+
+
+
 		try:
 			r = self.sess.post(url=URL, verify=False, data=requestData)
 		except any as err:
@@ -415,6 +451,13 @@ class Vision:
 				elif filename == tmp_files_path + 'attacks_per_device_bps.csv':
 					row_value = round(float(row['discards']) / 1000, 2)
 
+				if filename == tmp_files_path + 'traffic_per_device_pps.csv':
+					row_value = round(float(row['trafficValue']) ,2)
+
+				elif filename == tmp_files_path + 'attacks_per_device_pps.csv':
+					row_value = round(float(row['discards']) , 2)
+
+
 				elif filename == tmp_files_path + 'cps_per_device.csv':
 					row_value = float(row['connectionPerSecond'])  # Convert to number
 
@@ -451,10 +494,8 @@ class Vision:
 
 
 		# Write the updated data back to the CSV file
-		if daily:
-			
-			if self.today_day_number == 2:
-				print('Daily report - today is 2nd of the month - creating new file, overwriting previous data')
+		if (daily and self.today_day_number == 2) or monthly:
+				print('Creating new file, overwriting previous data')
 				# Final data will be only the new data, existing csv will be overwritten with new data only
 
 				final_data = [header_ips]  # Start with headers
@@ -480,43 +521,15 @@ class Vision:
 
 				print(f"CSV file '{filename}' has been updated successfully.")
 
-			else:
-				print('Daily report - today is not the 2nd day of the month - merging new data with existing data in the csv')
+		else:
+			print('Daily report - today is not the 2nd day of the month - merging new data with existing data in the csv')
 
-				# Final data will be the existing data + newly collected data
-				final_data = [header_names]  # Start with headers
-				for timestamp in sorted(existing_data_dict.keys()):
-					row = [timestamp] + [existing_data_dict[timestamp].get(dp_name, "") for dp_name in header_names[1:]]
-					final_data.append(row)
-				
-				# Remove rows with empty values for all devices (IRP communication issues or CC processing issue)
-				loss_rate = 0
-				for row in final_data:
-					if '' in row:
-						print(f"Removing row with empty values: {row} , {time.strftime('%d-%b-%Y %H:%M:%S', time.localtime(int(row[0])/1000))}")
-						loss_rate += 1
-						final_data.remove(row)
-				print(f"Removed {loss_rate} rows with empty values for all devices.")
-
-				# Merging existing csv data with new collected data only
-				with open(filename, "w", newline="") as csv_file:
-					writer = csv.writer(csv_file)
-					writer.writerows(final_data)
-
-				print(f"CSV file '{filename}' has been updated successfully.")
-
-		elif monthly:
-
-			print('Monthly report  - creating new file')
-
-			# Final data will be only the new data, existing csv will be overwritten with new data only
-			final_data = [header_ips]  # Start with headers
-			for timestamp in sorted(collected_data_dict.keys()):
-				row = [timestamp] + [collected_data_dict[timestamp].get(ip, "") for ip in header_ips[1:]]  # Preserve order\
+			# Final data will be the existing data + newly collected data
+			final_data = [header_names]  # Start with headers
+			for timestamp in sorted(existing_data_dict.keys()):
+				row = [timestamp] + [existing_data_dict[timestamp].get(dp_name, "") for dp_name in header_names[1:]]
 				final_data.append(row)
 			
-			final_data[0] = [dp_ip_to_name_dict.get(ip, ip) for ip in final_data[0]]  # Replace IP with name
-
 			# Remove rows with empty values for all devices (IRP communication issues or CC processing issue)
 			loss_rate = 0
 			for row in final_data:
@@ -524,15 +537,15 @@ class Vision:
 					print(f"Removing row with empty values: {row} , {time.strftime('%d-%b-%Y %H:%M:%S', time.localtime(int(row[0])/1000))}")
 					loss_rate += 1
 					final_data.remove(row)
-
 			print(f"Removed {loss_rate} rows with empty values for all devices.")
 
-			# Overwrite the existing csv with new collected data only
+			# Merging existing csv data with new collected data only
 			with open(filename, "w", newline="") as csv_file:
 				writer = csv.writer(csv_file)
 				writer.writerows(final_data)
 
 			print(f"CSV file '{filename}' has been updated successfully.")
+
 
 	def ams_stats_dashboards_call(self, units="bps", uri = "/mgmt/vrm/monitoring/traffic/periodic/report", report_type="AMS Dasboard"):
 
@@ -812,6 +825,17 @@ class Vision:
 			with open(raw_data_path + f"cps_per_device_raw_aggregate.json", "w", encoding="utf-8") as json_file:
 				json.dump(combined_response_json, json_file, indent=4)  # Save JSON with indentation
 			print(f"Response body saved as pretty JSON in cps_per_device_raw_aggregate.json")
+
+
+		if report_type == "Concurrent Connections Granular":
+			with open(raw_data_path + f"cec_per_device_raw_granular.json", "w", encoding="utf-8") as json_file:
+				json.dump(combined_response_json, json_file, indent=4)  # Save JSON with indentation
+			print(f"Response body saved as pretty JSON in cec_per_device_raw_granular.json")			
+
+		if report_type == "Concurrent Connections Aggregate":
+			with open(raw_data_path + f"cec_per_device_raw_aggregate.json", "w", encoding="utf-8") as json_file:
+				json.dump(combined_response_json, json_file, indent=4)  # Save JSON with indentation
+			print(f"Response body saved as pretty JSON in cec_per_device_raw_aggregate.json")
 
 		return combined_response_json
 
@@ -1310,70 +1334,131 @@ v = Vision(vision_ip, username, password)
 
 
 # Get Forensics data
+if not offline:
+	forensics_raw = v.get_forensics(v.start_time_lower,v.end_time_upper,v.days_in_prev_month)
+	v.compile_to_sqldb()
 
-forensics_raw = v.get_forensics(v.start_time_lower,v.end_time_upper,v.days_in_prev_month)
-v.compile_to_sqldb()
 
-
+######################################################################
 # !!!!!!!!!!! For testing - remove. Open json file and read it and set variable traffic_bps_per_device instead of getting it
-# with open(raw_data_path + "traffic_per_device_bps_raw_granular.json", "r") as json_file:
-# 	traffic_bps_per_device_granular = json.load(json_file)
 
-# with open(raw_data_path + "traffic_per_device_bps_raw_aggregate.json", "r") as json_file:
-# 	traffic_bps_per_device_aggregate = json.load(json_file)
+if offline:
+	with open(raw_data_path + "traffic_per_device_bps_raw_granular.json", "r") as json_file:
+		traffic_bps_per_device_granular = json.load(json_file)
+
+	with open(raw_data_path + "traffic_per_device_bps_raw_aggregate.json", "r") as json_file:
+		traffic_bps_per_device_aggregate = json.load(json_file)
 
 
 
-# with open(raw_data_path + "cps_per_device_raw_granular.json", "r") as json_file:
-# 	cps_per_device_granular = json.load(json_file)
+	with open(raw_data_path + "traffic_per_device_pps_raw_granular.json", "r") as json_file:
+		traffic_pps_per_device_granular = json.load(json_file)
 
-# with open(raw_data_path + "cps_per_device_raw_aggregate.json", "r") as json_file:
-# 	cps_per_device_aggregate = json.load(json_file)
+	with open(raw_data_path + "traffic_per_device_pps_raw_aggregate.json", "r") as json_file:
+		traffic_pps_per_device_aggregate = json.load(json_file)
 
+
+	with open(raw_data_path + "cps_per_device_raw_granular.json", "r") as json_file:
+		cps_per_device_granular = json.load(json_file)
+
+	with open(raw_data_path + "cps_per_device_raw_aggregate.json", "r") as json_file:
+		cps_per_device_aggregate = json.load(json_file)
+
+	with open(raw_data_path + "cec_per_device_raw_granular.json", "r") as json_file:
+		cec_per_device_granular = json.load(json_file)
+
+	with open(raw_data_path + "cec_per_device_raw_aggregate.json", "r") as json_file:
+		cec_per_device_aggregate = json.load(json_file)
+#####################################################################
 
 
 
 
 ###################### Traffic BPS Chart ###########################
 # 1. Collect the traffic data granularly (every 15 sec)
-traffic_bps_per_device_granular = v.ams_stats_dashboards_per_device_window_calls(v.start_time_lower, v.end_time_upper, traffic_window=3600, units = "bps", report_type="Traffic Volume BPS Granular")
+if not offline:
+	traffic_bps_per_device_granular = v.ams_stats_dashboards_per_device_window_calls(v.start_time_lower, v.end_time_upper, traffic_window=3600, units = "bps", report_type="Traffic Volume BPS Granular")
 
 # 2. Identify the attack timestamps
-attack_only_timestamps_list = v.extract_attack_data_only(traffic_bps_per_device_granular, attack_threshold, extra_timestamps)
+bps_attack_only_timestamps_list = v.extract_attack_data_only(traffic_bps_per_device_granular, bps_attack_threshold, extra_timestamps)
 
 # 3. Collect the averaged traffic data (average depending on the traffic_window)
-traffic_bps_per_device_aggregate = v.ams_stats_dashboards_per_device_window_calls(v.start_time_lower, v.end_time_upper, traffic_window=86400, units = "bps", report_type="Traffic Volume BPS Aggregate")
+if not offline:
+	traffic_bps_per_device_aggregate = v.ams_stats_dashboards_per_device_window_calls(v.start_time_lower, v.end_time_upper, traffic_window=86400, units = "bps", report_type="Traffic Volume BPS Aggregate")
 
 # 4. Merge attack only timestamps into aggregate data. This way attack timeframe will be granular and rest will be aggregated and averaged
-traffic_bps_per_device_merged = v.merge_attacks_to_aggregate(traffic_bps_per_device_aggregate, traffic_bps_per_device_granular,attack_only_timestamps_list)
-
+traffic_bps_per_device_merged = v.merge_attacks_to_aggregate(traffic_bps_per_device_aggregate, traffic_bps_per_device_granular,bps_attack_only_timestamps_list)
 # 5. Write Traffic BPS Volume to csv
 v.write_per_device_combined_traffic_stats_to_csv(traffic_bps_per_device_merged, tmp_files_path + 'traffic_per_device_bps.csv')
 
 
+###################### Traffic PPS Chart ###########################
+# 1. Collect the traffic data granularly (every 15 sec)
+if not offline:
+	traffic_pps_per_device_granular = v.ams_stats_dashboards_per_device_window_calls(v.start_time_lower, v.end_time_upper, traffic_window=3600, units = "pps", report_type="Traffic Volume PPS Granular")
+
+# 2. Identify the attack timestamps
+pps_attack_only_timestamps_list = v.extract_attack_data_only(traffic_pps_per_device_granular, pps_attack_threshold, extra_timestamps)
+
+# 3. Collect the averaged traffic data (average depending on the traffic_window)
+if not offline:
+	traffic_pps_per_device_aggregate = v.ams_stats_dashboards_per_device_window_calls(v.start_time_lower, v.end_time_upper, traffic_window=86400, units = "pps", report_type="Traffic Volume PPS Aggregate")
+
+# 4. Merge attack only timestamps into aggregate data. This way attack timeframe will be granular and rest will be aggregated and averaged
+traffic_pps_per_device_merged = v.merge_attacks_to_aggregate(traffic_pps_per_device_aggregate, traffic_pps_per_device_granular,pps_attack_only_timestamps_list)
+
+# 5. Write Traffic PPS Volume to csv
+v.write_per_device_combined_traffic_stats_to_csv(traffic_pps_per_device_merged, tmp_files_path + 'traffic_per_device_pps.csv')
+
+
+# Merge PPS attacks and BPS attack stamps
+
+merged_attack_only_timestamps_list = sorted(set(bps_attack_only_timestamps_list) | set(pps_attack_only_timestamps_list))
+
+print('Printing all attack timestamps BPS+PPS')
+print(merged_attack_only_timestamps_list)
 
 ##################### Attacks BPS Chart ############################
 # 1. Write Attacks BPS Volume to csv (reusing the same data from Traffic BPS)
 v.write_per_device_combined_traffic_stats_to_csv(traffic_bps_per_device_merged, tmp_files_path + 'attacks_per_device_bps.csv')
 
+##################### Attacks PPS Chart ############################
+# 1. Write Attacks PPS Volume to csv (reusing the same data from Traffic PPS)
+v.write_per_device_combined_traffic_stats_to_csv(traffic_pps_per_device_merged, tmp_files_path + 'attacks_per_device_pps.csv')
 
 
 ##################### CPS Chart ####################################
 
 # 1. Collect the CPS data granularly (every 15 sec)
-cps_per_device_granular = v.ams_stats_dashboards_per_device_window_calls(v.start_time_lower, v.end_time_upper, traffic_window=3600, units=None, uri = "/mgmt/vrm/monitoring/traffic/cps", report_type="CPS Granular")
+if not offline:
+	cps_per_device_granular = v.ams_stats_dashboards_per_device_window_calls(v.start_time_lower, v.end_time_upper, traffic_window=3600, units=None, uri = "/mgmt/vrm/monitoring/traffic/cps", report_type="CPS Granular")
 
 # 2. Collect the averaged traffic data (average depending on the traffic_window)
-cps_per_device_aggregate = v.ams_stats_dashboards_per_device_window_calls(v.start_time_lower, v.end_time_upper, traffic_window=86400, units=None, uri = "/mgmt/vrm/monitoring/traffic/cps", report_type="CPS Aggregate")
+if not offline:
+	cps_per_device_aggregate = v.ams_stats_dashboards_per_device_window_calls(v.start_time_lower, v.end_time_upper, traffic_window=86400, units=None, uri = "/mgmt/vrm/monitoring/traffic/cps", report_type="CPS Aggregate")
 
 # 3. Merge attack only timestamps into aggregate data. This way attack timeframe will be granular and rest will be aggregated and averaged
-cps_per_device_merged = v.merge_attacks_to_aggregate(cps_per_device_aggregate, cps_per_device_granular,attack_only_timestamps_list)
 
-# 4. Write Traffic BPS Volume to csv
+cps_per_device_merged = v.merge_attacks_to_aggregate(cps_per_device_aggregate, cps_per_device_granular,merged_attack_only_timestamps_list)
+
+# 4. Write CPS to csv
 v.write_per_device_combined_traffic_stats_to_csv(cps_per_device_merged, tmp_files_path + 'cps_per_device.csv')
 
 
+##################### Concurrent Connections Chart ####################################
 
-#/mgmt/vrm/monitoring/traffic/concurrent-connections
+# 1. Collect the Concurent Connections data granularly (every 15 sec)
+if not offline:
+	cec_per_device_granular = v.ams_stats_dashboards_per_device_window_calls(v.start_time_lower, v.end_time_upper, traffic_window=3600, units=None, uri = "/mgmt/vrm/monitoring/traffic/concurrent-connections", report_type="Concurrent Connections Granular")
 
+# 2. Collect the averaged traffic data (average depending on the traffic_window)
+if not offline:
+	cec_per_device_aggregate = v.ams_stats_dashboards_per_device_window_calls(v.start_time_lower, v.end_time_upper, traffic_window=86400, units=None, uri = "/mgmt/vrm/monitoring/traffic/concurrent-connections", report_type="Concurrent Connections Aggregate")
 
+# 3. Merge attack only timestamps into aggregate data. This way attack timeframe will be granular and rest will be aggregated and averaged
+cec_per_device_merged = v.merge_attacks_to_aggregate(cec_per_device_aggregate, cec_per_device_granular,merged_attack_only_timestamps_list)
+
+# 4. Write Concurrent Connections to csv
+v.write_per_device_combined_traffic_stats_to_csv(cec_per_device_merged, tmp_files_path + 'cec_per_device.csv')
+
+print(f'Finished data collection at {print(datetime.today())}')

@@ -14,6 +14,8 @@ import json
 import csv
 from datetime import datetime
 
+print(f'Start time {datetime.today()}')
+
 start_time = time.time()
 cust_id = sys.argv[1]
 last_month = sys.argv[2]
@@ -681,4 +683,5 @@ def gen_charts_data(db_path):
 
 gen_charts_data(db_path)
 
+print(f'End time {datetime.today()}')
 print("--- %s seconds ---" % (time.time() - start_time))
