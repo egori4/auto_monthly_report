@@ -310,11 +310,12 @@ V11.5.1 (2/27/2025)
 V11.6 (2/27/2025)
 - PHP files cleanup
 
-V11.7 (In progress)
+V11.7 (3/3/2025)
 - Added new CEC/PPS/PPS attacks charts
 - Moved charts to categorized BPS/PPS
 - Added logic for 403 error and reauthentication
 - Code optimization
+
 
 Next steps/Functionality/ideas to add more charts
 
