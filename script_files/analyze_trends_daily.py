@@ -1092,7 +1092,10 @@ if __name__ == '__main__':
 
 			var maxpps_per_day_options = {{
 			  title: 'Highest PPS rate attack of the day, last month (packet units as is)',
-			  vAxis: {{minValue: 0}},
+			  vAxis: {{
+				minValue: 0,
+				viewWindow: {{ min: 0 }}
+				}},
 			  hAxis: {{ticks: maxpps_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
 			  isStacked: false,
 			  legend: {{position: 'top', maxLines: 5}},
@@ -1101,7 +1104,10 @@ if __name__ == '__main__':
 
 			var maxbps_per_day_options = {{
 			  title: 'Highest volume attack of the day, last month (units {bps_units_desc})',
-			  vAxis: {{minValue: 0}},
+			  vAxis: {{
+				minValue: 0,
+				viewWindow: {{ min: 0 }}
+				}},
 			  hAxis: {{ticks: maxbps_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
 			  isStacked: false,
 			  legend: {{position: 'top', maxLines: 5}},
@@ -1190,8 +1196,12 @@ if __name__ == '__main__':
 
 			var bandwidth_per_day_options_alltimehigh = {{
 			  title: 'Cumulative malicious bandwidth by attack vector(units {bw_units})',
-			  vAxis: {{minValue: 0}},
+			  vAxis: {{
+				minValue: 0,
+				viewWindow: {{ min: 0 }}
+				}},
 			  isStacked: false,
+			  hAxis: {{ticks: bandwidth_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
 			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
@@ -1613,9 +1623,9 @@ if __name__ == '__main__':
 		}}
 		}});
 
-		// Smoothly scroll to TOC when button is clicked
+		// Smoothly scroll to the top of the page when button is clicked
 		function scrollToToc() {{
-		document.getElementById('toc').scrollIntoView({{ behavior: 'smooth' }});
+		window.scrollTo({{ top: 0, behavior: 'smooth' }}); // Scrolls to the top of the page
 		}}
 
 		</script>
