@@ -385,7 +385,7 @@ def events_per_day_html_table():
 	events_per_day = data_month.groupby(['Day of the Month', 'Attack Name', 'Device Name', 'Policy Name']).size()
 
 	# Get the top 5 events with the highest sum of packet counts for each day
-	events_per_day_top5 = events_per_day.groupby(level=['Day of the Month'], group_keys=False).nlargest(5).apply(format_with_commas).to_frame('Security Events Count')
+	events_per_day_top5 = events_per_day.groupby(level=['Day of the Month'], group_keys=False).nlargest(5).apply(format_with_commas).to_frame('Attack Events Count')
 	events_per_day_top5 = events_per_day_top5.to_html()
 
 	for device_ip, device_name in defensepros.items():
@@ -430,7 +430,7 @@ def bandwidth_per_day_html_table():
 def events_per_day_html(epm):
 	data_month_epm = data_month[data_month['Attack Name'] == epm]
 	series_epm = data_month_epm.groupby(['Attack Name','Device Name','Policy Name']).size().sort_values(ascending=False).apply(format_with_commas).head(10)
-	events_per_day_html = series_epm.to_frame('Security Events')
+	events_per_day_html = series_epm.to_frame('Attack Events')
 	events_per_day_html=events_per_day_html.to_html()
 
 	for device_ip, device_name in defensepros.items():
@@ -474,7 +474,7 @@ def device_events_per_day_html(device_epm):
 
 			data_month_epm = data_month[data_month['Device Name'] == device_ip]
 			device_series_epm = data_month_epm.groupby(['Device Name','Attack Name','Policy Name']).size().sort_values(ascending=False).apply(format_with_commas).head(10)
-			device_events_per_day_html = device_series_epm.to_frame('Security Events')
+			device_events_per_day_html = device_series_epm.to_frame('Attack Events')
 			device_events_per_day_html=device_events_per_day_html.to_html().replace(device_ip, device_name)
 			
 	return device_events_per_day_html
@@ -508,7 +508,7 @@ def policy_events_per_day_html(policy_epm):
 
 	data_month_epm = data_month[data_month['Policy Name'] == policy_epm]
 	series_epm = data_month_epm.groupby(['Policy Name','Attack Name','Device Name']).size().sort_values(ascending=False).apply(format_with_commas).head(10)
-	events_per_day_html = series_epm.to_frame('Security Events')
+	events_per_day_html = series_epm.to_frame('Attack Events')
 	events_per_day_html=events_per_day_html.to_html()
 
 	for device_ip, device_name in defensepros.items():
@@ -545,7 +545,7 @@ def sip_events_per_day_html(sip_epm):
 
 	data_month_epm = data_month[data_month['Source IP'] == sip_epm]
 	series_epm = data_month_epm.groupby(['Source IP','Attack Name','Device Name','Policy Name']).size().sort_values(ascending=False).apply(format_with_commas).head(10)
-	events_per_day_html = series_epm.to_frame('Security Events')
+	events_per_day_html = series_epm.to_frame('Attack Events')
 	events_per_day_html=events_per_day_html.to_html()
 
 	for device_ip, device_name in defensepros.items():
@@ -706,7 +706,7 @@ if __name__ == '__main__':
 	#4 Iterate through each Device and popluate the html table
 
 	for index, value in enumerate(events_per_day_top_list):
-		events_per_day_html_final+=f'<h4>Distribution of topmost Security Events for attack "{value}" across devices and policies</h4>'
+		events_per_day_html_final+=f'<h4>Distribution of topmost Attack Events for attack "{value}" across devices and policies</h4>'
 		events_per_day_html_final+= events_per_day_html(events_per_day_top_list[index])
 
 	for index, value in enumerate(packets_per_day_top_list):
@@ -720,7 +720,7 @@ if __name__ == '__main__':
 
 
 	for index, value in enumerate(device_events_per_day_top_list):
-		device_events_per_day_html_final+=f'<h4>Distribution of topmost Security events for device "{value}" across policies</h4>'
+		device_events_per_day_html_final+=f'<h4>Distribution of topmost Attack Events for device "{value}" across policies</h4>'
 		device_events_per_day_html_final+= device_events_per_day_html(device_events_per_day_top_list[index])
 
 	for index, value in enumerate(device_packets_per_day_top_list):
@@ -733,7 +733,7 @@ if __name__ == '__main__':
 
 
 	for index, value in enumerate(policy_events_per_day_top_list):
-		policy_events_per_day_html_final+=f'<h4>Distribution of topmost Security events for policy "{value}" across devices</h4>'
+		policy_events_per_day_html_final+=f'<h4>Distribution of topmost Attack Events for policy "{value}" across devices</h4>'
 		policy_events_per_day_html_final+= policy_events_per_day_html(policy_events_per_day_top_list[index])
 
 	for index, value in enumerate(policy_packets_per_day_top_list):
@@ -746,7 +746,7 @@ if __name__ == '__main__':
 
 
 	for index, value in enumerate(sip_events_per_day_top_list):
-		sip_events_per_day_html_final+=f'<h4>Distribution of topmost Security events for Source IP {value}</h4>'
+		sip_events_per_day_html_final+=f'<h4>Distribution of topmost Attack Events for Source IP {value}</h4>'
 		sip_events_per_day_html_final+= sip_events_per_day_html(sip_events_per_day_top_list[index])
 
 	for index, value in enumerate(sip_packets_per_day_top_list):
@@ -1115,7 +1115,7 @@ if __name__ == '__main__':
 			}};
 			
 			var events_per_day_options = {{
-			  title: 'Events per day, last month',
+			  title: 'Attack Events per day, last month',
 			  vAxis: {{minValue: 0}},
 			  hAxis: {{ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
 			  isStacked: false,
@@ -1142,7 +1142,7 @@ if __name__ == '__main__':
 			}};
 
 			var attack_events_per_day_options = {{
-			  title: 'Security Events trends - TopN by last day',
+			  title: 'Attack Events trends - TopN by last day',
 			  vAxis: {{minValue: 0}},
 			  hAxis: {{ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
 			  isStacked: false,
@@ -1175,7 +1175,7 @@ if __name__ == '__main__':
 
 
 			var events_per_day_options_alltimehigh = {{
-			  title: 'Security Events trends - TopN all time high',
+			  title: 'Attack Events trends - TopN all time high',
 			  vAxis: {{minValue: 0}},
 			  hAxis: {{ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
 			  isStacked: false,
@@ -1238,7 +1238,7 @@ if __name__ == '__main__':
 			}};
 
 			var sip_events_per_day_options = {{
-			  title: 'Security Events trends by source IP',
+			  title: 'Attack Events trends by source IP',
 			  vAxis: {{minValue: 0}},
 			  hAxis: {{ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
 			  isStacked: false,
@@ -1268,7 +1268,7 @@ if __name__ == '__main__':
 			}};
 
 			var policy_events_per_day_options = {{
-			  title: 'Security Events trends by Policy Name',
+			  title: 'Attack Events trends by Policy Name',
 			  vAxis: {{minValue: 0}},
 			  hAxis: {{ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
 			  isStacked: false,
@@ -2727,7 +2727,7 @@ if __name__ == '__main__':
 
 				<!-- Button container for centering -->
 				<div class="button-container">
-					<button class="toggle-btn" data-original-text="Distribution of topmost Security events for Source IP's" onclick="toggleTable('DistributionOfSIPAttacksPerDayTable', this)">Distribution of topmost Security events for Source IP's</button>
+					<button class="toggle-btn" data-original-text="Distribution of topmost Attack Events for Source IP's" onclick="toggleTable('DistributionOfSIPAttacksPerDayTable', this)">Distribution of topmost Attack Events for Source IP's</button>
 				</div>
 		  		<div id="DistributionOfSIPAttacksPerDayTable" class="collapsible-content">
 				  
