@@ -1047,9 +1047,9 @@ if __name__ == '__main__':
 				}};
 				
 			var cps_per_device_combined_trends_options = {{
-				title: 'Connections Per Seconds per device',
+				title: 'Connections Per Second per device',
 				vAxis: {{
-					title: 'Connections Per Seconds per device',
+					title: 'Number of Connections Per Second(CPS)',
 					minValue: 0
 					}},
 				hAxis: {{
@@ -1091,51 +1091,75 @@ if __name__ == '__main__':
 				}};
 
 			var maxpps_per_day_options = {{
-			  title: 'Highest PPS rate attack of the day, last month (packet units as is)',
+			  title: 'Highest PPS rate attack of the day',
 			  vAxis: {{
 				minValue: 0,
-				viewWindow: {{ min: 0 }}
+				title: 'Max Attack Rate (PPS) ',
 				}},
-			  hAxis: {{ticks: maxpps_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
+			  hAxis: {{
+				ticks: maxpps_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1,
+				title: 'Day of the Month'
+				}},
 			  isStacked: false,
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
 			}};
 
 			var maxbps_per_day_options = {{
-			  title: 'Highest volume attack of the day, last month (units {bps_units_desc})',
+			  title: 'Highest volume attack of the day',
 			  vAxis: {{
 				minValue: 0,
-				viewWindow: {{ min: 0 }}
+				title: 'Max Attack Rate({bps_units_desc})'
 				}},
-			  hAxis: {{ticks: maxbps_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
+			  hAxis: {{
+				ticks: maxbps_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1,
+				title: 'Day of the Month'
+				}},
 			  isStacked: false,
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
 			}};
 			
 			var events_per_day_options = {{
-			  title: 'Attack Events per day, last month',
-			  vAxis: {{minValue: 0}},
-			  hAxis: {{ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
+			  title: 'Attack Events per day',
+			  vAxis: {{
+				minValue: 0,
+				title: 'Number of Attack Events'
+				}},
+			  hAxis: {{
+				ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1,
+				title: 'Day of the Month'
+				}},
 			  isStacked: false,
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
 			}};
 
 			  var packets_per_day_options = {{
-			  title: 'Cumulative Malicious packets per day (units {pkt_units})',
-			  vAxis: {{minValue: 0}},
-			  hAxis: {{ticks: packets_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
+			  title: 'Cumulative Malicious packets per day',
+			  vAxis: {{
+				minValue: 0,
+				title: 'Packet units - {pkt_units}'
+				}},
+			  hAxis: {{
+				ticks: packets_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1,
+				title: 'Day of the Month'
+				}},
 			  isStacked: false,
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
 			}};
 
 			var bandwidth_per_day_options = {{
-			  title: 'Cumulative Malicious bandwidth per day, last month (units {bw_units})',
-			  vAxis: {{minValue: 0}},
-			  hAxis: {{ticks: bandwidth_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
+			  title: 'Cumulative Malicious bandwidth per day',
+			  vAxis: {{
+				minValue: 0,
+				title:'{bw_units}',
+				}},
+			  hAxis: {{
+				ticks: bandwidth_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1,
+				title: 'Day of the Month'
+				}},
 			  isStacked: false,
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
@@ -1175,9 +1199,15 @@ if __name__ == '__main__':
 
 
 			var events_per_day_options_alltimehigh = {{
-			  title: 'Attack Events trends - TopN all time high',
-			  vAxis: {{minValue: 0}},
-			  hAxis: {{ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
+			  title: 'Attack Events trends',
+			  vAxis: {{
+				minValue: 0,
+				title: 'Number of Attack Events'
+				}},
+			  hAxis: {{
+				ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1,
+				title: 'Day of the Month'
+				}},
 			  isStacked: false,
 			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
@@ -1185,9 +1215,15 @@ if __name__ == '__main__':
 			}};
 
 			var packets_per_day_options_alltimehigh = {{
-			  title: 'Cumulative Malicious Packets by attack vector (units {pkt_units})',
-			  vAxis: {{minValue: 0}},
-			  hAxis: {{ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
+			  title: 'Cumulative Malicious Packets by attack vector',
+			  vAxis: {{
+				minValue: 0,
+				title: 'Packet units - {pkt_units}'
+				}},
+			  hAxis: {{
+				ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1,
+				title: 'Day of the Month'
+				}},
 			  isStacked: false,
 			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
@@ -1195,32 +1231,46 @@ if __name__ == '__main__':
 			}};
 
 			var bandwidth_per_day_options_alltimehigh = {{
-			  title: 'Cumulative malicious bandwidth by attack vector(units {bw_units})',
+			  title: 'Cumulative malicious bandwidth by attack vector',
 			  vAxis: {{
 				minValue: 0,
-				viewWindow: {{ min: 0 }}
+				title:'{bw_units}'
 				}},
 			  isStacked: false,
-			  hAxis: {{ticks: bandwidth_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
+			  hAxis: {{
+				ticks: bandwidth_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1,
+				title: 'Day of the Month'
+				}},
 			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
 			}};
 
 			var events_per_day_by_device_options = {{
-			  title: 'Events by device trends',
-			  vAxis: {{minValue: 0}},
-			  hAxis: {{ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
-			  isStacked: false,
+			  title: 'Attack Events by device trends',
+			  vAxis: {{
+				minValue: 0,
+				title: 'Number of Attack Events'
+				}},
+			  hAxis: {{
+				ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1,
+				title: 'Day of the Month'
+				}},			  isStacked: false,
 			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
 			}};
 
 			var packets_per_day_by_device_options = {{
-			  title: 'Cumulative Packets by device (units {pkt_units})',
-			  vAxis: {{minValue: 0}},
-			  hAxis: {{ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
+			  title: 'Cumulative Packets by device',
+			  vAxis: {{
+				minValue: 0,
+				title: 'Packet units - {pkt_units}'
+				}},
+			  hAxis: {{
+				ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1,
+				title: 'Day of the Month'
+				}},
 			  isStacked: false,
 			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
@@ -1228,9 +1278,15 @@ if __name__ == '__main__':
 			}};
 
 			var bandwidth_per_day_by_device_options = {{
-			  title: 'Cumulative Malicious Bandwidth by device (units {bw_units})',
-			  vAxis: {{minValue: 0}},
-			  hAxis: {{ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
+			  title: 'Cumulative Malicious Bandwidth by device',
+			  vAxis: {{
+				minValue: 0,
+				title:'{bw_units}'
+				}},
+			  hAxis: {{
+				ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1,
+				title: 'Day of the Month'
+				}},
 			  isStacked: false,
 			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
@@ -1239,8 +1295,14 @@ if __name__ == '__main__':
 
 			var sip_events_per_day_options = {{
 			  title: 'Attack Events trends by source IP',
-			  vAxis: {{minValue: 0}},
-			  hAxis: {{ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
+			  vAxis: {{
+				minValue: 0,
+				title: 'Number of Attack Events'
+				}},
+			  hAxis: {{
+				ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1,
+				title: 'Day of the Month'
+				}},
 			  isStacked: false,
 			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
@@ -1248,9 +1310,15 @@ if __name__ == '__main__':
 			}};
 
 			var sip_packets_per_day_options = {{
-			  title: 'Cumulative Malicious Packets by Source IP (units {pkt_units})',
-			  vAxis: {{minValue: 0}},
-			  hAxis: {{ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
+			  title: 'Cumulative Malicious Packets by Source IP',
+			  vAxis: {{
+				minValue: 0,
+				title: 'Packet units - {pkt_units}'
+				}},
+			  hAxis: {{
+				ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1,
+				title: 'Day of the Month'
+				}},
 			  isStacked: false,
 			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
@@ -1258,9 +1326,15 @@ if __name__ == '__main__':
 			}};
 
 			var sip_bandwidth_per_day_options = {{
-			  title: 'Cumulative Malicious Bandwidth by Source IP (Megabytes)',
-			  vAxis: {{minValue: 0}},
-			  hAxis: {{ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
+			  title: 'Cumulative Malicious Bandwidth by Source IP',
+			  vAxis: {{
+				minValue: 0,
+				title:'Megabytes'
+				}},
+			  hAxis: {{
+				ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1,
+				title: 'Day of the Month'
+				}},
 			  isStacked: false,
 			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
@@ -1269,8 +1343,14 @@ if __name__ == '__main__':
 
 			var policy_events_per_day_options = {{
 			  title: 'Attack Events trends by Policy Name',
-			  vAxis: {{minValue: 0}},
-			  hAxis: {{ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
+			  vAxis: {{
+				minValue: 0,
+				title: 'Number of Attack Events'
+				}},
+			  hAxis: {{
+				ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1,
+				title: 'Day of the Month'
+				}},
 			  isStacked: false,
 			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
@@ -1278,9 +1358,15 @@ if __name__ == '__main__':
 			}};
 
 			var policy_packets_per_day_options = {{
-			  title: 'Cumulative Malicious Packets by policy (units {pkt_units})',
-			  vAxis: {{minValue: 0}},
-			  hAxis: {{ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
+			  title: 'Cumulative Malicious Packets by policy',
+			  vAxis: {{
+				minValue: 0,
+				title: 'Packet units - {pkt_units}'
+				}},
+			  hAxis: {{
+				ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1,
+				title: 'Day of the Month'
+				}},
 			  isStacked: false,
 			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
@@ -1288,9 +1374,15 @@ if __name__ == '__main__':
 			}};
 
 			var policy_bandwidth_per_day_options = {{
-			  title: 'Cumulative Malicious Bandwidth by policy (units {bw_units})',
-			  vAxis: {{minValue: 0}},
-			  hAxis: {{ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
+			  title: 'Cumulative Malicious Bandwidth by policy',
+			  vAxis: {{
+				minValue: 0,
+				title:'{bw_units}'
+				}},
+			  hAxis: {{
+				ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1,
+				title: 'Day of the Month'
+				}},
 			  isStacked: false,
 			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
@@ -1863,23 +1955,23 @@ if __name__ == '__main__':
 	  }}
 	  
 	  #maxpps_per_day_chart_div {{
-		height: 20vh;
+		height: 25vh;
 	  }}
 
 	  #maxbps_per_day_chart_div {{
-		height: 20vh;
+		height: 25vh;
 	  }}
 
 	  #events_per_day_chart_div {{
-		height: 20vh;
+		height: 25vh;
 	  }}
 
 	  #bandwidth_per_day_chart_div {{
-		height: 20vh;
+		height: 25vh;
 	  }}
 
 	  #packets_per_day_chart_div {{
-		height: 20vh;
+		height: 25vh;
 	  }}
 
 	  #attack_packets_per_day_chart_div {{
@@ -2136,7 +2228,7 @@ if __name__ == '__main__':
 				<div id="toc" class="toc-container">
 					<ul class="toc-list">
 						<li>
-						<b><a href="#section4">Connections insights (CPS/Concurrent Established)</a></b>
+						<b><a href="#section4">Connections Information (CPS/Concurrent Established)</a></b>
 						<ul class="sub-list">
 							<li><a href="#section4-1">Connections Per Second</a></li>
 							<li><a href="#section4-2">Concurrent Connections</a></li>
@@ -2631,7 +2723,7 @@ if __name__ == '__main__':
 
 
 		  <tr>
-		  	<td colspan="3">
+		  	<td colspan="3" style="border-bottom: 0;">
 			<h3 id="section3-4">Number of attack events by device</h3>
 			<div id="events_per_day_by_device_chart_div" style="height: 400px;" style="border-bottom: 0;">
 			</td>

@@ -191,7 +191,7 @@ def gen_charts_data(db_path):
 
 	cur.execute("SELECT startDayOfMonth, COUNT(*) FROM attacks GROUP BY startDayOfMonth")
 	
-	new_column_names = ['Day of the month', 'Security Events count']
+	new_column_names = ['Day of the month', 'Attack Events']
 
 	data = cur.fetchall()
 

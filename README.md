@@ -329,12 +329,13 @@ V11.8 (3/4/2025)
 V11.8.1 (3/5/2025)
 - Small improvement - scrol to TOC button now scrolls to the top of the page instead of the TOC
 - Fixed cosmetic appearance of X-Axis days in "Cumulative malicious bandwidth breakdown by attack vectors". Removed decimals
+- Added titles for X and Y axis
+- Made security events vs attack events consistent
 
 Next steps/Functionality/ideas to add more charts
-	Add units on x axis and vaxis
-	Make security events vs attack events consistent in html(Glenn comment)
-	Add all new reports we have on daily to monthly
-	Add cosmetics
+
+	
+	Replicate all new reports/cosmetics we have on daily to monthly
 	Add MAX daily bps/pps/cec/cps max values graph per day
 
 ===========================================================================================================================
