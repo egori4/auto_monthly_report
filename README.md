@@ -316,6 +316,15 @@ V11.7 (3/3/2025)
 - Added logic for 403 error and reauthentication
 - Code optimization
 
+V11.8 (3/4/2025)
+- Cosmetics:
+	- added header image
+	- changed title to on top of the header
+	- Added headlines to charts
+	- Charts renames
+	- Charts restructure
+	- Added Table of contents
+	- Added floating button to return to table of contents
 
 Next steps/Functionality/ideas to add more charts
 

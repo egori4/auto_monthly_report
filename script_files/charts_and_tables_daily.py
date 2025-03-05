@@ -256,7 +256,7 @@ def gen_charts_data(db_path):
 	cur.execute("SELECT startDayOfMonth, MAX(maxAttackPacketRatePps) as 'Max Attack rate PPS' FROM attacks GROUP BY startDayOfMonth ORDER BY startDayOfMonth")
 
 
-	new_column_names = ['Day of the month', 'Attack rate Max PPS']
+	new_column_names = ['Day of the month', 'MAX Attack rate PPS']
 
 	data = cur.fetchall()
 
@@ -280,7 +280,7 @@ def gen_charts_data(db_path):
 	cur.execute(f"SELECT startDayOfMonth, {bps_units} as 'Max Attack rate BPS' FROM attacks GROUP BY startDayOfMonth ORDER BY startDayOfMonth")
 
 
-	new_column_names = ['Day of the month', 'Attack rate Max BPS']
+	new_column_names = ['Day of the month', 'MAX attack rate']
 
 	data = cur.fetchall()
 

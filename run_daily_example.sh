@@ -63,6 +63,7 @@ top_n=7
 collect_data=true
 gen_python_csv_data=true  #generate csv data using python scripts
 modify_csv=true
+db_from_forensics=false
 analyze_trends=true
 email_send=true
 ####################################################################################################
