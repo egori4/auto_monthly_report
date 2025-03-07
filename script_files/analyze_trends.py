@@ -290,8 +290,9 @@ def csv_to_html_table(filename, bw_units=None, pkt_units=None):
 
 	# Apply formatting to numeric columns
 	if bw_units or pkt_units and filename!=charts_tables_path + 'sip_ppm_table_lm.csv':
-		formatted_df = df.applymap(lambda x: format_numeric_value(x, bw_units, pkt_units))
-	
+		# formatted_df = df.applymap(lambda x: format_numeric_value(x, bw_units, pkt_units))
+		formatted_df = df.apply(lambda column: column.apply(lambda x: format_numeric_value(x, bw_units, pkt_units)))
+
 	else:
 		df = df.apply(convert_to_int, axis=0)
 		formatted_df = df

@@ -341,6 +341,14 @@ V11.9 (3/7/2025)
 	- Added "Back to Top" button
 	- Aligned naming convention
 	- Cosmetic improvements
+	- replaced deprecated df.applymap by df.apply to avoid warning
+		analyze_trends.py:293: FutureWarning: DataFrame.applymap has been deprecated. Use DataFrame.map instead.
+
+  			formatted_df = df.applymap(lambda x: format_numeric_value(x, bw_units, pkt_units))
+
+			replaced by 
+
+			formatted_df = df.apply(lambda column: column.apply(lambda x: format_numeric_value(x, bw_units, pkt_units)))
 
 Next steps/Functionality/ideas to add more charts
 
