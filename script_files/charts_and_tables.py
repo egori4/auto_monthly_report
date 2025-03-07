@@ -172,10 +172,10 @@ def gen_charts_data(db_path):
 		f.write('Month, Total Events')
 
 	with open(tmp_path + 'ppm_total_bar.csv', 'w') as f:
-		f.write('Month, Total Malicious Packets')
+		f.write('Month, Total Attack Packets')
 
 	with open(tmp_path + 'bpm_total_bar.csv', 'w') as f:
-		f.write('Month, Total Malicious Bandwidth')
+		f.write('Month, Total Attack Volume')
 
 	with open(tmp_path + 'total_attack_time_bar.csv', 'w') as f:
 		f.write('Month, Total attack time(days)')
@@ -231,11 +231,11 @@ def gen_charts_data(db_path):
 
 
 
-				####Get malicious bandwidth by day from the last month and write to csv########
+				####Get Attack Volume by day from the last month and write to csv########
 					
 				cur.execute(f"SELECT startDayOfMonth, {bw_units_sum} FROM attacks GROUP BY startDayOfMonth")
 							
-				new_column_names = ['Day of the month', 'Malicious Bandwidth']
+				new_column_names = ['Day of the month', 'Attack Volume']
 
 				data = cur.fetchall()
 	
@@ -299,7 +299,7 @@ def gen_charts_data(db_path):
 				###################################################################
 
 
-				####Get malicious packets by day from the last month and write to csv########
+				####Get Attack Packets by day from the last month and write to csv########
 
 				if pkt_units.lower() == 'thousands':					
 					cur.execute("SELECT startDayOfMonth, SUM(packetCount)/1000 FROM attacks GROUP BY startDayOfMonth")
@@ -310,7 +310,7 @@ def gen_charts_data(db_path):
 				if pkt_units.lower() == 'billions':
 					cur.execute("SELECT startDayOfMonth, SUM(packetCount)/1000000000 FROM attacks GROUP BY startDayOfMonth")
 							
-				new_column_names = ['Day of the month', 'Malicious Packets']
+				new_column_names = ['Day of the month', 'Attack Packets']
 
 				data = cur.fetchall()
 	
@@ -337,22 +337,22 @@ def gen_charts_data(db_path):
 					writer.writerow(['Device', 'Number of Events'])
 					writer.writerows(device_epm_this_month)
 
-				########Get malicious packets by device this month and write to csv#########
+				########Get Attack Packets by device this month and write to csv#########
 				cur.execute("select deviceName as 'Device Name', sum(packetCount) as 'Total Events' from attacks group by deviceName order by sum(packetCount) desc")
 
 				device_ppm_this_month = cur.fetchall()[:top_n]
 				with open(tmp_path + 'device_ppm_chart_this_month.csv', 'w', newline='') as f:
 					writer = csv.writer(f)
-					writer.writerow(['Device', 'Malicious Packets'])
+					writer.writerow(['Device', 'Attack Packets'])
 					writer.writerows(device_ppm_this_month)
 
-				########Get malicious bandwidth by device this month and write to csv#########
+				########Get Attack Volume by device this month and write to csv#########
 				cur.execute("select deviceName as 'Device Name', sum(packetBandwidth) as 'Total Events' from attacks group by deviceName order by sum(packetBandwidth) desc")
 
 				device_bpm_this_month = cur.fetchall()[:top_n]
 				with open(tmp_path + 'device_bpm_chart_this_month.csv', 'w', newline='') as f:
 					writer = csv.writer(f)
-					writer.writerow(['Device', 'Malicious Bandwidth'])
+					writer.writerow(['Device', 'Attack Volume'])
 					writer.writerows(device_bpm_this_month)
 
 			########Get total events count this month and write to csv#########
@@ -363,8 +363,8 @@ def gen_charts_data(db_path):
 				f.write(f'\n{month_name},{total_events_this_month}')
 			###################################################################
 
-			########Get total malicious packets this month and write to csv#########
-			cur.execute(f"select month as Month,sum(packetCount) as \'Malicious Packets\' from attacks")
+			########Get total Attack Packets this month and write to csv#########
+			cur.execute(f"select month as Month,sum(packetCount) as \'Attack Packets\' from attacks")
 			total_packets_this_month = cur.fetchall()[0][1]
 
 
@@ -373,8 +373,8 @@ def gen_charts_data(db_path):
 			###################################################################
 
 
-			########Get total malicious bandwidth this month and write to csv#########
-			cur.execute(f"select month as Month,sum(packetBandwidth) as \'Malicious Bandwidth\' from attacks")
+			########Get total Attack Volume this month and write to csv#########
+			cur.execute(f"select month as Month,sum(packetBandwidth) as \'Attack Volume\' from attacks")
 			total_bw_this_month = cur.fetchall()[0][1]
 
 

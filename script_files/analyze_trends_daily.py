@@ -2148,7 +2148,7 @@ if __name__ == '__main__':
   AAAAkIdgCAAAAACQh2AIAAAAAJCHYAgAAAAAkIdgCAAAAACQh2AIAAAAApHBj/C92OYLskdJAmgAAAABJRU5ErkJggg==" alt="Header Image" width="100%" height="100px">
 </div>
 
-<h1 class="headline">Radware Daily report {month},{year} - {cust_id}</h1>
+<h1 class="headline">Radware Daily trends report {month}, {year} - {cust_id}</h1>
 
 <table class="toc-table">
 	
@@ -2166,7 +2166,7 @@ if __name__ == '__main__':
 				<div id="toc" class="toc-container">
 					<ul class="toc-list">
 						<li>
-						<b><a href="#section1">Attack Traffic Overview (Volume - Mbps/Gbps/Cumulative GB)</a></b>
+						<b><a href="#section1">Attack Traffic Overview (Volume - Mbps/Cumulative GB)</a></b>
 						<ul class="sub-list">
 							<li><a href="#section1-1">All Attacks per device</a></li>
 							<li><a href="#section1-2">Legitimate Traffic Volume per device</a></li>
@@ -2250,7 +2250,7 @@ if __name__ == '__main__':
 
 
 <div class="sticky-header">
-	<h2 id="section1">Attack Traffic Overview (Volume - Mbps/Gbps/Cumulative GB)</h2>
+	<h2 id="section1">Attack Traffic Overview (Volume - Mbps/Cumulative GB)</h2>
 </div>	
 
 
@@ -2865,7 +2865,7 @@ if __name__ == '__main__':
 	  </table>
 
 	  <!-- Floating "Back to TOC" Button -->
-  <button id="backToToc" class="back-to-toc hidden" onclick="scrollToToc()">⬆ Back to TOC</button>
+  <button id="backToToc" class="back-to-toc hidden" onclick="scrollToToc()">⬆ Back to TOP</button>
 
 	</body>
 

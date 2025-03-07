@@ -69,6 +69,9 @@ with open (run_file) as f:
 			else:
 				db_from_forensics = False
 			continue
+		if line.startswith('top_n'):	
+			top_n = int(line.split('=')[1].replace('\n',''))
+			continue
 
 ########################################### Functions ####################################################
 def convert_csv_to_list_of_lists(filename):
@@ -302,7 +305,7 @@ def csv_to_html_table(filename, bw_units=None, pkt_units=None):
 def write_html(html_page,month,year):
 	# write html_page to file function
 
-	with open(reports_path + f'trends-monthly_{cust_id}_{month}_{year}.html', 'w') as f:
+	with open(reports_path + f'trends-monthly_{cust_id}_{month}_{year}.html', 'w', encoding="utf-8") as f:
 		f.write(html_page)
 
 
@@ -344,7 +347,7 @@ def events_per_day_html():
 	events_per_day = data_month.groupby(['Day of the Month', 'Attack Name', 'Device Name', 'Policy Name']).size()
 
 	# Get the top 5 events with the highest sum of packet counts for each day
-	events_per_day_top5 = events_per_day.groupby(level=['Day of the Month'], group_keys=False).nlargest(5).apply(format_with_commas).to_frame('Security Events Count')
+	events_per_day_top5 = events_per_day.groupby(level=['Day of the Month'], group_keys=False).nlargest(5).apply(format_with_commas).to_frame('Attack Events Count')
 	events_per_day_top5 = events_per_day_top5.to_html()
 
 	for device_ip, device_name in defensepros.items():
@@ -384,7 +387,7 @@ def bandwidth_per_day_html():
 	bandwidth_per_day = bandwidth_per_day.apply(bw_units_conversion)
 
 	# Get the top 5 events with the highest sum of packet counts for each day
-	bandwidth_per_day_top5 = bandwidth_per_day.groupby(level=['Day of the Month'], group_keys=False).nlargest(5).apply(format_with_commas).to_frame('Malicious bandwidth sum')
+	bandwidth_per_day_top5 = bandwidth_per_day.groupby(level=['Day of the Month'], group_keys=False).nlargest(5).apply(format_with_commas).to_frame('Attack Volume sum')
 	bandwidth_per_day_top5 = bandwidth_per_day_top5.to_html()
 
 	for device_ip, device_name in defensepros.items():
@@ -402,7 +405,7 @@ def packets_per_day_html():
 	packets_per_day = packets_per_day.apply(pkt_units_conversion)
 
 	# Get the top 5 events with the highest sum of packet counts for each day
-	packets_per_day_top5 = packets_per_day.groupby(level=['Day of the Month'], group_keys=False).nlargest(5).apply(format_with_commas).to_frame('Malicious Packets sum')
+	packets_per_day_top5 = packets_per_day.groupby(level=['Day of the Month'], group_keys=False).nlargest(5).apply(format_with_commas).to_frame('Attack Packets sum')
 	packets_per_day_top5 = packets_per_day_top5.to_html()
 
 	for device_ip, device_name in defensepros.items():
@@ -414,7 +417,7 @@ def packets_per_day_html():
 def epm_html(epm):
 	data_month_epm = data_month[data_month['Attack Name'] == epm]
 	series_epm = data_month_epm.groupby(['Attack Name','Device Name','Policy Name']).size().sort_values(ascending=False).apply(format_with_commas).head(10)
-	epm_html = series_epm.to_frame('Security Events')
+	epm_html = series_epm.to_frame('Attack Events')
 	epm_html=epm_html.to_html()
 
 	for device_ip, device_name in defensepros.items():
@@ -427,7 +430,7 @@ def ppm_html(ppm):
 	series_ppm = data_month_ppm.groupby(['Attack Name','Device Name','Policy Name']).sum()['packetCount'].sort_values(ascending=False)
 	# Convert units
 	series_ppm = series_ppm.apply(pkt_units_conversion).apply(format_with_commas).head(10)
-	ppm_html = series_ppm.to_frame('Malicious Packets')
+	ppm_html = series_ppm.to_frame('Attack Packets')
 	ppm_html=ppm_html.to_html()
 
 	for device_ip, device_name in defensepros.items():
@@ -440,7 +443,7 @@ def bpm_html(bpm):
 	series_bpm = data_month_bpm.groupby(['Attack Name','Device Name','Policy Name']).sum()['packetBandwidth'].sort_values(ascending=False)
 	# Convert units
 	series_bpm = series_bpm.apply(bw_units_conversion).apply(format_with_commas).head(10)
-	df_bpm_html = series_bpm.to_frame('Malicious Bandwidth')
+	df_bpm_html = series_bpm.to_frame('Attack Volume')
 	df_bpm_html=df_bpm_html.to_html()
 
 	for device_ip, device_name in defensepros.items():
@@ -457,7 +460,7 @@ def device_epm_html(device_epm):
 
 			data_month_epm = data_month[data_month['Device Name'] == device_ip]
 			device_series_epm = data_month_epm.groupby(['Device Name','Attack Name','Policy Name']).size().sort_values(ascending=False).apply(format_with_commas).head(10)
-			device_epm_html = device_series_epm.to_frame('Security Events')
+			device_epm_html = device_series_epm.to_frame('Attack Events')
 			device_epm_html=device_epm_html.to_html().replace(device_ip, device_name)
 			return device_epm_html
 		else:
@@ -470,7 +473,7 @@ def device_ppm_html(device_ppm):
 			data_month_ppm = data_month[data_month['Device Name'] == device_ip]
 			device_series_ppm = data_month_ppm.groupby(['Device Name','Attack Name','Policy Name']).sum()['packetCount'].sort_values(ascending=False)
 			device_series_ppm = device_series_ppm.apply(pkt_units_conversion).apply(format_with_commas).head(10)
-			device_ppm_html = device_series_ppm.to_frame('Malicious Packets')
+			device_ppm_html = device_series_ppm.to_frame('Attack Packets')
 			device_ppm_html=device_ppm_html.to_html().replace(device_ip, device_name)
 			return device_ppm_html
 		else:
@@ -483,7 +486,7 @@ def device_bpm_html(device_bpm):
 			data_month_bpm = data_month[data_month['Device Name'] == device_ip]
 			device_series_bpm = data_month_bpm.groupby(['Device Name','Attack Name','Policy Name']).sum()['packetBandwidth'].sort_values(ascending=False)
 			device_series_bpm = device_series_bpm.apply(bw_units_conversion).apply(format_with_commas).head(10)
-			device_df_bpm_html = device_series_bpm.to_frame('Malicious Bandwidth')
+			device_df_bpm_html = device_series_bpm.to_frame('Attack Volume')
 			device_df_bpm_html= device_df_bpm_html.to_html().replace(device_ip, device_name)
 			return device_df_bpm_html
 		else:
@@ -494,7 +497,7 @@ def policy_epm_html(policy_epm):
 
 	data_month_epm = data_month[data_month['Policy Name'] == policy_epm]
 	series_epm = data_month_epm.groupby(['Policy Name','Attack Name','Device Name']).size().sort_values(ascending=False).apply(format_with_commas).head(10)
-	epm_html = series_epm.to_frame('Security Events')
+	epm_html = series_epm.to_frame('Attack Events')
 	epm_html=epm_html.to_html()
 
 	for device_ip, device_name in defensepros.items():
@@ -506,7 +509,7 @@ def policy_ppm_html(policy_ppm):
 	data_month_ppm = data_month[data_month['Policy Name'] == policy_ppm]
 	series_ppm = data_month_ppm.groupby(['Policy Name','Attack Name','Device Name']).sum()['packetCount'].sort_values(ascending=False)
 	series_ppm = series_ppm.apply(pkt_units_conversion).apply(format_with_commas).head(10)
-	ppm_html = series_ppm.to_frame('Malicious Packets')
+	ppm_html = series_ppm.to_frame('Attack Packets')
 	ppm_html=ppm_html.to_html()
 	
 	for device_ip, device_name in defensepros.items():
@@ -518,7 +521,7 @@ def policy_bpm_html(policy_bpm):
 	data_month_bpm = data_month[data_month['Policy Name'] == policy_bpm]
 	series_bpm = data_month_bpm.groupby(['Policy Name','Attack Name','Device Name']).sum()['packetBandwidth'].sort_values(ascending=False)
 	series_bpm = series_bpm.apply(bw_units_conversion).apply(format_with_commas).head(10)
-	df_bpm_html = series_bpm.to_frame('Malicious Bandwidth')
+	df_bpm_html = series_bpm.to_frame('Attack Volume')
 	df_bpm_html=df_bpm_html.to_html()
 
 	for device_ip, device_name in defensepros.items():
@@ -531,7 +534,7 @@ def sip_epm_html(sip_epm):
 
 	data_month_epm = data_month[data_month['Source IP'] == sip_epm]
 	series_epm = data_month_epm.groupby(['Source IP','Attack Name','Device Name','Policy Name']).size().sort_values(ascending=False).apply(format_with_commas).head(10)
-	epm_html = series_epm.to_frame('Security Events')
+	epm_html = series_epm.to_frame('Attack Events')
 	epm_html=epm_html.to_html()
 
 	for device_ip, device_name in defensepros.items():
@@ -544,7 +547,7 @@ def sip_ppm_html(sip_ppm):
 	data_month_ppm = data_month[data_month['Source IP'] == sip_ppm]
 	series_ppm = data_month_ppm.groupby(['Source IP','Attack Name','Device Name','Policy Name']).sum()['packetCount'].sort_values(ascending=False)
 	series_ppm = series_ppm.apply(pkt_units_conversion).apply(format_with_commas).head(10)
-	ppm_html = series_ppm.to_frame('Malicious Packets')
+	ppm_html = series_ppm.to_frame('Attack Packets')
 	ppm_html=ppm_html.to_html()
 	
 	for device_ip, device_name in defensepros.items():
@@ -556,7 +559,7 @@ def sip_bpm_html(sip_bpm):
 	data_month_bpm = data_month[data_month['Source IP'] == sip_bpm]
 	series_bpm = data_month_bpm.groupby(['Source IP','Attack Name','Device Name','Policy Name']).sum()['packetBandwidth'].sort_values(ascending=False)
 	series_bpm = series_bpm.apply(bw_units_conversion).apply(format_with_commas).head(10)
-	df_bpm_html = series_bpm.to_frame('Malicious Bandwidth')
+	df_bpm_html = series_bpm.to_frame('Attack Volume')
 	df_bpm_html=df_bpm_html.to_html()
 
 	for device_ip, device_name in defensepros.items():
@@ -575,7 +578,7 @@ if __name__ == '__main__':
 
 	maxpps_per_day_trends = convert_csv_to_list_of_lists(charts_tables_path + 'maxpps_per_day_last_month.csv')
 
-	# Malicious bandwidth per day
+	# Attack Volume per day
 	maxbps_per_day_trends = convert_csv_to_list_of_lists(charts_tables_path + 'maxbps_per_day_last_month.csv')
 
 	# Traffic utilization
@@ -587,10 +590,10 @@ if __name__ == '__main__':
 	# Events per day count
 	events_per_day_trends = convert_csv_to_list_of_lists(charts_tables_path + 'events_per_day_last_month.csv')
 	
-	# Malicious bandwidth per day
+	# Attack Volume per day
 	bandwidth_per_day_trends = convert_csv_to_list_of_lists(charts_tables_path + 'bandwidth_per_day_last_month.csv')
 
-	# Malicious bandwidth per day
+	# Attack Volume per day
 	packets_per_day_trends = convert_csv_to_list_of_lists(charts_tables_path + 'packets_per_day_last_month.csv')
 
 
@@ -638,7 +641,7 @@ if __name__ == '__main__':
 				bw_total_bar_max = int(row[1]*1.1)
 			row.append(float(row[1])) 
 
-	bw_total_bar_move = trends_move_total(bw_total_bar, bw_units) 
+	bw_total_bar_move = trends_move_total(bw_total_bar, ' attack volume(' + bw_units + ')'  ) 
 
 	################################################# Events, packets and bandwidth trends by Attack name sorted by the last month ##########################################################
 	events_trends = convert_csv_to_list_of_lists(charts_tables_path + 'epm_chart_lm.csv')
@@ -847,7 +850,7 @@ if __name__ == '__main__':
 			row.append(int(row[1]))
 		
 
-	# Malicious packets by device this month (blue bars charts)
+	# Attack Packets by device this month (blue bars charts)
 	device_ppm_chart_this_month = convert_csv_to_list_of_lists(charts_tables_path + 'device_ppm_chart_this_month.csv')
 	device_ppm_chart_this_month = convert_packets_units(device_ppm_chart_this_month, pkt_units)
 
@@ -865,7 +868,7 @@ if __name__ == '__main__':
 				device_ppm_chart_this_month_max = int(row[1]*1.1)
 			row.append(int(row[1]))  # Populate annotataion column with the same value as the data column
 
-	# Malicious bandwidth by device this month (blue bars charts)
+	# Attack Volume by device this month (blue bars charts)
 	device_bpm_chart_this_month = convert_csv_to_list_of_lists(charts_tables_path + 'device_bpm_chart_this_month.csv')
 	device_bpm_chart_this_month = convert_bw_units(device_bpm_chart_this_month, bw_units)
 
@@ -934,14 +937,6 @@ if __name__ == '__main__':
 				return [new Date(row[0]), ...row.slice(1)]; // Convert first column, keep others unchanged
 			}});
 
-			var traffic_per_device_combined_trends_bps_data = google.visualization.arrayToDataTable(raw_traffic_per_device_combined_trends_bps_data);
-			
-			var maxpps_per_day_data = google.visualization.arrayToDataTable({maxpps_per_day_trends});
-			var maxbps_per_day_data = google.visualization.arrayToDataTable({maxbps_per_day_trends});
-
-			var events_per_day_data = google.visualization.arrayToDataTable({events_per_day_trends});
-			var bandwidth_per_day_data = google.visualization.arrayToDataTable({bandwidth_per_day_trends});
-			var packets_per_day_data = google.visualization.arrayToDataTable({packets_per_day_trends});
   
 			var epm_total_data = google.visualization.arrayToDataTable({events_total_bar_chart});
 			var ppm_total_data = google.visualization.arrayToDataTable({packets_total_bar});
@@ -974,111 +969,17 @@ if __name__ == '__main__':
 			var total_attacks_days_data = google.visualization.arrayToDataTable({total_attacks_days_bar_chart});
 
 			
-			var traffic_per_device_combined_trends_bps_options = {{
-				title: 'Traffic utilization per device combined',
-				vAxis: {{
-					title: 'Traffic Volume (Mbps)',
-					minValue: 0
-					}},
-				hAxis: {{
-					title: 'Date and time'
-					}},
-				isStacked: false,
-				focusTarget: 'category',
-				legend: {{position: 'top', maxLines: 5}},
-				width: '100%',
-				explorer: {{
-					actions: ['dragToZoom', 'rightClickToReset'],
-					axis: 'horizontal',
-					maxZoomIn: 0.01,
-					maxZoomOut: 20
-					}}
-				}};
 
-			var maxpps_per_day_options = {{
-			  title: 'Highest attack of the day (PPS), last month',
-			  vAxis: {{
-				minValue: 0,
-				title: 'Attack rate PPS'
-				}},
-			  hAxis: {{
-				title: 'Day of the Month',
-				ticks: maxpps_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1
-				
-				}},
-			  isStacked: false,
-			  legend: {{position: 'top', maxLines: 5}},
-			  width: '100%'
-			}};
-
-			var maxbps_per_day_options = {{
-			  title: 'Highest attack of the day ({bps_units_desc}), last month',
-			  vAxis: {{
-				minValue: 0,
-				title: 'Attack rate {bps_units_desc}'
-				}},
-			  hAxis: {{
-				ticks: maxbps_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1,
-				title: 'Day of the Month'
-				}},
-			  isStacked: false,
-			  legend: {{position: 'top', maxLines: 5}},
-			  width: '100%'
-			}};
-
-			var events_per_day_options = {{
-			  title: 'Events per day, last month',
-			  vAxis: {{
-				minValue: 0,
-				title: 'Number of events'
-				}},
-			  hAxis: {{
-				ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1,
-				title: 'Day of the Month'
-				}},
-			  isStacked: false,
-			  legend: {{position: 'top', maxLines: 5}},
-			  width: '100%'
-			}};
-
-			var packets_per_day_options = {{
-			  title: 'Cumulative sum of malicious packets per day, last month',
-			  vAxis: {{
-				minValue: 0,
-				title: 'Units {pkt_units}'}},
-			  hAxis: {{
-				ticks: packets_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1,
-				title: 'Day of the Month'
-				}},
-			  isStacked: false,
-			  legend: {{position: 'top', maxLines: 5}},
-			  width: '100%'
-			}};
-
-			var bandwidth_per_day_options = {{
-			  title: 'Cumulative sum of malicious bandwidth per day, last month',
-			  vAxis: {{
-				minValue: 0,
-				title: 'Units {bw_units}'
-				}},
-			  hAxis: {{
-				ticks: bandwidth_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1,
-				title: 'Day of the Month'
-				}},
-			  isStacked: false,
-			  legend: {{position: 'top', maxLines: 5}},
-			  width: '100%'
-			}};
 
 			var epm_total_options = {{
-			  title: 'Total Events trends',
+			  title: 'Total Attack Events trends',
 			  bar: {{groupWidth: "70%"}},
 			  legend: {{position: 'bottom'}},
 			  hAxis: {{
 				title: 'Months',
 				}},
 			  vAxis: {{
-				title: 'Number of events',
+				title: 'Number of attack events',
 				minValue: 0,
 				maxValue: {events_total_bar_chart_max}
 				}},
@@ -1089,7 +990,7 @@ if __name__ == '__main__':
 			}};
 
 			var ppm_total_options = {{
-			  title: 'Total Malicious Packets count trends',
+			  title: 'Total Attack Packets trends(cumulative)',
 			  bar: {{groupWidth: "70%"}},
 			  legend: {{
 				position: 'bottom'
@@ -1098,7 +999,7 @@ if __name__ == '__main__':
 				title: 'Months',
 				}},
 			  vAxis: {{
-				title: 'Malicious packets (units {pkt_units})',
+				title: 'Attack packets (units {pkt_units})',
 				minValue: 0,
 				maxValue: {packets_total_bar_max}
 				}},
@@ -1109,7 +1010,7 @@ if __name__ == '__main__':
 			}};
 
 			var bpm_total_options = {{
-			  title: 'Total Malicious bandwidth sum trends',
+			  title: 'Total Attack volume trends(cumulative)',
 			  bar: {{
 				groupWidth: "70%"
 				}},
@@ -1120,7 +1021,7 @@ if __name__ == '__main__':
 				title: 'Months'
 				}},
 			  vAxis: {{
-				title: 'Malicious bandwidth (units {bw_units})',
+				title: 'Attack volume (units {bw_units})',
 				minValue: 0,
 				maxValue: {bw_total_bar_max}
 				}},
@@ -1131,10 +1032,10 @@ if __name__ == '__main__':
 			}};
 
 			var epm_options = {{
-			  title: 'Security Events trends - TopN by last month',
+			  title: 'Number of Attack Events - Ranked by Last Month',
 			  vAxis: {{
 				minValue: 0,
-				title: 'Number of events'}},
+				title: 'Number of attack events'}},
 			  hAxis: {{
 				title: 'Months'
 				}},
@@ -1145,10 +1046,10 @@ if __name__ == '__main__':
 			}};
 
 			var ppm_options = {{
-			  title: 'Malicious Packets trends - TopN by last month',
+			  title: 'Attack Packets trends - Ranked by Last Month',
 			  vAxis: {{
 				minValue: 0,
-				title: 'Malicious packets (units {pkt_units})'}},
+				title: 'Attack packets (units {pkt_units})'}},
 			  hAxis: {{
 				title: 'Months'
 				}},
@@ -1159,10 +1060,10 @@ if __name__ == '__main__':
 			}};
 
 			var bpm_options = {{
-			  title: 'Malicious Bandwidth trends - TopN by last month',
+			  title: 'Attack volume trends - Ranked by Last Month',
 			  vAxis: {{
 				minValue: 0,
-				title: 'Malicious bandwidth (units {bw_units})'}},
+				title: 'Attack volume (units {bw_units})'}},
 			  hAxis: {{
 				title: 'Months',
 				}},
@@ -1173,10 +1074,10 @@ if __name__ == '__main__':
 			}};
 
 			var epm_options_alltimehigh = {{
-			  title: 'Security Events trends - TopN all time high',
+			  title: 'Top {top_n} Attacks trends - Ranked by All Months Combined',
 			  vAxis: {{
 				minValue: 0,
-				title: 'Number of events'}},
+				title: 'Number of Attack Events'}},
 			  hAxis: {{
 				title: 'Months',
 				}},
@@ -1187,10 +1088,10 @@ if __name__ == '__main__':
 			}};
 
 			var ppm_options_alltimehigh = {{
-			  title: 'Malicious Packets trends - TopN all time high',
+			  title: 'Attack Packets trends - {top_n} all time high',
 			  vAxis: {{
 				minValue: 0,
-				title: 'Malicious packets (units {pkt_units})'}},
+				title: 'Attack Packets (units {pkt_units})'}},
 			  hAxis: {{
 				title: 'Months',
 				}},
@@ -1201,10 +1102,10 @@ if __name__ == '__main__':
 			}};
 
 			var bpm_options_alltimehigh = {{
-			  title: 'Malicious Bandwidth trends - TopN all time high',
+			  title: 'Attack Volume trends - {top_n} all time high',
 			  vAxis: {{
 				minValue: 0,
-				title: 'Malicious bandwidth (units {bw_units})'}},
+				title: 'Attack Volume (units {bw_units})'}},
 			  hAxis: {{
 				title: 'Months',
 				}},
@@ -1218,7 +1119,7 @@ if __name__ == '__main__':
 			  title: 'Events by device trends',
 			  vAxis: {{
 				minValue: 0,
-				title: 'Number of events'}},
+				title: 'Number of Attack Events'}},
 			  hAxis: {{
 				title: 'Months',
 				}},
@@ -1232,7 +1133,7 @@ if __name__ == '__main__':
 			  title: 'Packets by device trends',
 			  vAxis: {{
 				minValue: 0,
-				title: 'Malicious packets (units {pkt_units})'}},
+				title: 'Attack Packets (units {pkt_units})'}},
 			  hAxis: {{
 				title: 'Months',
 				}},
@@ -1243,10 +1144,10 @@ if __name__ == '__main__':
 			}};
 
 			var bpm_by_device_options = {{
-			  title: 'Malicious Bandwidth by device trends',
+			  title: 'Attack Volume by device trends',
 			  vAxis: {{
 				minValue: 0,
-				title: 'Malicious bandwidth (units {bw_units})'}},
+				title: 'Attack Volume (units {bw_units})'}},
 			  hAxis: {{
 				title: 'Months',
 				}},
@@ -1258,14 +1159,14 @@ if __name__ == '__main__':
 
 			
 			var device_epm_chart_this_month_options = {{
-			  title: 'Number of Events by device - this Month (Top N)',
+			  title: 'Number of Attack Events by device - this Month',
 			  bar: {{groupWidth: "70%"}},
 			  legend: {{position: 'bottom'}},
 			  hAxis: {{
 				title: 'Device',
 				}},
 			  vAxis: {{
-				title: 'Number of events',
+				title: 'Number of Attack Events',
 				minValue: 0,
 				maxValue: {device_epm_chart_this_month_max}
 				}},
@@ -1276,7 +1177,7 @@ if __name__ == '__main__':
 			}};
 
 			var device_ppm_chart_this_month_options = {{
-			  title: 'Malicious Packets by device - this Month (Top N)',
+			  title: 'Attack Packets by device - this Month',
 			  bar: {{groupWidth: "70%"}},
 			  legend: {{
 				position: 'bottom'
@@ -1285,7 +1186,7 @@ if __name__ == '__main__':
 				title: 'Device',
 				}},
 			  vAxis: {{
-				title: 'Malicious packets (units {pkt_units})',
+				title: 'Attack Packets (units {pkt_units})',
 				minValue: 0,
 				maxValue: {device_ppm_chart_this_month_max}
 				}},
@@ -1296,7 +1197,7 @@ if __name__ == '__main__':
 			}};
 
 			var device_bpm_chart_this_month_options = {{
-			  title: 'Malicious Bandwidth by device - this Month (Top N)',
+			  title: 'Attack Volume by device - this Month',
 			  bar: {{groupWidth: "70%"}},
 			  legend: {{
 				position: 'bottom'
@@ -1305,7 +1206,7 @@ if __name__ == '__main__':
 				title: 'Device',
 				}},
 			  vAxis: {{
-				title: 'Malicious bandwidth (units {bw_units})',
+				title: 'Attack Volume (units {bw_units})',
 				minValue: 0,
 				maxValue: {device_bpm_chart_this_month_max}
 				}},
@@ -1318,10 +1219,10 @@ if __name__ == '__main__':
 
 
 			var sip_epm_options = {{
-			  title: 'Security Events trends by source IP',
+			  title: 'Attack Events trends by source IP',
 			  vAxis: {{
 				minValue: 0,
-				title: 'Number of events'}},
+				title: 'Number of Attack Events'}},
 			  hAxis: {{
 				title: 'Months',
 				}},
@@ -1332,10 +1233,10 @@ if __name__ == '__main__':
 			}};
 
 			var sip_ppm_options = {{
-			  title: 'Malicious Packets trends - by source IP',
+			  title: 'Attack Packets trends - by source IP',
 			  vAxis: {{
 				minValue: 0,
-				title: 'Malicious packets'}},
+				title: 'Attack Packets'}},
 			  hAxis: {{
 				title: 'Months',
 				}},
@@ -1346,10 +1247,10 @@ if __name__ == '__main__':
 			}};
 
 			var sip_bpm_options = {{
-			  title: 'Malicious Bandwidth trends - by source IP',
+			  title: 'Attack Volume trends - by source IP',
 			  vAxis: {{
 				minValue: 0,
-				title: 'Malicious bandwidth (units Megabytes)'}},
+				title: 'Attack Volume (units Megabytes)'}},
 			  hAxis: {{
 				title: 'Months',
 				}},
@@ -1360,10 +1261,10 @@ if __name__ == '__main__':
 			}};
 
 			var policy_epm_options = {{
-			  title: 'Security Events trends by Policy',
+			  title: 'Attack Events trends by Policy',
 			  vAxis: {{
 				minValue: 0,
-				title: 'Number of events'}},
+				title: 'Number of Attack Events'}},
 			  hAxis: {{
 				title: 'Months',
 				}},
@@ -1374,10 +1275,10 @@ if __name__ == '__main__':
 			}};
 
 			var policy_ppm_options = {{
-			  title: 'Malicious Packets trends - by Policy',
+			  title: 'Attack Packets trends - by Policy',
 			  vAxis: {{
 				minValue: 0,
-				title: 'Malicious packets (units {pkt_units})'}},
+				title: 'Attack Packets (units {pkt_units})'}},
 			  hAxis: {{
 				title: 'Months',
 				}},
@@ -1388,10 +1289,10 @@ if __name__ == '__main__':
 			}};
 
 			var policy_bpm_options = {{
-			  title: 'Malicious Bandwidth trends - by Policy',
+			  title: 'Attack Volume trends - by Policy',
 			  vAxis: {{
 				minValue: 0,
-				title: 'Malicious bandwidth (units {bw_units})'}},
+				title: 'Attack Volume (units {bw_units})'}},
 			  hAxis: {{
 				title: 'Months',
 				}},
@@ -1421,14 +1322,7 @@ if __name__ == '__main__':
 			  width: '100%'
 			}};
 
-			var traffic_per_device_combined_trends_bps_chart = new google.visualization.AreaChart(document.getElementById('traffic_per_device_combined_trends_bps_chart_div'));
 
-			var maxpps_per_day_chart = new google.visualization.AreaChart(document.getElementById('maxpps_per_day_chart_div'));
-			var maxbps_per_day_chart = new google.visualization.AreaChart(document.getElementById('maxbps_per_day_chart_div'));
-
-			var events_per_day_chart = new google.visualization.AreaChart(document.getElementById('events_per_day_chart_div'));
-			var bandwidth_per_day_chart = new google.visualization.AreaChart(document.getElementById('bandwidth_per_day_chart_div'));
-			var packets_per_day_chart = new google.visualization.AreaChart(document.getElementById('packets_per_day_chart_div'));
 
 			var epm_total_chart = new google.visualization.ColumnChart(document.getElementById('epm_total_chart_div'));
 			var ppm_total_chart = new google.visualization.ColumnChart(document.getElementById('ppm_total_chart_div'));
@@ -1460,12 +1354,7 @@ if __name__ == '__main__':
 
 			var total_attacks_days_chart = new google.visualization.ColumnChart(document.getElementById('total_attacks_days_chart_div'));		
 
-            // Create checkboxes for Traffic utilization per device combined
-            createCheckboxes('traffic_per_device_combined_trends_bps_chart_div', raw_traffic_per_device_combined_trends_bps_data, function(selectedCategories) {{
-                var filteredData = filterDataByCategories(raw_traffic_per_device_combined_trends_bps_data, selectedCategories);
-                var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
-                traffic_per_device_combined_trends_bps_chart.draw(filteredDataTable, traffic_per_device_combined_trends_bps_options);
-            }});
+
 
 			// Create checkboxes for each chart
 			createCheckboxes('epm_chart_div', {events_trends}, function(selectedCategories) {{
@@ -1563,14 +1452,6 @@ if __name__ == '__main__':
 
 			// Draw initial charts
 
-			traffic_per_device_combined_trends_bps_chart.draw(traffic_per_device_combined_trends_bps_data, traffic_per_device_combined_trends_bps_options);
-
-			maxpps_per_day_chart.draw(maxpps_per_day_data, maxpps_per_day_options);
-			maxbps_per_day_chart.draw(maxbps_per_day_data, maxbps_per_day_options);
-
-			events_per_day_chart.draw(events_per_day_data, events_per_day_options);
-			bandwidth_per_day_chart.draw(bandwidth_per_day_data, bandwidth_per_day_options);
-			packets_per_day_chart.draw(packets_per_day_data, packets_per_day_options);
 
 			epm_total_chart.draw(epm_total_data, epm_total_options);
 			ppm_total_chart.draw(ppm_total_data, ppm_total_options);
@@ -1605,8 +1486,6 @@ if __name__ == '__main__':
 			
 
 			// Add radio button toggles for stacked/non-stacked
-
-            addStackedToggle('traffic_per_device_combined_trends_bps_chart_div', traffic_per_device_combined_trends_bps_chart, traffic_per_device_combined_trends_bps_data, traffic_per_device_combined_trends_bps_options);
 
 			addStackedToggle('epm_chart_div', epm_chart, epm_data, epm_options);
 			addStackedToggle('ppm_chart_div', ppm_chart, ppm_data, ppm_options);
@@ -1730,18 +1609,35 @@ if __name__ == '__main__':
 			}}
 		}}
 
+		// Show/hide "Back to TOC" button based on scroll position
+		window.addEventListener('scroll', function () {{
+		let button = document.getElementById('backToToc');
+		if (window.scrollY > 300) {{ // Show button after scrolling down
+			button.classList.remove('hidden');
+		}} else {{
+			button.classList.add('hidden');
+		}}
+		}});
+
+		// Smoothly scroll to the top of the page when button is clicked
+		function scrollToToc() {{
+		window.scrollTo({{ top: 0, behavior: 'smooth' }}); // Scrolls to the top of the page
+		}}
+
 		</script>
 
 	<style>
 	  body, html {{
 		margin: 0;
-		display: flex;
+		display: block;
 		justify-content: center;
 		align-items: center;
 		background-color: #f0f0f0;
 		font-family: Arial, sans-serif;
 		font-size: 14px;
 	  }}
+
+	
 	  
 	  table {{
 		width: 100%;
@@ -1749,6 +1645,11 @@ if __name__ == '__main__':
 		table-layout: fixed;
 	  }}
 
+	  thead {{
+        background-color: #1C5373;  /* Green background for the header */
+        color: white;               /* White text */
+        font-weight: bold;          /* Bold text for headers */
+    }}
 	  
 	  th, td {{
 		width: 33%;
@@ -1756,6 +1657,175 @@ if __name__ == '__main__':
 		border: 1px solid black;
 		padding: 10px;
 	  }}
+
+		/* Table of Contents styles */
+			.toc-container {{
+			background-color: #fff;
+			border: 1px solid #ddd;
+			padding: 20px;
+			width: 500px;
+			margin: 20px auto; /* Centers the TOC below the previous container */
+			box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+			border-radius: 8px;
+			z-index: 100;
+			}}
+
+			.toc-header {{
+			font-size: 18px;
+			margin-bottom: 10px;
+			text-align: center;
+			font-weight: bold;
+			}}
+
+			.toc-list {{
+			list-style-type: none;
+			padding-left: 20px; /* Controls indentation */
+			margin: 0;
+			}}
+
+			.toc-list li {{
+			margin: 10px 0;
+			}}
+
+			.toc-list li a {{
+			text-decoration: none;
+			color: #333;
+			font-size: 14px;
+			padding: 5px;
+			border-radius: 4px;
+			display: block;
+			transition: background-color 0.3s ease;
+			}}
+
+			.toc-list li a:hover {{
+			background-color: #f0f0f0;
+			}}
+
+		/* Subsection styling */
+			.sub-list {{
+			list-style-type: none;
+			padding-left: 15px; /* Indents nested lists */
+			margin: 5px 0;
+			}}
+
+			.sub-list li {{
+			margin-left: 10px; /* Extra spacing to align better */
+			}}
+			.sub-list li a {{
+			display: block;
+			padding: 5px;
+			font-size: 13px; /* Slightly smaller font for subsections */
+			color: #555;
+			}}
+			.toc-cell {{
+				text-align: left; /* Aligns content to the left */
+				border: none;
+				vertical-align: top; /* Aligns content to the top */
+			}}
+
+			.toc-table {{
+				border: none;  /* Remove the border from the table itself */
+				width: 100%;
+			}}
+			/* Add some margin to content to make room for TOC */
+			.content {{
+			margin-right: 300px; /* Make room for the TOC */
+			padding: 20px;
+			}}
+
+			/* Adjust the scroll position so headings don't get covered by sticky header */
+			h3, h4 {{
+			scroll-margin-top: 80px; /* Adjust this value based on your sticky header height */
+			}}
+
+
+			/* Styling for the headings */
+			h1 {{
+			font-size: 30px;
+			color: #333;
+			margin-bottom: 10px;
+			}}
+
+			h2 {{
+			font-size: 24px;
+			color: #444;
+			margin-bottom: 8px;
+			}}
+
+			h3 {{
+			font-size: 20px;
+			color: #555;
+			}}
+
+			h4 {{
+			font-size: 18px;
+			color: #666;
+			}}
+
+		/* Style the container div */
+		.header-container {{
+		position: relative;
+		text-align: center; /* Center the text */
+		width: 100%;
+		}}
+
+		/* Style for the header image */
+		.header-image {{
+		width: 100%;
+		height: 150px; /* Adjust height as needed */
+		object-fit: cover; /* Ensures the image covers the space */
+		}}
+
+		/* Style for the headline */
+		.headline {{
+		position: absolute;
+		top: 30px; /* Vertically centers the text */
+		left: 50%;
+		transform: translate(-50%, -50%); /* Centers text exactly */
+		color: white; /* White text color */
+		font-size: 30px; /* Adjust the font size as needed */
+		font-weight: bold; /* Optional: makes the text bold */
+		text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5); /* Optional: adds shadow to the text */
+		}}
+
+	  .sticky-header {{
+		position: sticky;
+		top: 0;
+		background-color: white; /* Keeps it visible */
+		z-index: 1000; /* Ensures it's above other elements */
+		padding: 10px;
+		border-bottom: 2px solid #ddd; /* Adds a separator */
+		border-top: 2px solid #ddd; /* Adds a separator */
+		text-align: center;
+	  }}
+
+
+		/* Floating "Back to TOC" button */
+	  .back-to-toc {{
+		position: fixed;
+		bottom: 20px;
+		right: 20px;
+		background: #1C5373;
+		color: white;
+		border: none;
+		padding: 12px 16px;
+		font-size: 14px;
+		font-weight: bold;
+		border-radius: 8px;
+		cursor: pointer;
+		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+		transition: background 0.3s ease, transform 0.2s ease;
+		}}
+
+		.back-to-toc:hover {{
+		background: #005bb5;
+		transform: scale(1.1);
+		}}
+
+		/* Hide button when at the top of the page */
+		.hidden {{
+		display: none;
+		}}
 
 	  .checkbox-container, .radio-container {{
       margin-bottom: 10px;
@@ -1776,26 +1846,7 @@ if __name__ == '__main__':
 		height: 20vh;
 	  }}
 
-	  
-	  #maxpps_per_day_chart_div {{
-		height: 25vh;
-	  }}
-
-	  #maxbps_per_day_chart_div {{
-		height: 25vh;
-	  }}
-
-	  #events_per_day_chart_div {{
-		height: 25vh;
-	  }}
-
-	  #bandwidth_per_day_chart_div {{
-		height: 25vh;
-	  }}
-
-	  #packets_per_day_chart_div {{
-		height: 25vh;
-	  }}
+	
 
 	  #epm_total_chart_div {{
 		height: 50vh;
@@ -1884,6 +1935,9 @@ if __name__ == '__main__':
 	  }}
 
 	  #total_attacks_days_chart_div {{
+	    width: 33vw;  /* 33% of the screen width */
+        margin: 0 auto;  /* Centers the div horizontally */
+        text-align: center;  /* Ensures content inside is centered */
 		height: 50vh;
 	  }}
 
@@ -1900,7 +1954,7 @@ if __name__ == '__main__':
         /* Styling for the toggle button */
         .toggle-btn {{
             cursor: pointer;
-            background-color: #6c757d; /* Gray color */
+            background-color: #1C5373; /* Dark blue Radware Banner color */
             color: white;
             padding: 12px 24px;
             border: none;
@@ -1952,181 +2006,183 @@ if __name__ == '__main__':
 	</style>
 	<title>Radware Monthly Reports</title>
 	</head>
+			
+
 	<body>
+  <!-- Header Image -->
+<div class="header-container">
+  <img src="data:image/png;base64,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
+  kIdgCAAAAACQh2AIAAAAAJCHYAgAAAAAkIdgCAAAAACQh2AIAAAAAJCHYAgAAAAAkIdgCAAAAACQh2AIAAAAAJCHYAgA
+  AAAAkIdgCAAAAACQh2AIAAAAAJCHYAgAAAAAkIdgCAAAAACQh2AIAAAAAJCHYAgAAAAAkIdgCAAAAACQh2AIAAAAAJCH
+  YAgAAAAAkIdgCAAAAACQh2AIAAAAAJCHYAgAAAAAkIdgCAAAAACQh2AIAAAAAJCHYAgAAAAAkIdgCAAAAACQh2AIAAAA
+  AJCHYAgAAAAAkIdgCAAAAACQh2AIAAAAAJCHYAgAAAAAkIdgCAAAAACQh2AIAAAAAJCHYAgAAAAAkIdgCAAAAACQh2AI
+  AAAAAJCHYAgAAAAAkIdgCAAAAACQh2AIAAAAAJCHYAgAAAAAkIdgCAAAAACQh2AIAAAAAJCHYAgAAAAAkIdgCAAAAACQ
+  h2AIAAAAAJCHYAgAAAAAkIdgCAAAAACQh2AIAAAAAJCHYAgAAAAAkIdgCAAAAACQh2AIAAAAAJCHYAgAAAAAkIdgCAAA
+  AACQh2AIAAAAAJCHYAgAAAAAkIdgCAAAAACQh2AIAAAAAJCHYAgAAAAAkIdgCAAAAACQh2AIAAAAAJCHYAgAAAAAkIdg
+  CAAAAACQh2AIAAAAAJCHYAgAAAAAkIdgCAAAAACQh2AIAAAAAJCHYAgAAAAAkIdgCAAAAACQh2AIAAAAAJCHYAgAAAAA
+  kIdgCAAAAACQh2AIAAAAAJCHYAgAAAAAkIdgCAAAAACQh2AIAAAAAJCHYAgAAAAAkIdgCAAAAACQh2AIAAAAAJCHYAgA
+  AAAAkIdgCAAAAACQh2AIAAAAAJCHYAgAAAAAkIdgCAAAAACQh2AIAAAAApHBj/C92OYLskdJAmgAAAABJRU5ErkJggg==" alt="Header Image" width="100%" height="100px">
+</div>
+
+<h1 class="headline">Radware Monthly trends report {month}, {year} - {cust_id}</h1>
+
+<table class="toc-table">
+	
+		<thead>
+
+
+
+            <td class="toc-cell">
+				<!-- Table of Contents -->
+				<div id="toc" class="toc-container">
+					<ul class="toc-list">
+						<li>
+						<b><a href="#section1">Table of Contents</a></b>
+						<ul class="sub-list">
+							<li><a href="#section1">Monthly Attack Trends - Total</a></li>
+							<li><a href="#section2">Monthly Attack Trends by Attack Vectors</a></li>
+							<li><a href="#section3">Monthly Attack Trends by Distribution Across Devices</a></li>
+							<li><a href="#section4">Attacks Distribution Across Devices - This Month</a></li>
+							<li><a href="#section5">Monthly Attack Trends by distribution across policies</a></li>
+							<li><a href="#section6">Monthly Attack Trends by Source IP</a></li>
+							<li><a href="#section7">Monthly attack trends by total attack time</a></li>
+						</ul>
+						</li>
+					</ul>
+  				</div>
+			</td>
+
+
+
+		</tr>
+
+		</thead>
+</table>
+
+
+
+<div class="sticky-header">
+	<h2 id="section1">Monthly Attack Trends - Total</h2>
+</div>
 
 	  <table>
 		<thead>
 
+
 		  <tr>
-			<td colspan="3">
-			<h1>Radware Monthly report {month},{year} - {cust_id}</h1>
-			</td>
+			<th>Month to month trends by Number of Attack Events</th>
+			<th>Month to month trends by Attack Packets(cumulative)</th>
+			<th>Month to month trends by Attack Volume(cumulative)</th>
 		  </tr>
+		</thead>
 
-          <tr>
-            <td colspan="3" style="border-bottom: 0;">
-            <h4>Traffic utilization per device combined</h4>
-            <div id="traffic_per_device_combined_trends_bps_chart_div" style="height: 400px;">
-            </td>
-          </tr> 
-
+		<tbody>
 		  <tr>
-		  	<td colspan="3" style="border-bottom: 0;">
-			<div id="maxpps_per_day_chart_div">
+			<td style="vertical-align: top; text-align: left;">
+				<div id="epm_total_chart_div"></div>
+				<h4>Change in Attack events this month compared to the previous month</h4>
+				<div style="text-align: left;"><ul>{events_total_bar_move_text}</ul></div>
 			</td>
-		  </tr>
-		  <tr>
 
-		  	<td colspan="3" valign="top" style="border-top: 0;" class="fit-text">
-			  
-				<!-- Button container for centering -->
-				<div class="button-container">
-					<button class="toggle-btn" data-original-text="Show Details" onclick="toggleTable('maxppsPerDayTable', this)">Show Details</button>
-				</div>
+
+			<td style="vertical-align: top; text-align: left;">
+				<div id="ppm_total_chart_div"></div>
+				<h4>Change in Attack packets this month compared to the previous month</h4>
+				<div style="text-align: left;"><ul>{pakets_total_bar_move}</ul></div>
+			</td>
+				
+
+
+			<td style="vertical-align: top; text-align: left;">
+				<div id="bpm_total_chart_div"></div>
+				<h4>Change in Attack volume this month compared to the previous month</h4>
+				<div style="text-align: left;"><ul>{bw_total_bar_move}</ul></div>
+			</td>
 			
-		  		<div id="maxppsPerDayTable" class="collapsible-content">
-		  			{maxpps_per_day_table}
-		  		</div>
-		  	</td>
 		  </tr>
+		</tbody>
+	  </table>
 
+<div class="sticky-header">
+	<h2 id="section2">Monthly Attack Trends by Attack Vectors</h2>
+	<h3>Top {top_n} Attacks - Ranked by Last Month's Data</h3>
+</div>		
+
+<table>
+	<thead>
 
 		  <tr>
-		  	<td colspan="3" style="border-bottom: 0;">
-			<div id="maxbps_per_day_chart_div">
-			</td>
+			<th>Month to month trends by Number of Attack Events</th>
+			<th>Month to month trends by Attack Packets(cumulative)</th>
+			<th>Month to month trends by Attack Volume(cumulative)</th>
 		  </tr>
-
+	</thead>
+	<tbody>
 		  <tr>
-
-			<td colspan="3" valign="top" style="border-top: 0;" class="fit-text">
-				<!-- Button container for centering -->
-				<div class="button-container">
-					<button class="toggle-btn" data-original-text="Show Details" onclick="toggleTable('maxbpsPerDayTable', this)">Show Details</button>
-				</div>
-		  		<div id="maxbpsPerDayTable" class="collapsible-content">
-				{maxbps_per_day_table}
-				</div>
+			<td style="vertical-align: top;border-bottom: 0;">
+				
+				<div id="epm_chart_div" style="height: 600px;"></div>
+				<h4>Change in Attack vectors this month compared to the previous month</h4>
+				<div style="text-align: left;"><ul>{events_trends_move}</ul></div>
 			</td>
-		  </tr>
-
-		  <tr>
-		  	<td colspan="3" style="border-bottom: 0;">
-			<div id="events_per_day_chart_div">
+			<td style="vertical-align: top;border-bottom: 0;">
+				<div id="ppm_chart_div" style="height: 600px;"></div>
+				<h4>Change in Attack vectors this month compared to the previous month</h4>
+				<div style="text-align: left;"><ul>{packets_trends_move_text}</ul></div>
 			</td>
-		  </tr>
-
-		  
-
-		  <tr>
-
-			<td colspan="3" valign="top" style="border-top: 0;" class="fit-text">
-				<!-- Button container for centering -->
-				<div class="button-container">
-					<button class="toggle-btn" data-original-text="Show Details" onclick="toggleTable('eventsPerDayTable', this)">Show Details</button>
-				</div>
-		  		<div id="eventsPerDayTable" class="collapsible-content">
-				  
-				{events_per_day_table}
-				</div>
+			<td style="vertical-align: top;border-bottom: 0;">
+				<div id="bpm_chart_div" style="height: 600px;"></div>
+				<h4>Change in Attack vectors this month compared to the previous month</h4>
+				<div style="text-align: left;"><ul>{bw_trends_move}</ul></div>
 			</td>
-		  </tr>		  
-
-
-
-		  <tr>
-		  	<td colspan="3" style="border-bottom: 0;">
-				<div id="packets_per_day_chart_div">
-			</td>
-		  </tr>
-
-		  
-
-		  <tr>
-
-			<td colspan="3" valign="top" style="border-top: 0;" class="fit-text">
-				<!-- Button container for centering -->
-				<div class="button-container">
-					<button class="toggle-btn" data-original-text="Show Details" onclick="toggleTable('packetsPerDayTable', this)">Show Details</button>
-				</div>
-		  		<div id="packetsPerDayTable" class="collapsible-content">
-				  
-				{packets_per_day_table}
-				</div>
-			</td>
-		  </tr>		
-
-
-
-
-		  <tr>
-		  	<td colspan="3" style="border-bottom: 0;">
-				<div id="bandwidth_per_day_chart_div">
-			</td>
-		  </tr>
-
-		  
-
-		  <tr>
-
-			<td colspan="3" valign="top" style="border-top: 0;" class="fit-text">
-				<!-- Button container for centering -->
-				<div class="button-container">
-					<button class="toggle-btn" data-original-text="Show Details" onclick="toggleTable('bwPerDayTable', this)">Show Details</button>
-				</div>
-		  		<div id="bwPerDayTable" class="collapsible-content">
-				  
-				{bandwidth_per_day_table}
-				</div>
-			</td>
-		  </tr>		
-
-
-
-	
-
-
-
-		  <tr>
-			<th>Month to month trends by Security Events count</th>
-			<th>Month to month trends by Malicious Packets(cumulative)</th>
-			<th>Month to month trends by Malicious Bandwidth sum(cumulative)</th>
-		  </tr>
-
-		  <tr>
-			<td><div id="epm_total_chart_div"></td>
-			<td><div id="ppm_total_chart_div"></td>
-			<td><div id="bpm_total_chart_div"></td>
-		  </tr>
-
-		  
-
-
-
-
-
-		  <tr>
-			<td style="border-bottom: 0;"><div id="epm_chart_div" style="height: 600px;"></td>
-			<td style="border-bottom: 0;"><div id="ppm_chart_div" style="height: 600px;"></td>
-			<td style="border-bottom: 0;"><div id="bpm_chart_div" style="height: 600px;"></td>
 		  </tr>
 
 		  
 		  <tr >
-		  <td valign="top" style="border-top: 0;">
+
+		  <td style="vertical-align: top;border-top: 0;border-bottom: 0;">
+			
 				<!-- Button container for centering -->
 				<div class="button-container">
-					<button class="toggle-btn" data-original-text="Security events change trends" onclick="toggleTable('eventsTrendText', this)">Security events change trends</button>
-				</div>
-		  		<div id="eventsTrendText" class="collapsible-content" style="text-align: left;">
-					<h4>Change in Security Events number by attack name this month compared to the previous month</h4>
-					{events_total_bar_move_text}{events_trends_move}
-				</div>
-
-
-				<!-- Button container for centering -->
-				<div class="button-container">
-					<button class="toggle-btn" data-original-text="Security events distribution" onclick="toggleTable('LMeventsDistribution', this)">Security events distribution</button>
+					<button class="toggle-btn" data-original-text="Attack events distribution" onclick="toggleTable('LMeventsDistribution', this)">Attack events distribution</button>
 				</div>
 		  		<div id="LMeventsDistribution" class="collapsible-content" style="text-align: left;">
 					{epm_html_final}
@@ -2134,19 +2190,11 @@ if __name__ == '__main__':
 
 		  </td>		  
 
-		  <td valign="top" style="border-top: 0;">
-				<!-- Button container for centering -->
-				<div class="button-container">
-					<button class="toggle-btn" data-original-text="Malicious packets change trends" onclick="toggleTable('PacketsTrendText', this)">Malicious packets change trends</button>
-				</div>
-		  		<div id="PacketsTrendText" class="collapsible-content" style="text-align: left;">
-					<h4>Change in Malicious packets amount by attack name this month compared to the previous month</h4>
-					{pakets_total_bar_move}{packets_trends_move_text}
-				</div>
+		  <td style="vertical-align: top;border-top: 0;border-bottom: 0;">
 
 				<!-- Button container for centering -->
 				<div class="button-container">
-					<button class="toggle-btn" data-original-text="Malicious packets distribution" onclick="toggleTable('LMPacketsDistribution', this)">Malicious packets distribution</button>
+					<button class="toggle-btn" data-original-text="Attack packets distribution" onclick="toggleTable('LMPacketsDistribution', this)">Attack packets distribution</button>
 				</div>
 		  		<div id="LMPacketsDistribution" class="collapsible-content" style="text-align: left;">
 					{ppm_html_final}
@@ -2156,19 +2204,11 @@ if __name__ == '__main__':
 			</td>
 
 			
-		  <td valign="top" style="border-top: 0;">
-				<!-- Button container for centering -->
-				<div class="button-container">
-					<button class="toggle-btn" data-original-text="Malicious bandwidth change trends" onclick="toggleTable('BWTrendText', this)">Malicious bandwidth change trends</button>
-				</div>
-		  		<div id="BWTrendText" class="collapsible-content" style="text-align: left;">
-					<h4>Change in Malicious bandwidth amount by attack name this month compared to the previous month</h4>
-					{bw_total_bar_move}{bw_trends_move}
-				</div>
+		  <td style="vertical-align: top;border-top: 0;border-bottom: 0;">
 
 				<!-- Button container for centering -->
 				<div class="button-container">
-					<button class="toggle-btn" data-original-text="Malicious bandwidth distribution" onclick="toggleTable('LMBWDistribution', this)">Malicious bandwidth distribution</button>
+					<button class="toggle-btn" data-original-text="Attack Volume Distribution" onclick="toggleTable('LMBWDistribution', this)">Attack Volume Distribution</button>
 				</div>
 		  		<div id="LMBWDistribution" class="collapsible-content" style="text-align: left;">
 					{bpm_html_final}
@@ -2182,30 +2222,30 @@ if __name__ == '__main__':
 
 
 		  <tr>
-			<td colspan="3" style="border-bottom: 0;">
+			<td colspan="3" style="vertical-align: top;border-top: 0;">
 				<!-- Button container for centering -->
 				<div class="button-container" align="center">
-					<button class="toggle-btn" data-original-text="Number of Security Events per Month" onclick="toggleTable('SecurityEventsPerMonth', this)">Number of Security Events per Month</button>
+					<button class="toggle-btn" data-original-text="Number of Attack Events per Month" onclick="toggleTable('SecurityEventsPerMonth', this)">Number of Attack Events per Month</button>
 				
 
-					<button align="center" class="toggle-btn" data-original-text="Malicious Packets per Month" onclick="toggleTable('PacketsPerMonth', this)">Malicious Packets per Month</button>
+					<button align="center" class="toggle-btn" data-original-text="Attack Packets per Month" onclick="toggleTable('PacketsPerMonth', this)">Attack Packets per Month</button>
 
-					<button class="toggle-btn" data-original-text="Malicious Bandwidth per Month" onclick="toggleTable('BWPerMonth', this)">Malicious Bandwidth per Month</button>
+					<button class="toggle-btn" data-original-text="Attack Volume per Month" onclick="toggleTable('BWPerMonth', this)">Attack Volume per Month</button>
 				</div>
 
 
 		  		<div id="SecurityEventsPerMonth" class="collapsible-content" style="text-align: left;">
-				  <h4 align="center">Security Events table</h4>
+				  <h4 align="center">Attack Events table</h4>
 					{events_trends_table}
 				</div>
 
 		  		<div id="PacketsPerMonth" class="collapsible-content" style="text-align: left;">
-				  <h4 align="center">Malicious packets table (units {pkt_units})</h4>
+				  <h4 align="center">Attack Packets table (units {pkt_units})</h4>
 					{packets_table}
 				</div>
 				
 		  		<div id="BWPerMonth" class="collapsible-content" style="text-align: left;">
-				  <h4 align="center">Malicious bandwidth table (units {bw_units})</h4>
+				  <h4 align="center">Attack Volume table (units {bw_units})</h4>
 					{bw_table}
 				</div>
 
@@ -2213,76 +2253,73 @@ if __name__ == '__main__':
 
 			</td>
 		  </tr>	  
+	</tbody>
+	  </table>
 
 
+<div class="sticky-header">
+	<h2 id="section2">Monthly Attack Trends by Attack Vectors</h2>
+	<h3>Top {top_n} Attacks - Ranked by All Months Combined</h3>
+</div>		
+
+
+  
+<table>
+	<thead>
+		   <tr>
+			<th>Month to month trends by Number of Attack Events</th>
+			<th>Month to month trends by Attack Packets(cumulative)</th>
+			<th>Month to month trends by Attack Volume(cumulative)</th>
+		  </tr>
+	</thead>
+
+		<tbody>
 		  <tr>
 			<td><div id="epm_chart_div_alltimehigh" style="height: 600px;"></td>
 			<td><div id="ppm_chart_div_alltimehigh" style="height: 600px;"></td>
 			<td><div id="bpm_chart_div_alltimehigh" style="height: 600px;"></td>
 		  </tr>
+		</tbody>
+	
+</table>
 
+<div class="sticky-header">
+	<h2 id="section3">Monthly Attack Trends by distribution across devices</h2>
+	<h3>Top {top_n} Devices - Ranked by Last Month's data</h3>
+</div>		
+
+<table>
+	<thead>
+		   <tr>
+			<th>Month to month trends by Number of Attack Events</th>
+			<th>Month to month trends by Attack Packets(cumulative)</th>
+			<th>Month to month trends by Attack Volume(cumulative)</th>
+		  </tr>
+	</thead>
+
+	<tbody>
 		  <tr>
-			<td><div id="device_epm_chart_this_month_div" style="height: 600px;"></td>
-			<td><div id="device_ppm_chart_this_month_div" style="height: 600px;"></td>
-			<td><div id="device_bpm_chart_this_month_div" style="height: 600px;"></td>
-		  </tr>	
-
-		  <tr>
-			<td colspan="3" style="border-bottom: 0;">
-				<!-- Button container for centering -->
-				<div class="button-container" align="center">
-					<button class="toggle-btn" data-original-text="Number of Security Events per Month" onclick="toggleTable('SecurityEventsDevicePerMonth', this)">Number of Security Events per Month</button>
-				
-
-					<button align="center" class="toggle-btn" data-original-text="Malicious Packets per Month" onclick="toggleTable('PacketsDevicePerMonth', this)">Malicious Packets per Month</button>
-
-					<button class="toggle-btn" data-original-text="Malicious Bandwidth per Month" onclick="toggleTable('BWDevicePerMonth', this)">Malicious Bandwidth per Month</button>
-				</div>
-
-
-		  		<div id="SecurityEventsDevicePerMonth" class="collapsible-content" style="text-align: left;">
-				  <h4 align="center">Security Events by device table</h4>
-					{events_by_device_table}
-				</div>
-
-		  		<div id="PacketsDevicePerMonth" class="collapsible-content" style="text-align: left;">
-				  <h4 align="center">Malicious packets by device table (units {pkt_units})</h4>
-					{packets_by_device_table}
-				</div>
-				
-		  		<div id="BWDevicePerMonth" class="collapsible-content" style="text-align: left;">
-				  <h4 align="center">alicious Bandwidth by device table (units {bw_units})</h4>
-					{bw_by_device_table}
-				</div>
-
-
-
-			</td>
-		  </tr>	  
-
-		  <tr>
-			<td><div id="epm_by_device_chart_div" style="height: 600px;"></td>
-			<td><div id="ppm_by_device_chart_div" style="height: 600px;"></td>
-			<td><div id="bpm_by_device_chart_div" style="height: 600px;"></td>
+			<td style="vertical-align: top;border-bottom: 0;"><div id="epm_by_device_chart_div" style="height: 600px;"></td>
+			<td style="vertical-align: top;border-bottom: 0;"><div id="ppm_by_device_chart_div" style="height: 600px;"></td>
+			<td style="vertical-align: top;border-bottom: 0;"><div id="bpm_by_device_chart_div" style="height: 600px;"></td>
 		  </tr>
 
 
-
 		  <tr >
-		  <td valign="top" style="border-top: 0;">
+		  <td style="vertical-align: top;border-top: 0;">
 				<!-- Button container for centering -->
 				<div class="button-container">
-					<button class="toggle-btn" data-original-text="Security events change trends" onclick="toggleTable('eventsDeviceTrendText', this)">Security events change trends</button>
+					<button class="toggle-btn" data-original-text="Attack Events change trends" onclick="toggleTable('eventsDeviceTrendText', this)">Attack Events change trends</button>
 				</div>
 		  		<div id="eventsDeviceTrendText" class="collapsible-content" style="text-align: left;">
-					<h4>Change in Security Events number by device this month compared to the previous month</h4>
+					<h4>Change in Attack Events number by device this month compared to the previous month</h4>
 					{events_by_device_trends_move_text}
 				</div>
 
 
 				<!-- Button container for centering -->
 				<div class="button-container">
-					<button class="toggle-btn" data-original-text="Security events distribution" onclick="toggleTable('LMeventsDeviceDistribution', this)">Security events distribution</button>
+					<button class="toggle-btn" data-original-text="Attack Events distribution" onclick="toggleTable('LMeventsDeviceDistribution', this)">Attack Events distribution</button>
 				</div>
 		  		<div id="LMeventsDeviceDistribution" class="collapsible-content" style="text-align: center;">
 					{device_epm_html_final}
@@ -2293,16 +2330,16 @@ if __name__ == '__main__':
 		  <td valign="top" style="border-top: 0;">
 				<!-- Button container for centering -->
 				<div class="button-container">
-					<button class="toggle-btn" data-original-text="Malicious packets change trends" onclick="toggleTable('PacketsDeviceTrendText', this)">Malicious packets change trends</button>
+					<button class="toggle-btn" data-original-text="Attack Packets change trends" onclick="toggleTable('PacketsDeviceTrendText', this)">Attack Packets change trends</button>
 				</div>
 		  		<div id="PacketsDeviceTrendText" class="collapsible-content" style="text-align: left;">
-					<h4>Change in Malicious Packets number by device this month compared to the previous month</h4>
+					<h4>Change in Attack Packets number by device this month compared to the previous month</h4>
 					{packets_by_device_trends_move_text}
 				</div>
 
 				<!-- Button container for centering -->
 				<div class="button-container">
-					<button class="toggle-btn" data-original-text="Malicious packets distribution" onclick="toggleTable('LMPacketsDeviceDistribution', this)">Malicious packets distribution</button>
+					<button class="toggle-btn" data-original-text="Attack packets distributionbution" onclick="toggleTable('LMPacketsDeviceDistribution', this)">Attack packets distributionbution</button>
 				</div>
 		  		<div id="LMPacketsDeviceDistribution" class="collapsible-content" style="text-align: center;">
 					{device_ppm_html_final}
@@ -2315,7 +2352,7 @@ if __name__ == '__main__':
 		  <td valign="top" style="border-top: 0;">
 				<!-- Button container for centering -->
 				<div class="button-container">
-					<button class="toggle-btn" data-original-text="Malicious bandwidth change trends" onclick="toggleTable('BWDeviceTrendText', this)">Malicious bandwidth change trends</button>
+					<button class="toggle-btn" data-original-text="Attack Volume change trends" onclick="toggleTable('BWDeviceTrendText', this)">Attack Volume change trends</button>
 				</div>
 		  		<div id="BWDeviceTrendText" class="collapsible-content" style="text-align: left;">
 					<h4>Change in Malicious Traffic sum by device this month compared to the previous month</h4>
@@ -2324,7 +2361,7 @@ if __name__ == '__main__':
 
 				<!-- Button container for centering -->
 				<div class="button-container">
-					<button class="toggle-btn" data-original-text="Malicious bandwidth distribution" onclick="toggleTable('LMBWDeviceDistribution', this)">Malicious bandwidth distribution</button>
+					<button class="toggle-btn" data-original-text="Attack Volume Distribution" onclick="toggleTable('LMBWDeviceDistribution', this)">Attack Volume Distribution</button>
 				</div>
 		  		<div id="LMBWDeviceDistribution" class="collapsible-content" style="text-align: center;">
 					{device_bpm_html_final}
@@ -2336,30 +2373,97 @@ if __name__ == '__main__':
 		  </tr>	
 
 
-		  
+	</tbody>
 
 
+</table>	  
+<div class="sticky-header">
+	<h2 id="section4">Attacks distribution across devices - this month</h2>
+	<h3>Top {top_n} devices - this month</h3>
+</div>	
 
-
-
-
+<table>
+	<thead>
+		  <tr>
+			<th>Number of Attack Events - this month</th>
+			<th>Attack Packets(cumulative) - this month</th>
+			<th>Attack Volume(cumulative) - this month</th>
+		  </tr>
+	</thead>
+	<tbody>
+		  <tr>
+			<td style="vertical-align: top;border-bottom: 0;"><div id="device_epm_chart_this_month_div" style="height: 600px;"></td>
+			<td style="vertical-align: top;border-bottom: 0;"><div id="device_ppm_chart_this_month_div" style="height: 600px;"></td>
+			<td style="vertical-align: top;border-bottom: 0;"><div id="device_bpm_chart_this_month_div" style="height: 600px;"></td>
+		  </tr>	
 
 		  <tr>
-			<td><div id="policy_epm_chart_div" style="height: 600px;"></td>
-			<td><div id="policy_ppm_chart_div" style="height: 600px;"></td>
-			<td><div id="policy_bpm_chart_div" style="height: 600px;"></td>
+			<td colspan="3" style="border-top: 0;">
+				<!-- Button container for centering -->
+				<div class="button-container" align="center">
+					<button class="toggle-btn" data-original-text="Number of Attack Events per Month" onclick="toggleTable('SecurityEventsDevicePerMonth', this)">Number of Attack Events per Month</button>
+				
+
+					<button align="center" class="toggle-btn" data-original-text="Attack Packets per Month" onclick="toggleTable('PacketsDevicePerMonth', this)">Attack Packets per Month</button>
+
+					<button class="toggle-btn" data-original-text="Attack Volume per Month" onclick="toggleTable('BWDevicePerMonth', this)">Attack Volume per Month</button>
+				</div>
+
+
+		  		<div id="SecurityEventsDevicePerMonth" class="collapsible-content" style="text-align: left;">
+				  <h4 align="center">Attack Events by device table</h4>
+					{events_by_device_table}
+				</div>
+
+		  		<div id="PacketsDevicePerMonth" class="collapsible-content" style="text-align: left;">
+				  <h4 align="center">Attack Packets by device table (units {pkt_units})</h4>
+					{packets_by_device_table}
+				</div>
+				
+		  		<div id="BWDevicePerMonth" class="collapsible-content" style="text-align: left;">
+				  <h4 align="center">alicious Bandwidth by device table (units {bw_units})</h4>
+					{bw_by_device_table}
+				</div>
+			</td>
+		  </tr>	  
+	</tbody>
+</table>
+
+<div class="sticky-header">
+	<h2 id="section5">Monthly Attack Trends by distribution across policies</h2>
+	<h3>Top {top_n} Policies - Ranked by Last Month's data</h3>
+</div>	
+
+
+<table>
+	<thead>
+		  <tr>
+			<th>Month to month trends by Number of Attack Events</th>
+			<th>Month to month trends by Attack Packets(cumulative)</th>
+			<th>Month to month trends by Attack Volume(cumulative)</th>
+		  </tr>
+	</thead>
+	<tbody>
+		  <tr>
+			<td style="vertical-align: top;border-bottom: 0;">
+				<div id="policy_epm_chart_div" style="height: 600px;">
+			</td>
+			<td style="vertical-align: top;border-bottom: 0;">
+				<div id="policy_ppm_chart_div" style="height: 600px;">
+			</td>
+			<td style="vertical-align: top;border-bottom: 0;">
+				<div id="policy_bpm_chart_div" style="height: 600px;">
+			</td>
 		  </tr>
 
 		  
 
 		  <tr >
-		  <td valign="top" style="border-top: 0;">
-
-
+		  <td style="vertical-align: top;border-bottom: 0;border-top: 0;">
 
 				<!-- Button container for centering -->
 				<div class="button-container">
-					<button class="toggle-btn" data-original-text="Security events distribution" onclick="toggleTable('eventsPolicyDistribution', this)">Security events distribution</button>
+					<button class="toggle-btn" data-original-text="Attack Events distribution" onclick="toggleTable('eventsPolicyDistribution', this)">Attack Events distribution</button>
 				</div>
 		  		<div id="eventsPolicyDistribution" class="collapsible-content" style="text-align: center;">
 					{policy_epm_html_final}
@@ -2367,11 +2471,11 @@ if __name__ == '__main__':
 
 		  </td>		  
 
-		  <td valign="top" style="border-top: 0;">
+		  <td style="vertical-align: top;border-bottom: 0;border-top: 0;">
 
 				<!-- Button container for centering -->
 				<div class="button-container">
-					<button class="toggle-btn" data-original-text="Malicious packets distribution" onclick="toggleTable('PacketsPolicyDistribution', this)">Malicious packets distribution</button>
+					<button class="toggle-btn" data-original-text="Attack packets distributionbution" onclick="toggleTable('PacketsPolicyDistribution', this)">Attack packets distributionbution</button>
 				</div>
 		  		<div id="PacketsPolicyDistribution" class="collapsible-content" style="text-align: center;">
 					{policy_ppm_html_final}
@@ -2381,11 +2485,11 @@ if __name__ == '__main__':
 			</td>
 
 			
-		  <td valign="top" style="border-top: 0;">
+		  <td style="vertical-align: top;border-bottom: 0;border-top: 0;">
 
 				<!-- Button container for centering -->
 				<div class="button-container">
-					<button class="toggle-btn" data-original-text="Malicious bandwidth distribution" onclick="toggleTable('BWPolicyDistribution', this)">Malicious bandwidth distribution</button>
+					<button class="toggle-btn" data-original-text="Attack Volume Distribution" onclick="toggleTable('BWPolicyDistribution', this)">Attack Volume Distribution</button>
 				</div>
 		  		<div id="BWPolicyDistribution" class="collapsible-content" style="text-align: center;">
 					{policy_bpm_html_final}
@@ -2397,24 +2501,24 @@ if __name__ == '__main__':
 		  </tr>		
 
 		  <tr>
-			<td colspan="3" style="border-bottom: 0;">
+			<td colspan="3" style="border-top: 0;">
 				<!-- Button container for centering -->
 				<div class="button-container" align="center">
-					<button class="toggle-btn" data-original-text="Number of Security Events per Month" onclick="toggleTable('SecurityEventsPolicyPerMonth', this)">Number of Security Events per Month</button>
+					<button class="toggle-btn" data-original-text="Number of Attack Events per Month" onclick="toggleTable('SecurityEventsPolicyPerMonth', this)">Number of Attack Events per Month</button>
 				
-					<button align="center" class="toggle-btn" data-original-text="Malicious Packets per Month" onclick="toggleTable('PacketsPolicyPerMonth', this)">Malicious Packets per Month</button>
+					<button align="center" class="toggle-btn" data-original-text="Attack Packets per Month" onclick="toggleTable('PacketsPolicyPerMonth', this)">Attack Packets per Month</button>
 
-					<button class="toggle-btn" data-original-text="Malicious Bandwidth per Month" onclick="toggleTable('BWPolicyPerMonth', this)">Malicious Bandwidth per Month</button>
+					<button class="toggle-btn" data-original-text="Attack Volume per Month" onclick="toggleTable('BWPolicyPerMonth', this)">Attack Volume per Month</button>
 				</div>
 
 
 		  		<div id="SecurityEventsPolicyPerMonth" class="collapsible-content" style="text-align: left;">
-				  <h4 align="center">Security Events by policy table</h4>
+				  <h4 align="center">Attack Events by policy table</h4>
 					{policy_events_trends_table}
 				</div>
 
 		  		<div id="PacketsPolicyPerMonth" class="collapsible-content" style="text-align: left;">
-				  <h4 align="center">Malicious packets by policy table (units {pkt_units})</h4>
+				  <h4 align="center">Attack Packets by policy table (units {pkt_units})</h4>
 					{policy_packets_table}
 				</div>
 				
@@ -2425,26 +2529,45 @@ if __name__ == '__main__':
 			</td>
 		  </tr>	  
 
+	</tbody>
+</table>
 
 
+<div class="sticky-header">
+	<h2 id="section6">Monthly Attack Trends by Source IP</h2>
+	<h3>Top {top_n} Attacking Source IP - Ranked by Last Month's data</h3>
+</div>	
 
-
-
+<table>
+	<thead>
+		<tr>
+			<th>Month to month trends by Number of Attack Events</th>
+			<th>Month to month trends by Attack Packets(cumulative)</th>
+			<th>Month to month trends by Attack Volume(cumulative)</th>
+		  </tr>
+	</thead>
+	<tbody>
 		  <tr>
-			<td><div id="sip_epm_chart_div" style="height: 600px;"></td>
-			<td><div id="sip_ppm_chart_div" style="height: 600px;"></td>
-			<td><div id="sip_bpm_chart_div" style="height: 600px;"></td>
+			<td style="vertical-align: top;border-bottom: 0;">
+				<div id="sip_epm_chart_div" style="height: 600px;">
+			</td>
+			<td style="vertical-align: top;border-bottom: 0;">
+				<div id="sip_ppm_chart_div" style="height: 600px;">
+			</td>
+			<td style="vertical-align: top;border-bottom: 0;">
+				<div id="sip_bpm_chart_div" style="height: 600px;">
+			</td>
 		  </tr>
 
 
 
 
 		  <tr >
-		  <td valign="top" style="border-top: 0;">
+		  <td style="vertical-align: top;border-top: 0;border-bottom: 0;">
 
 				<!-- Button container for centering -->
 				<div class="button-container">
-					<button class="toggle-btn" data-original-text="Security events distribution" onclick="toggleTable('eventsSIPDistribution', this)">Security events distribution</button>
+					<button class="toggle-btn" data-original-text="Attack Events distribution" onclick="toggleTable('eventsSIPDistribution', this)">Attack Events distribution</button>
 				</div>
 		  		<div id="eventsSIPDistribution" class="collapsible-content" style="text-align: center;">
 					{sip_epm_html_final}
@@ -2452,11 +2575,11 @@ if __name__ == '__main__':
 
 		  </td>		  
 
-		  <td valign="top" style="border-top: 0;">
+		  <td style="vertical-align: top;border-top: 0;border-bottom: 0;">
 
 				<!-- Button container for centering -->
 				<div class="button-container">
-					<button class="toggle-btn" data-original-text="Malicious packets distribution" onclick="toggleTable('PacketsSIPDistribution', this)">Malicious packets distribution</button>
+					<button class="toggle-btn" data-original-text="Attack packets distributionbution" onclick="toggleTable('PacketsSIPDistribution', this)">Attack packets distributionbution</button>
 				</div>
 		  		<div id="PacketsSIPDistribution" class="collapsible-content" style="text-align: center;">
 					{sip_ppm_html_final}
@@ -2466,11 +2589,11 @@ if __name__ == '__main__':
 			</td>
 
 			
-		  <td valign="top" style="border-top: 0;">
+		  <td style="vertical-align: top;border-top: 0;border-bottom: 0;">
 
 				<!-- Button container for centering -->
 				<div class="button-container">
-					<button class="toggle-btn" data-original-text="Malicious bandwidth distribution" onclick="toggleTable('BWSIPDistribution', this)">Malicious bandwidth distribution</button>
+					<button class="toggle-btn" data-original-text="Attack Volume Distribution" onclick="toggleTable('BWSIPDistribution', this)">Attack Volume Distribution</button>
 				</div>
 		  		<div id="BWSIPDistribution" class="collapsible-content" style="text-align: center;">
 					{sip_bpm_html_final}
@@ -2482,50 +2605,51 @@ if __name__ == '__main__':
 		  </tr>		
 
 		  <tr>
-			<td colspan="3" style="border-bottom: 0;">
+			<td colspan="3" style="border-top: 0;">
 				<!-- Button container for centering -->
 				<div class="button-container" align="center">
-					<button class="toggle-btn" data-original-text="Number of Security Events per Month" onclick="toggleTable('SecurityEventsSIPPerMonth', this)">Number of Security Events per Month</button>
+					<button class="toggle-btn" data-original-text="Number of Attack Events per Month" onclick="toggleTable('SecurityEventsSIPPerMonth', this)">Number of Attack Events per Month</button>
 				
-					<button align="center" class="toggle-btn" data-original-text="Malicious Packets per Month" onclick="toggleTable('PacketsSIPPerMonth', this)">Malicious Packets per Month</button>
+					<button align="center" class="toggle-btn" data-original-text="Attack Packets per Month" onclick="toggleTable('PacketsSIPPerMonth', this)">Attack Packets per Month</button>
 
-					<button class="toggle-btn" data-original-text="Malicious Bandwidth per Month" onclick="toggleTable('BWSIPPerMonth', this)">Malicious Bandwidth per Month</button>
+					<button class="toggle-btn" data-original-text="Attack Volume per Month" onclick="toggleTable('BWSIPPerMonth', this)">Attack Volume per Month</button>
 				</div>
 
 
 		  		<div id="SecurityEventsSIPPerMonth" class="collapsible-content" style="text-align: left;">
-				  <h4 align="center">Security Events by Source IP table</h4>
+				  <h4 align="center">Attack Events by Source IP table</h4>
 					{sip_events_trends_table}
 				</div>
 
 		  		<div id="PacketsSIPPerMonth" class="collapsible-content" style="text-align: left;">
-				  <h4 align="center">Malicious packets by Source IP table (units {pkt_units})</h4>
+				  <h4 align="center">Attack Packets by Source IP table (units {pkt_units})</h4>
 					{sip_packets_table}
 				</div>
 				
 		  		<div id="BWSIPPerMonth" class="collapsible-content" style="text-align: left;">
-				  <h4 align="center">Malicious Bandwidth by Source IP table (units {bw_units})</h4>
+				  <h4 align="center">Attack Volume by Source IP table (units {bw_units})</h4>
 					{sip_bw_table}
 				</div>
 			</td>
 		  </tr>
 
-		  <tr>
-		  	<td>
-			</td>
-		  	<td>
-			<div id="total_attacks_days_chart_div">
-			</td>
-		  	<td>
-			</td>
-		  </tr> 
+	</tbody>
+</table>
 
 
-		</tbody>
 
-	  </table>
+<div class="sticky-header">
+	<h2 id="section7">Monthly Attack Trends by Total Attack Time</h2>
+	<h3>Duration of all attacks per month</h2>
+</div>	
 
-		  <p></p>
+
+			<div id="total_attacks_days_chart_div"></div>
+
+		
+
+	  <!-- Floating "Back to TOC" Button -->
+  <button id="backToToc" class="back-to-toc hidden" onclick="scrollToToc()">⬆ Back to TOP</button>
 
 	</body>
 

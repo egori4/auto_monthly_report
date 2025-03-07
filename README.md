@@ -332,10 +332,18 @@ V11.8.1 (3/5/2025)
 - Added titles for X and Y axis
 - Made security events vs attack events consistent
 
+V11.9 (3/7/2025)
+- Daily report - changed the button from "Back to TOC" to "Back to TOP"
+- Monthly report
+	- removed all daily charts
+	- Added table of contents
+	- Added top banner
+	- Added "Back to Top" button
+	- Aligned naming convention
+	- Cosmetic improvements
+
 Next steps/Functionality/ideas to add more charts
 
-	
-	Replicate all new reports/cosmetics we have on daily to monthly
 	Add MAX daily bps/pps/cec/cps max values graph per day
 
 ===========================================================================================================================
