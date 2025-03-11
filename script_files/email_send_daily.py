@@ -142,7 +142,11 @@ def send_report(SMTP_AUTH,SMTP_SERVER,SMTP_SERVER_PORT,SMTP_SENDER,SMTP_PASSWORD
                 mailserver.starttls()
                 mailserver.ehlo()
                 mailserver.login(SMTP_SENDER, SMTP_PASSWORD)
-        mailserver.sendmail(from_addr=SMTP_SENDER,to_addrs=SMTP_LIST, msg=msg.as_string())
+        response = mailserver.sendmail(from_addr=SMTP_SENDER,to_addrs=SMTP_LIST, msg=msg.as_string())
+        if response:
+                print(f"Failed to deliver: {response}")  # Prints non-empty dict if issues
+        else:
+                print("Email sent successfully.")
         mailserver.quit()
 
 send_report(smtp_auth,smtp_server,smtp_server_port,smtp_sender,smtp_password,smtp_list,smtp_subject_prefix)

@@ -350,6 +350,9 @@ V11.9 (3/7/2025)
 
 			formatted_df = df.apply(lambda column: column.apply(lambda x: format_numeric_value(x, bw_units, pkt_units)))
 
+V11.9.2 (3/11/2025)
+- Daily report - added printing error if email function returns an error or success
+
 Next steps/Functionality/ideas to add more charts
 
 	Add MAX daily bps/pps/cec/cps max values graph per day
