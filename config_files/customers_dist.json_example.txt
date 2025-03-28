@@ -23,7 +23,14 @@
 			"decimals": 2,
 			"pktDecimals": 2,
 			"bwDecimals": 2,
-			"barChartsAnnotations": "false"
+			"barChartsAnnotations": "true",
+			"TrafficWindowGranular": 14400,
+			"TrafficWindowAveraged": 86400,
+			"ForensicsWindow": 3600,
+			"PreAttackTimestampsToKeep": 4,
+			"PostAttackTimestampsToKeep": 20,
+			"BpsAttackThreshold": 10000,
+			"PpsAttackThreshold": 10000
 		},
 		"user": "radware",
 		"pass": "radware",
