@@ -2377,7 +2377,7 @@ if __name__ == '__main__':
 				<div id="toc" class="toc-container">
 					<ul class="toc-list">
 						<li>
-						<b><a href="#section4">Connections Information (CPS/Concurrent Established)</a></b>
+						<b><a href="#section4">Other statistics</a></b>
 						<ul class="sub-list">
 							<li><a href="#section4-1">Connections Per Second</a></li>
 							<li><a href="#section4-2">Concurrent Connections</a></li>
