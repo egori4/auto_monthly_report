@@ -350,12 +350,37 @@ V11.9 (3/7/2025)
 
 			formatted_df = df.apply(lambda column: column.apply(lambda x: format_numeric_value(x, bw_units, pkt_units)))
 
+V11.9.1 - on different branch (headline coloring)
+
 V11.9.2 (3/11/2025)
 - Daily report - added printing error if email function returns an error or success
 
+V11.10 (3/28/2025)
+- collector.py - Added "TrafficWindowAveraged" and "TrafficWindowGranular" variables under customers.json for user defined granular and aggreagate collection (defaults are 86400 and 14400 respectively)
+
+	traffic_window_granular = selected_entry['variables']['TrafficWindowGranular']
+	traffic_window_averaged = selected_entry['variables']['TrafficWindowAveraged']
+
+- Daily report- Split variables pre_attack_extra_timestamps (set to 1 min) and post_attack_extra_timestamps (set to 5 min) as if we have less than 5 min granular post attacks times, next value within 5 min will be 5 min averaged value which is higher value than actual (bottom line, we need to keep it granular 5 min post attack).
+
+	pre_attack_extra_timestamps = selected_entry['variables']['PreAttackTimestampsToKeep']
+	post_attack_extra_timestamps = selected_entry['variables']['PostAttackTimestampsToKeep']
+
+- Daily report - Merged traffic and attacks charts into the same single chart
+- Daily report- Added charts coloring persistence upon checking/unchecking
+- Daily report - Aligned naming convention malicious bandwidth, malicioius packets renamed to Attack Volume, Attack Packets respectively
+- Daily report - Added 2 charts - Excluded traffic (Mbps) and Excluded traffic (PPS)
+
+
 Next steps/Functionality/ideas to add more charts
 
-	Add MAX daily bps/pps/cec/cps max values graph per day
+	align/fix color persistence, checkbox vs stacking functionality in monthly report similarly to daily
+
+	Review Glenn's feedback
+
+	Add MAX daily bps/pps/cec/cps max values graph per da
+	Add Radware banner
+	https://files.constantcontact.com/01bf4ea6901/d24931ad-5b43-4e8b-bc1d-d8cc76ab21e3.png
 
 ===========================================================================================================================
 Instructions how to deploy as a docker container (on Vision example):

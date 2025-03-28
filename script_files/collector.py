@@ -67,9 +67,14 @@ try:
 		bw_units = selected_entry['variables']['bwUnitDaily']
 
 		try:
-			traffic_window = selected_entry['variables']['TrafficWindow']
+			traffic_window_granular = selected_entry['variables']['TrafficWindowGranular']
 		except:
-			traffic_window = 14400 # this is in seconds (4 hours). This setting controls the period of time blocks for which the traffic volume data is pulled
+			traffic_window_granular = 14400 # this is in seconds (4 hours). This setting controls the period of time blocks for which the traffic volume data is pulled
+
+		try:
+			traffic_window_averaged = selected_entry['variables']['TrafficWindowAveraged']
+		except:
+			traffic_window_averaged = 86400 # this is in seconds (4 hours). This setting controls the period of time blocks for which the traffic volume data is pulled
 
 		try:
 			forensics_window = selected_entry['variables']['ForensicsWindow']
@@ -78,19 +83,25 @@ try:
 
 
 		try:
-			extra_timestamps = selected_entry['variables']['PrePostAttackTimestampsToKeep']
+			pre_attack_extra_timestamps = selected_entry['variables']['PreAttackTimestampsToKeep']
 		except:
-			extra_timestamps = 4  # Number of granular  timestamps(each 15 sec) to keep before the attack and after the attack
+			pre_attack_extra_timestamps = 4  # Number of granular  timestamps(each 15 sec) to keep before the attack and after the attack
+
+		try:
+			post_attack_extra_timestamps = selected_entry['variables']['PostAttackTimestampsToKeep']
+		except:
+			post_attack_extra_timestamps = 20  # Number of granular  timestamps(each 15 sec) to keep before the attack and after the attack. Not recommended to reduce since average timestamp may falsly present extra attack volume in addition to granular.
+
 
 		try:
 			bps_attack_threshold = selected_entry['variables']['BpsAttackThreshold']
 		except:
-			bps_attack_threshold = 10000  # Attack volume in Kbps to keep granular logging
+			bps_attack_threshold = 10000  # Attack volume in Kbps to keep granular chart
 
 		try:
 			pps_attack_threshold = selected_entry['variables']['PpsAttackThreshold']
 		except:
-			pps_attack_threshold = 10000  # Attack volume in Kbps to keep granular logging
+			pps_attack_threshold = 10000  # Attack volume in Kbps to keep granular chart
 
 
 
@@ -383,7 +394,7 @@ class Vision:
 				writer.writerows(data)
 				print (f'Created {filename}')
 
-	def extract_attack_data_only(self, data, attack_threshold, extra_timestamps):
+	def extract_attack_data_only(self, data, attack_threshold, pre_attack_extra_timestamps,post_attack_extra_timestamps):
 		attack_timestamps = set()
 		
 		for ip, details in data.items():
@@ -395,10 +406,10 @@ class Vision:
 					attack_timestamps.add(timestamps[i])
 					
 					# Add Y timestamps before
-					attack_timestamps.update(timestamps[max(0, i - extra_timestamps):i])
+					attack_timestamps.update(timestamps[max(0, i - pre_attack_extra_timestamps):i])
 					
 					# Add ExTY timestamps after
-					attack_timestamps.update(timestamps[i + 1: min(len(timestamps), i + 1 + extra_timestamps)])
+					attack_timestamps.update(timestamps[i + 1: min(len(timestamps), i + 1 + post_attack_extra_timestamps)])
 		
 		return sorted(attack_timestamps)  # Return sorted list of unique timestamps
 
@@ -448,20 +459,25 @@ class Vision:
 				if filename == tmp_files_path + 'traffic_per_device_bps.csv':
 					row_value = round(float(row['trafficValue']) / 1000, 2)
 
-				elif filename == tmp_files_path + 'attacks_per_device_bps.csv':
+				if filename == tmp_files_path + 'attacks_per_device_bps.csv':
 					row_value = round(float(row['discards']) / 1000, 2)
+
+				if filename == tmp_files_path + 'excluded_per_device_bps.csv':
+					row_value = round(float(row['excluded']) / 1000, 2)
 
 				if filename == tmp_files_path + 'traffic_per_device_pps.csv':
 					row_value = round(float(row['trafficValue']) ,2)
 
-				elif filename == tmp_files_path + 'attacks_per_device_pps.csv':
+				if filename == tmp_files_path + 'attacks_per_device_pps.csv':
 					row_value = round(float(row['discards']) , 2)
 
+				if filename == tmp_files_path + 'excluded_per_device_pps.csv':
+					row_value = round(float(row['excluded']) ,2)
 
-				elif filename == tmp_files_path + 'cps_per_device.csv':
+				if filename == tmp_files_path + 'cps_per_device.csv':
 					row_value = float(row['connectionPerSecond'])  # Convert to number
 
-				elif filename == tmp_files_path + 'cec_per_device.csv':
+				if filename == tmp_files_path + 'cec_per_device.csv':
 					row_value = float(row['connectionsPerSecond'])  # Convert to number
 
 				# Store stats in time_series dictionary
@@ -1377,17 +1393,18 @@ if offline:
 ###################### Traffic BPS Chart ###########################
 # 1. Collect the traffic data granularly (every 15 sec)
 if not offline:
-	traffic_bps_per_device_granular = v.ams_stats_dashboards_per_device_window_calls(v.start_time_lower, v.end_time_upper, traffic_window=3600, units = "bps", report_type="Traffic Volume BPS Granular")
+	traffic_bps_per_device_granular = v.ams_stats_dashboards_per_device_window_calls(v.start_time_lower, v.end_time_upper, traffic_window_granular, units = "bps", report_type="Traffic Volume BPS Granular")
 
 # 2. Identify the attack timestamps
-bps_attack_only_timestamps_list = v.extract_attack_data_only(traffic_bps_per_device_granular, bps_attack_threshold, extra_timestamps)
+bps_attack_only_timestamps_list = v.extract_attack_data_only(traffic_bps_per_device_granular, bps_attack_threshold, pre_attack_extra_timestamps, post_attack_extra_timestamps)
 
 # 3. Collect the averaged traffic data (average depending on the traffic_window)
 if not offline:
-	traffic_bps_per_device_aggregate = v.ams_stats_dashboards_per_device_window_calls(v.start_time_lower, v.end_time_upper, traffic_window=86400, units = "bps", report_type="Traffic Volume BPS Aggregate")
+	traffic_bps_per_device_aggregate = v.ams_stats_dashboards_per_device_window_calls(v.start_time_lower, v.end_time_upper, traffic_window_averaged, units = "bps", report_type="Traffic Volume BPS Aggregate")
 
 # 4. Merge attack only timestamps into aggregate data. This way attack timeframe will be granular and rest will be aggregated and averaged
 traffic_bps_per_device_merged = v.merge_attacks_to_aggregate(traffic_bps_per_device_aggregate, traffic_bps_per_device_granular,bps_attack_only_timestamps_list)
+
 # 5. Write Traffic BPS Volume to csv
 v.write_per_device_combined_traffic_stats_to_csv(traffic_bps_per_device_merged, tmp_files_path + 'traffic_per_device_bps.csv')
 
@@ -1395,14 +1412,14 @@ v.write_per_device_combined_traffic_stats_to_csv(traffic_bps_per_device_merged, 
 ###################### Traffic PPS Chart ###########################
 # 1. Collect the traffic data granularly (every 15 sec)
 if not offline:
-	traffic_pps_per_device_granular = v.ams_stats_dashboards_per_device_window_calls(v.start_time_lower, v.end_time_upper, traffic_window=3600, units = "pps", report_type="Traffic Volume PPS Granular")
+	traffic_pps_per_device_granular = v.ams_stats_dashboards_per_device_window_calls(v.start_time_lower, v.end_time_upper, traffic_window_granular, units = "pps", report_type="Traffic Volume PPS Granular")
 
 # 2. Identify the attack timestamps
-pps_attack_only_timestamps_list = v.extract_attack_data_only(traffic_pps_per_device_granular, pps_attack_threshold, extra_timestamps)
+pps_attack_only_timestamps_list = v.extract_attack_data_only(traffic_pps_per_device_granular, pps_attack_threshold, pre_attack_extra_timestamps, post_attack_extra_timestamps)
 
 # 3. Collect the averaged traffic data (average depending on the traffic_window)
 if not offline:
-	traffic_pps_per_device_aggregate = v.ams_stats_dashboards_per_device_window_calls(v.start_time_lower, v.end_time_upper, traffic_window=86400, units = "pps", report_type="Traffic Volume PPS Aggregate")
+	traffic_pps_per_device_aggregate = v.ams_stats_dashboards_per_device_window_calls(v.start_time_lower, v.end_time_upper, traffic_window_averaged, units = "pps", report_type="Traffic Volume PPS Aggregate")
 
 # 4. Merge attack only timestamps into aggregate data. This way attack timeframe will be granular and rest will be aggregated and averaged
 traffic_pps_per_device_merged = v.merge_attacks_to_aggregate(traffic_pps_per_device_aggregate, traffic_pps_per_device_granular,pps_attack_only_timestamps_list)
@@ -1426,16 +1443,27 @@ v.write_per_device_combined_traffic_stats_to_csv(traffic_bps_per_device_merged, 
 # 1. Write Attacks PPS Volume to csv (reusing the same data from Traffic PPS)
 v.write_per_device_combined_traffic_stats_to_csv(traffic_pps_per_device_merged, tmp_files_path + 'attacks_per_device_pps.csv')
 
+###################### Excluded BPS ###########################
+
+# Write Excluded BPS Volume to csv from already collected data
+v.write_per_device_combined_traffic_stats_to_csv(traffic_bps_per_device_aggregate, tmp_files_path + 'excluded_per_device_bps.csv')
+
+###################### Excluded PPS ###########################
+
+# Write Excluded BPS Volume to csv from already collected data
+v.write_per_device_combined_traffic_stats_to_csv(traffic_pps_per_device_aggregate, tmp_files_path + 'excluded_per_device_pps.csv')
+
+
 
 ##################### CPS Chart ####################################
 
 # 1. Collect the CPS data granularly (every 15 sec)
 if not offline:
-	cps_per_device_granular = v.ams_stats_dashboards_per_device_window_calls(v.start_time_lower, v.end_time_upper, traffic_window=3600, units=None, uri = "/mgmt/vrm/monitoring/traffic/cps", report_type="CPS Granular")
+	cps_per_device_granular = v.ams_stats_dashboards_per_device_window_calls(v.start_time_lower, v.end_time_upper, traffic_window_granular, units=None, uri = "/mgmt/vrm/monitoring/traffic/cps", report_type="CPS Granular")
 
 # 2. Collect the averaged traffic data (average depending on the traffic_window)
 if not offline:
-	cps_per_device_aggregate = v.ams_stats_dashboards_per_device_window_calls(v.start_time_lower, v.end_time_upper, traffic_window=86400, units=None, uri = "/mgmt/vrm/monitoring/traffic/cps", report_type="CPS Aggregate")
+	cps_per_device_aggregate = v.ams_stats_dashboards_per_device_window_calls(v.start_time_lower, v.end_time_upper, traffic_window_averaged, units=None, uri = "/mgmt/vrm/monitoring/traffic/cps", report_type="CPS Aggregate")
 
 # 3. Merge attack only timestamps into aggregate data. This way attack timeframe will be granular and rest will be aggregated and averaged
 
@@ -1449,11 +1477,11 @@ v.write_per_device_combined_traffic_stats_to_csv(cps_per_device_merged, tmp_file
 
 # 1. Collect the Concurent Connections data granularly (every 15 sec)
 if not offline:
-	cec_per_device_granular = v.ams_stats_dashboards_per_device_window_calls(v.start_time_lower, v.end_time_upper, traffic_window=3600, units=None, uri = "/mgmt/vrm/monitoring/traffic/concurrent-connections", report_type="Concurrent Connections Granular")
+	cec_per_device_granular = v.ams_stats_dashboards_per_device_window_calls(v.start_time_lower, v.end_time_upper, traffic_window_granular, units=None, uri = "/mgmt/vrm/monitoring/traffic/concurrent-connections", report_type="Concurrent Connections Granular")
 
 # 2. Collect the averaged traffic data (average depending on the traffic_window)
 if not offline:
-	cec_per_device_aggregate = v.ams_stats_dashboards_per_device_window_calls(v.start_time_lower, v.end_time_upper, traffic_window=86400, units=None, uri = "/mgmt/vrm/monitoring/traffic/concurrent-connections", report_type="Concurrent Connections Aggregate")
+	cec_per_device_aggregate = v.ams_stats_dashboards_per_device_window_calls(v.start_time_lower, v.end_time_upper, traffic_window_averaged, units=None, uri = "/mgmt/vrm/monitoring/traffic/concurrent-connections", report_type="Concurrent Connections Aggregate")
 
 # 3. Merge attack only timestamps into aggregate data. This way attack timeframe will be granular and rest will be aggregated and averaged
 cec_per_device_merged = v.merge_attacks_to_aggregate(cec_per_device_aggregate, cec_per_device_granular,merged_attack_only_timestamps_list)

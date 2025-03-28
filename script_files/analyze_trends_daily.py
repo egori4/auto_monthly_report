@@ -400,7 +400,7 @@ def packets_per_day_html_table():
 	packets_per_day = packets_per_day.apply(pkt_units_conversion)
 
 	# Get the top 5 events with the highest sum of packet counts for each day
-	packets_per_day_top5 = packets_per_day.groupby(level=['Day of the Month'], group_keys=False).nlargest(5).apply(format_with_commas).to_frame('Malicious Packets sum')
+	packets_per_day_top5 = packets_per_day.groupby(level=['Day of the Month'], group_keys=False).nlargest(5).apply(format_with_commas).to_frame('Attack packets sum')
 	packets_per_day_top5 = packets_per_day_top5.to_html()
 
 	for device_ip, device_name in defensepros.items():
@@ -415,7 +415,7 @@ def bandwidth_per_day_html_table():
 	bandwidth_per_day = bandwidth_per_day.apply(bw_units_conversion)
 
 	# Get the top 5 events with the highest sum of packet counts for each day
-	bandwidth_per_day_top5 = bandwidth_per_day.groupby(level=['Day of the Month'], group_keys=False).nlargest(5).apply(format_with_commas).to_frame('Malicious bandwidth sum')
+	bandwidth_per_day_top5 = bandwidth_per_day.groupby(level=['Day of the Month'], group_keys=False).nlargest(5).apply(format_with_commas).to_frame('Attack Volume sum')
 	bandwidth_per_day_top5 = bandwidth_per_day_top5.to_html()
 
 	for device_ip, device_name in defensepros.items():
@@ -443,7 +443,7 @@ def packets_per_day_html(ppm):
 	series_ppm = data_month_ppm.groupby(['Attack Name','Device Name','Policy Name']).sum()['packetCount'].sort_values(ascending=False)
 	# Convert units
 	series_ppm = series_ppm.apply(pkt_units_conversion).apply(format_with_commas).head(10)
-	packets_per_day_html = series_ppm.to_frame('Malicious Packets')
+	packets_per_day_html = series_ppm.to_frame('Attack packets')
 	packets_per_day_html=packets_per_day_html.to_html()
 
 	for device_ip, device_name in defensepros.items():
@@ -457,7 +457,7 @@ def bandwidth_per_day_html(bpm):
 	# Convert units
 	series_bpm = series_bpm.apply(bw_units_conversion).apply(format_with_commas).head(10)
 
-	df_bandwidth_per_day_html = series_bpm.to_frame('Malicious Bandwidth')
+	df_bandwidth_per_day_html = series_bpm.to_frame('Attack Volume')
 	df_bandwidth_per_day_html=df_bandwidth_per_day_html.to_html()
 
 	for device_ip, device_name in defensepros.items():
@@ -487,7 +487,7 @@ def device_packets_per_day_html(device_ppm):
 			data_month_ppm = data_month[data_month['Device Name'] == device_ip]
 			device_series_ppm = data_month_ppm.groupby(['Device Name','Attack Name','Policy Name']).sum()['packetCount'].sort_values(ascending=False)
 			device_series_ppm = device_series_ppm.apply(pkt_units_conversion).apply(format_with_commas).head(10)
-			device_packets_per_day_html = device_series_ppm.to_frame('Malicious Packets')
+			device_packets_per_day_html = device_series_ppm.to_frame('Attack packets')
 			device_packets_per_day_html=device_packets_per_day_html.to_html().replace(device_ip, device_name)
 	return device_packets_per_day_html
 
@@ -497,7 +497,7 @@ def device_bandwidth_per_day_html(device_bpm):
 			data_month_bpm = data_month[data_month['Device Name'] == device_ip]
 			device_series_bpm = data_month_bpm.groupby(['Device Name','Attack Name','Policy Name']).sum()['packetBandwidth'].sort_values(ascending=False)
 			device_series_bpm = device_series_bpm.apply(bw_units_conversion).apply(format_with_commas).head(10)
-			device_df_bandwidth_per_day_html = device_series_bpm.to_frame('Malicious Bandwidth')
+			device_df_bandwidth_per_day_html = device_series_bpm.to_frame('Attack Volume')
 			device_df_bandwidth_per_day_html= device_df_bandwidth_per_day_html.to_html().replace(device_ip, device_name)
 
 
@@ -520,7 +520,7 @@ def policy_packets_per_day_html(policy_ppm):
 	data_month_ppm = data_month[data_month['Policy Name'] == policy_ppm]
 	series_ppm = data_month_ppm.groupby(['Policy Name','Attack Name','Device Name']).sum()['packetCount'].sort_values(ascending=False)
 	series_ppm = series_ppm.apply(pkt_units_conversion).apply(format_with_commas).head(10)
-	packets_per_day_html = series_ppm.to_frame('Malicious Packets')
+	packets_per_day_html = series_ppm.to_frame('Attack packets')
 	packets_per_day_html=packets_per_day_html.to_html()
 	
 	for device_ip, device_name in defensepros.items():
@@ -532,7 +532,7 @@ def policy_bandwidth_per_day_html(policy_bpm):
 	data_month_bpm = data_month[data_month['Policy Name'] == policy_bpm]
 	series_bpm = data_month_bpm.groupby(['Policy Name','Attack Name','Device Name']).sum()['packetBandwidth'].sort_values(ascending=False)
 	series_bpm = series_bpm.apply(bw_units_conversion).apply(format_with_commas).head(10)
-	df_bandwidth_per_day_html = series_bpm.to_frame('Malicious Bandwidth')
+	df_bandwidth_per_day_html = series_bpm.to_frame('Attack Volume')
 	df_bandwidth_per_day_html=df_bandwidth_per_day_html.to_html()
 
 	for device_ip, device_name in defensepros.items():
@@ -558,7 +558,7 @@ def sip_packets_per_day_html(sip_ppm):
 	data_month_ppm = data_month[data_month['Source IP'] == sip_ppm]
 	series_ppm = data_month_ppm.groupby(['Source IP','Attack Name','Device Name','Policy Name']).sum()['packetCount'].sort_values(ascending=False)
 	series_ppm = series_ppm.apply(pkt_units_conversion).apply(format_with_commas).head(10)
-	packets_per_day_html = series_ppm.to_frame('Malicious Packets')
+	packets_per_day_html = series_ppm.to_frame('Attack packets')
 	packets_per_day_html=packets_per_day_html.to_html()
 	
 	for device_ip, device_name in defensepros.items():
@@ -570,7 +570,7 @@ def sip_bandwidth_per_day_html(sip_bpm):
 	data_month_bpm = data_month[data_month['Source IP'] == sip_bpm]
 	series_bpm = data_month_bpm.groupby(['Source IP','Attack Name','Device Name','Policy Name']).sum()['packetBandwidth'].sort_values(ascending=False)
 	series_bpm = series_bpm.apply(bw_units_conversion).apply(format_with_commas).head(10)
-	df_bandwidth_per_day_html = series_bpm.to_frame('Malicious Bandwidth')
+	df_bandwidth_per_day_html = series_bpm.to_frame('Attack Volume')
 	df_bandwidth_per_day_html=df_bandwidth_per_day_html.to_html()
 
 	for device_ip, device_name in defensepros.items():
@@ -601,6 +601,29 @@ def get_legit_traffic(traffic_csv_file, attacks_csv_file):
 
 	return result
 
+def combine_traffic_attacks(traffic_csv_file, attacks_csv_file):
+
+	# Load both CSV files
+	traffic_df = pd.read_csv(charts_tables_path + traffic_csv_file)
+	attacks_df = pd.read_csv(charts_tables_path + attacks_csv_file)
+
+	# Rename columns (skip 'Timestamp')
+	attacks_df.columns = ["Timestamp"] + [f"Attacks {col}" for col in attacks_df.columns[1:]]
+	traffic_df.columns = ["Timestamp"] + [f"Traffic {col}" for col in traffic_df.columns[1:]]
+
+	# Merge on Timestamp
+	merged_df = pd.merge(traffic_df, attacks_df, on="Timestamp", how="outer")
+
+	# # Reorder columns: Timestamp → Attacks → Traffic
+	# columns_order = ["Timestamp"] + [col for col in merged_df.columns if "Attacks" in col] + [col for col in merged_df.columns if "Traffic" in col]
+	# merged_df = merged_df[columns_order]
+
+	# # Save to a new CSV file
+	# merged_df.to_csv("merged_traffic_attacks.csv", index=False)
+
+	return merged_df
+
+
 def format_with_commas(value):
 	return '{:,}'.format(value)
 
@@ -610,17 +633,17 @@ if __name__ == '__main__':
 
 	maxpps_per_day_trends = convert_csv_to_list_of_lists(charts_tables_path + 'maxpps_per_day_last_month.csv')
 
-	# Malicious bandwidth per day
+	# Attack Volume per day
 	maxbps_per_day_trends = convert_csv_to_list_of_lists(charts_tables_path + 'maxbps_per_day_last_month.csv')
 
 
 	# Events per day count
 	events_per_day_trends = convert_csv_to_list_of_lists(charts_tables_path + 'events_per_day_last_month.csv')
 
-	# Malicious bandwidth per day
+	# Attack Volume per day
 	packets_per_day_trends = convert_csv_to_list_of_lists(charts_tables_path + 'packets_per_day_last_month.csv')
 
-	# Malicious bandwidth per day
+	# Attack Volume per day
 	bandwidth_per_day_trends = convert_csv_to_list_of_lists(charts_tables_path + 'bandwidth_per_day_last_month.csv')
 
 
@@ -645,16 +668,29 @@ if __name__ == '__main__':
 		legit_traffic_without_attacks_pps.to_csv(charts_tables_path + "legit_traffic_without_attacks_pps.csv")
 		########################################################################################
 
+		################## Combine traffic and attacks together ###########################
+
+		merged_traffic_attacks_bps = combine_traffic_attacks('legit_traffic_without_attacks_bps.csv', 'attacks_per_device_bps.csv')
+		merged_traffic_attacks_bps.to_csv(charts_tables_path + "merged_traffic_with_attacks_bps.csv", index=False)
+
+		merged_traffic_attacks_pps = combine_traffic_attacks('legit_traffic_without_attacks_pps.csv', 'attacks_per_device_pps.csv')
+		merged_traffic_attacks_pps.to_csv(charts_tables_path + "merged_traffic_with_attacks_pps.csv", index=False)
+
+		########################################################################################
 
 		# traffic_per_device_combined_trends_bps = convert_csv_to_list_of_lists(charts_tables_path + 'traffic_per_device_bps.csv')
-		traffic_per_device_combined_trends_bps = convert_csv_to_list_of_lists(charts_tables_path + 'legit_traffic_without_attacks_bps.csv')
+		traffic_per_device_combined_trends_bps = convert_csv_to_list_of_lists(charts_tables_path + 'merged_traffic_with_attacks_bps.csv')
 		attacks_per_device_combined_trends_bps = convert_csv_to_list_of_lists(charts_tables_path + 'attacks_per_device_bps.csv')
+		number_of_devices = len(attacks_per_device_combined_trends_bps[0]) - 1  # Exclude timestamp column
 
-		traffic_per_device_combined_trends_pps = convert_csv_to_list_of_lists(charts_tables_path + 'legit_traffic_without_attacks_pps.csv')
+		traffic_per_device_combined_trends_pps = convert_csv_to_list_of_lists(charts_tables_path + 'merged_traffic_with_attacks_pps.csv')
 		attacks_per_device_combined_trends_pps = convert_csv_to_list_of_lists(charts_tables_path + 'attacks_per_device_pps.csv')
 
 		cps_per_device_combined_trends = convert_csv_to_list_of_lists(charts_tables_path + 'cps_per_device.csv')
 		cec_per_device_combined_trends = convert_csv_to_list_of_lists(charts_tables_path + 'cec_per_device.csv')
+
+		excluded_per_device_combined_trends_bps = convert_csv_to_list_of_lists(charts_tables_path + 'excluded_per_device_bps.csv')
+		excluded_per_device_combined_trends_pps = convert_csv_to_list_of_lists(charts_tables_path + 'excluded_per_device_pps.csv')
 
 	################################################# Analyze deeper top category ##########################################################
 
@@ -710,51 +746,51 @@ if __name__ == '__main__':
 		events_per_day_html_final+= events_per_day_html(events_per_day_top_list[index])
 
 	for index, value in enumerate(packets_per_day_top_list):
-		packets_per_day_html_final+=f'<h4>Distribution of topmost Malicious packets for attack "{value}" across devices and policies</h4>'
+		packets_per_day_html_final+=f'<h4>Distribution of topmost Attack packets for attack "{value}" across devices and policies</h4>'
 		packets_per_day_html_final+= packets_per_day_html(packets_per_day_top_list[index])
 		
 	for index, value in enumerate(bandwidth_per_day_top_list):
-		bandwidth_per_day_html_final+=f'<h4>Distribution of topmost Malicious Bandwidth for attack "{value}" across devices and policies</h4>'
+		bandwidth_per_day_html_final+=f'<h4>Distribution of topmost Attack Volume for attack "{value}" across devices and policies</h4>'
 		bandwidth_per_day_html_final+= bandwidth_per_day_html(bandwidth_per_day_top_list[index])
 
 
 
 	for index, value in enumerate(device_events_per_day_top_list):
-		device_events_per_day_html_final+=f'<h4>Distribution of topmost Attack Events for device "{value}" across policies</h4>'
+		device_events_per_day_html_final+=f'<h4>Distribution of Attack Events for device "{value}" across policies</h4>'
 		device_events_per_day_html_final+= device_events_per_day_html(device_events_per_day_top_list[index])
 
 	for index, value in enumerate(device_packets_per_day_top_list):
-		device_packets_per_day_html_final+=f'<h4>Distribution of topmost malicious packets for device "{value}" across policies</h4>'
+		device_packets_per_day_html_final+=f'<h4>Distribution of Attack packets for device "{value}" across policies</h4>'
 		device_packets_per_day_html_final+= device_packets_per_day_html(device_packets_per_day_top_list[index])
 
 	for index, value in enumerate(device_bandwidth_per_day_top_list):
-		device_bandwidth_per_day_html_final+=f'<h4>Distribution of topmost malicious bandwidth for device "{value}" across policies</h4>'
+		device_bandwidth_per_day_html_final+=f'<h4>Distribution of Attack Volume for device "{value}" across policies</h4>'
 		device_bandwidth_per_day_html_final+= device_bandwidth_per_day_html(device_packets_per_day_top_list[index])
 
 
 	for index, value in enumerate(policy_events_per_day_top_list):
-		policy_events_per_day_html_final+=f'<h4>Distribution of topmost Attack Events for policy "{value}" across devices</h4>'
+		policy_events_per_day_html_final+=f'<h4>Distribution of Attack Events for policy "{value}" across devices</h4>'
 		policy_events_per_day_html_final+= policy_events_per_day_html(policy_events_per_day_top_list[index])
 
 	for index, value in enumerate(policy_packets_per_day_top_list):
-		policy_packets_per_day_html_final+=f'<h4>Distribution of topmost Malicious packets for policy "{value}" across devices</h4>'
+		policy_packets_per_day_html_final+=f'<h4>Distribution of  Attack packets for policy "{value}" across devices</h4>'
 		policy_packets_per_day_html_final+= policy_packets_per_day_html(policy_packets_per_day_top_list[index])
 		
 	for index, value in enumerate(policy_bandwidth_per_day_top_list):
-		policy_bandwidth_per_day_html_final+=f'<h4>Distribution of topmost Malicious bandwidth for policy "{value}" across devices</h4>'
+		policy_bandwidth_per_day_html_final+=f'<h4>Distribution of Malicious bandwidth for policy "{value}" across devices</h4>'
 		policy_bandwidth_per_day_html_final+= policy_bandwidth_per_day_html(policy_bandwidth_per_day_top_list[index])
 
 
 	for index, value in enumerate(sip_events_per_day_top_list):
-		sip_events_per_day_html_final+=f'<h4>Distribution of topmost Attack Events for Source IP {value}</h4>'
+		sip_events_per_day_html_final+=f'<h4>Distribution of Attack Events for Source IP {value}</h4>'
 		sip_events_per_day_html_final+= sip_events_per_day_html(sip_events_per_day_top_list[index])
 
 	for index, value in enumerate(sip_packets_per_day_top_list):
-		sip_packets_per_day_html_final+=f'<h4>Distribution of topmost malicious packets for Source IP {value}</h4>'
+		sip_packets_per_day_html_final+=f'<h4>Distribution of Attack packets for Source IP {value}</h4>'
 		sip_packets_per_day_html_final+= sip_packets_per_day_html(sip_packets_per_day_top_list[index])
 		
 	for index, value in enumerate(sip_bandwidth_per_day_top_list):
-		sip_bandwidth_per_day_html_final+=f'<h4>Distribution of topmost malicious bandwidth for Source IP {value}</h4>'
+		sip_bandwidth_per_day_html_final+=f'<h4>Distribution of Attack Volume for Source IP {value}</h4>'
 		sip_bandwidth_per_day_html_final+= sip_bandwidth_per_day_html(sip_bandwidth_per_day_top_list[index])
 
 
@@ -799,7 +835,7 @@ if __name__ == '__main__':
 	bw_table_alltimehigh = csv_to_html_table(charts_tables_path + 'bandwidth_per_day_table_alltimehigh.csv',bw_units)
 
 
-	################################################# Events, packets and bandwidth trends by Device  ##########################################################
+	################################################# Events, packets and bandwidth trends by DefensePro  ##########################################################
 
 	events_by_device_trends_chart_data = convert_csv_to_list_of_lists(charts_tables_path + 'device_events_per_day_chart_alltimehigh.csv')
 	events_by_device_trends_move_text = trends_move(events_by_device_trends_chart_data, 'events')
@@ -867,43 +903,21 @@ if __name__ == '__main__':
 		  google.charts.load('current', {{'packages':['corechart']}});
 		  google.charts.setOnLoadCallback(drawChart);
 
+			var default_google_colors = [
+				"#3366cc", "#dc3912", "#ff9900", "#109618", "#990099", "#0099c6",
+				"#dd4477", "#66aa00", "#b82e2e", "#316395", "#994499", "#22aa99",
+				"#aaaa11", "#6633cc", "#e67300", "#8b0707", "#651067", "#329262",
+				"#5574a6", "#3b3eac", "#b77322", "#16d620", "#b91383", "#f4359e",
+				"#9c5935", "#a9c413", "#2a778d", "#668d1c", "#bea413", "#0c5922", "#743411"
+			];
 
+			var purple_colors = [
+				"#990099", "#6633cc", "#994499", "#651067", "#3b3eac", 
+				"#b91383", "#f4359e", "#743411", "#800080", "#6a0dad", 
+				"#8b008b", "#9370db", "#ba55d3", "#9400d3", "#9932cc", 
+				"#4b0082", "#7b68ee", "#8a2be2", "#dda0dd", "#ee82ee"
+			];
 
-
-		  function drawChart() {{
-		  
-			
-			
-			// Convert epoch timestamps to Date objects before passing to Google Charts
-			var raw_traffic_per_device_combined_trends_bps_data = {traffic_per_device_combined_trends_bps}.map(row => {{
-				return [new Date(row[0]), ...row.slice(1)]; // Convert first column, keep others unchanged
-			}});
-
-			// Convert epoch timestamps to Date objects before passing to Google Charts
-			var raw_attacks_per_device_combined_trends_bps_data = {attacks_per_device_combined_trends_bps}.map(row => {{
-				return [new Date(row[0]), ...row.slice(1)]; // Convert first column, keep others unchanged
-			}});
-
-			
-			// Convert epoch timestamps to Date objects before passing to Google Charts
-			var raw_traffic_per_device_combined_trends_pps_data = {traffic_per_device_combined_trends_pps}.map(row => {{
-				return [new Date(row[0]), ...row.slice(1)]; // Convert first column, keep others unchanged
-			}});
-
-			// Convert epoch timestamps to Date objects before passing to Google Charts
-			var raw_attacks_per_device_combined_trends_pps_data = {attacks_per_device_combined_trends_pps}.map(row => {{
-				return [new Date(row[0]), ...row.slice(1)]; // Convert first column, keep others unchanged
-			}});
-
-			// Convert epoch timestamps to Date objects before passing to Google Charts
-			var raw_cps_per_device_combined_trends_data = {cps_per_device_combined_trends}.map(row => {{
-				return [new Date(row[0]), ...row.slice(1)]; // Convert first column, keep others unchanged
-			}});
-
-			// Convert epoch timestamps to Date objects before passing to Google Charts
-			var raw_cec_per_device_combined_trends_data = {cec_per_device_combined_trends}.map(row => {{
-				return [new Date(row[0]), ...row.slice(1)]; // Convert first column, keep others unchanged
-			}});
 
 			// Function to generate an array of the same red color for all series for attacks data
 			function generateSameRedColor(numColors) {{
@@ -920,20 +934,66 @@ if __name__ == '__main__':
 			}}
 
 
+			// Determine the number of series dynamically for attack data for coloring based on attack data
+			var numSeries = {number_of_devices};
+			var redColors = generateSameRedColor(numSeries);
+			var blueColors = generateGradientBlueColors(numSeries);
+			var redBlueColors = [...blueColors, ...redColors]; // Merge both color sets
+
+
+		  var colorMap = {{}}; // Store colors globally
+
+		  let debounceTimeout;
+		  let chart;
+
+		  function drawChart() {{
+		  
+			
+			// Convert epoch timestamps to Date objects before passing to Google Charts
+			var raw_traffic_per_device_combined_trends_bps_data = {traffic_per_device_combined_trends_bps}.map(row => {{
+				return [new Date(row[0]), ...row.slice(1)]; // Convert first column, keep others unchanged
+			}});
+
+
+			
+			// Convert epoch timestamps to Date objects before passing to Google Charts
+			var raw_traffic_per_device_combined_trends_pps_data = {traffic_per_device_combined_trends_pps}.map(row => {{
+				return [new Date(row[0]), ...row.slice(1)]; // Convert first column, keep others unchanged
+			}});
+
+
+			// Convert epoch timestamps to Date objects before passing to Google Charts
+			var raw_cps_per_device_combined_trends_data = {cps_per_device_combined_trends}.map(row => {{
+				return [new Date(row[0]), ...row.slice(1)]; // Convert first column, keep others unchanged
+			}});
+
+			// Convert epoch timestamps to Date objects before passing to Google Charts
+			var raw_cec_per_device_combined_trends_data = {cec_per_device_combined_trends}.map(row => {{
+				return [new Date(row[0]), ...row.slice(1)]; // Convert first column, keep others unchanged
+			}});
+
+			// Convert epoch timestamps to Date objects before passing to Google Charts
+			var raw_excluded_per_device_combined_trends_bps_data = {excluded_per_device_combined_trends_bps}.map(row => {{
+				return [new Date(row[0]), ...row.slice(1)]; // Convert first column, keep others unchanged
+			}});
+
+			// Convert epoch timestamps to Date objects before passing to Google Charts
+			var raw_excluded_per_device_combined_trends_pps_data = {excluded_per_device_combined_trends_pps}.map(row => {{
+				return [new Date(row[0]), ...row.slice(1)]; // Convert first column, keep others unchanged
+			}});
+
+
 			var traffic_per_device_combined_trends_bps_data = google.visualization.arrayToDataTable(raw_traffic_per_device_combined_trends_bps_data);
 			var traffic_per_device_combined_trends_pps_data = google.visualization.arrayToDataTable(raw_traffic_per_device_combined_trends_pps_data);
 
 				
-			var attacks_per_device_combined_trends_bps_data = google.visualization.arrayToDataTable(raw_attacks_per_device_combined_trends_bps_data);
-			var attacks_per_device_combined_trends_pps_data = google.visualization.arrayToDataTable(raw_attacks_per_device_combined_trends_pps_data);
 
-			// Determine the number of series dynamically for attack data for coloring based on attack data
-			let numSeries = attacks_per_device_combined_trends_bps_data.getNumberOfColumns() - 1; // Exclude timestamp column
-			let redColors = generateSameRedColor(numSeries);
-			let blueColors = generateGradientBlueColors(numSeries);
 
 			var cps_per_device_combined_trends_data = google.visualization.arrayToDataTable(raw_cps_per_device_combined_trends_data);
 			var cec_per_device_combined_trends_data = google.visualization.arrayToDataTable(raw_cec_per_device_combined_trends_data);
+
+			var excluded_per_device_combined_trends_bps_data = google.visualization.arrayToDataTable(raw_excluded_per_device_combined_trends_bps_data);
+			var excluded_per_device_combined_trends_pps_data = google.visualization.arrayToDataTable(raw_excluded_per_device_combined_trends_pps_data);
 
 			var maxpps_per_day_data = google.visualization.arrayToDataTable({maxpps_per_day_trends});
 			var maxbps_per_day_data = google.visualization.arrayToDataTable({maxbps_per_day_trends});
@@ -959,18 +1019,18 @@ if __name__ == '__main__':
 			var policy_bandwidth_per_day_data = google.visualization.arrayToDataTable({policy_bw_trends_chart });
 
 			var traffic_per_device_combined_trends_bps_options = {{
-				title: 'Legitimate Traffic Volume per device',
+				title: 'Traffic and Attack Volume for each DefensePro',
 				vAxis: {{
-					title: 'Traffic Volume (Mbps)',
+					title: 'Traffic and Attack Volume (Mbps)',
 					minValue: 0
 					}},
 				hAxis: {{
 					title: 'Date and time'
 					}},
 				isStacked: false,
-				colors: blueColors,
+				colors: redBlueColors,
 				focusTarget: 'category',
-				legend: {{position: 'top', maxLines: 5}},
+				legend: {{position: 'top', maxLines: 10}},
 				width: '100%',
 				explorer: {{
 					actions: ['dragToZoom', 'rightClickToReset'],
@@ -980,41 +1040,20 @@ if __name__ == '__main__':
 					}}
 				}};
 
-			var attacks_per_device_combined_trends_bps_options = {{
-				title: 'Attack volume per device',
-				vAxis: {{
-					title: 'Attack Volume (Mbps)',
-					minValue: 0
-					}},
-				hAxis: {{
-					title: 'Date and time'
-					}},
-				isStacked: true,
-				colors: redColors,
-				focusTarget: 'category',
-				legend: {{position: 'top', maxLines: 5}},
-				width: '100%',
-				explorer: {{
-					actions: ['dragToZoom', 'rightClickToReset'],
-					axis: 'horizontal',
-					maxZoomIn: 0.001,
-					maxZoomOut: 20
-					}}
-				}};
 
 			var traffic_per_device_combined_trends_pps_options = {{
-				title: 'Legitimate Traffic Volume per device',
+				title: 'Traffic and Atttack Rate for each DefensePro',
 				vAxis: {{
-					title: 'Traffic Volume (PPS)',
+					title: 'Traffic and Attack Rate (PPS)',
 					minValue: 0
 					}},
 				hAxis: {{
 					title: 'Date and time'
 					}},
 				isStacked: false,
-				colors: blueColors,
+				colors: redBlueColors,
 				focusTarget: 'category',
-				legend: {{position: 'top', maxLines: 5}},
+				legend: {{position: 'top', maxLines: 10}},
 				width: '100%',
 				explorer: {{
 					actions: ['dragToZoom', 'rightClickToReset'],
@@ -1024,27 +1063,6 @@ if __name__ == '__main__':
 					}}
 				}};
 
-			var attacks_per_device_combined_trends_pps_options = {{
-				title: 'Attack volume per device',
-				vAxis: {{
-					title: 'Attack Volume (PPS)',
-					minValue: 0
-					}},
-				hAxis: {{
-					title: 'Date and time'
-					}},
-				isStacked: true,
-				colors: redColors,
-				focusTarget: 'category',
-				legend: {{position: 'top', maxLines: 5}},
-				width: '100%',
-				explorer: {{
-					actions: ['dragToZoom', 'rightClickToReset'],
-					axis: 'horizontal',
-					maxZoomIn: 0.001,
-					maxZoomOut: 20
-					}}
-				}};
 				
 			var cps_per_device_combined_trends_options = {{
 				title: 'Connections Per Second per device',
@@ -1090,6 +1108,50 @@ if __name__ == '__main__':
 					}}
 				}};
 
+			var excluded_per_device_combined_trends_bps_options = {{
+				title: 'Excluded Uninspected Traffic Volume by DefensePro',
+				vAxis: {{
+					title: 'Excluded Uninspected Traffic (Mbps)',
+					minValue: 0
+					}},
+				hAxis: {{
+					title: 'Date and time'
+					}},
+				isStacked: false,
+				colors: purple_colors,
+				focusTarget: 'category',
+				legend: {{position: 'top', maxLines: 10}},
+				width: '100%',
+				explorer: {{
+					actions: ['dragToZoom', 'rightClickToReset'],
+					axis: 'horizontal',
+					maxZoomIn: 0.001,
+					maxZoomOut: 20
+					}}
+				}};
+
+			var excluded_per_device_combined_trends_pps_options = {{
+				title: 'Excluded Uninspected Traffic Rate by DefensePro',
+				vAxis: {{
+					title: 'Excluded Uninspected Traffic (PPS)',
+					minValue: 0
+					}},
+				hAxis: {{
+					title: 'Date and time'
+					}},
+				isStacked: false,
+				colors: purple_colors,
+				focusTarget: 'category',
+				legend: {{position: 'top', maxLines: 10}},
+				width: '100%',
+				explorer: {{
+					actions: ['dragToZoom', 'rightClickToReset'],
+					axis: 'horizontal',
+					maxZoomIn: 0.001,
+					maxZoomOut: 20
+					}}
+				}};
+				
 			var maxpps_per_day_options = {{
 			  title: 'Highest PPS rate attack of the day',
 			  vAxis: {{
@@ -1136,7 +1198,7 @@ if __name__ == '__main__':
 			}};
 
 			  var packets_per_day_options = {{
-			  title: 'Cumulative Malicious packets per day',
+			  title: 'Cumulative Attack packets per day',
 			  vAxis: {{
 				minValue: 0,
 				title: 'Packet units - {pkt_units}'
@@ -1151,7 +1213,7 @@ if __name__ == '__main__':
 			}};
 
 			var bandwidth_per_day_options = {{
-			  title: 'Cumulative Malicious bandwidth per day',
+			  title: 'Cumulative Attack Volume per day',
 			  vAxis: {{
 				minValue: 0,
 				title:'{bw_units}',
@@ -1177,7 +1239,7 @@ if __name__ == '__main__':
 
 
 			var attack_packets_per_day_options = {{
-			  title: 'Malicious Packets trends (units {pkt_units}) - TopN by last day',
+			  title: 'Attack packets trends (units {pkt_units}) - TopN by last day',
 			  vAxis: {{minValue: 0}},
 			  hAxis: {{ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
 			  isStacked: false,
@@ -1187,7 +1249,7 @@ if __name__ == '__main__':
 			}};
 
 			var attack_bandwidth_per_day_options = {{
-			  title: 'Malicious Bandwidth trends (units {bw_units}) - TopN by last day',
+			  title: 'Attack Volume trends (units {bw_units}) - TopN by last day',
 			  vAxis: {{minValue: 0}},
 			  hAxis: {{ticks: events_per_day_data.getDistinctValues(0),minTextSpacing:1,showTextEvery:1}},
 			  isStacked: false,
@@ -1209,13 +1271,14 @@ if __name__ == '__main__':
 				title: 'Day of the Month'
 				}},
 			  isStacked: false,
+			  colors: default_google_colors,
 			  focusTarget: 'category',
 			  legend: {{position: 'top', maxLines: 5}},
 			  width: '100%'
 			}};
 
 			var packets_per_day_options_alltimehigh = {{
-			  title: 'Cumulative Malicious Packets by attack vector',
+			  title: 'Cumulative Attack packets by attack vector',
 			  vAxis: {{
 				minValue: 0,
 				title: 'Packet units - {pkt_units}'
@@ -1231,7 +1294,7 @@ if __name__ == '__main__':
 			}};
 
 			var bandwidth_per_day_options_alltimehigh = {{
-			  title: 'Cumulative malicious bandwidth by attack vector',
+			  title: 'Cumulative Attack Volume by attack vector',
 			  vAxis: {{
 				minValue: 0,
 				title:'{bw_units}'
@@ -1247,7 +1310,7 @@ if __name__ == '__main__':
 			}};
 
 			var events_per_day_by_device_options = {{
-			  title: 'Attack Events by device trends',
+			  title: 'Attack Events by DefensePro trends',
 			  vAxis: {{
 				minValue: 0,
 				title: 'Number of Attack Events'
@@ -1262,7 +1325,7 @@ if __name__ == '__main__':
 			}};
 
 			var packets_per_day_by_device_options = {{
-			  title: 'Cumulative Packets by device',
+			  title: 'Cumulative Packets by DefensePro',
 			  vAxis: {{
 				minValue: 0,
 				title: 'Packet units - {pkt_units}'
@@ -1278,7 +1341,7 @@ if __name__ == '__main__':
 			}};
 
 			var bandwidth_per_day_by_device_options = {{
-			  title: 'Cumulative Malicious Bandwidth by device',
+			  title: 'Cumulative Attack Volume by DefensePro',
 			  vAxis: {{
 				minValue: 0,
 				title:'{bw_units}'
@@ -1310,7 +1373,7 @@ if __name__ == '__main__':
 			}};
 
 			var sip_packets_per_day_options = {{
-			  title: 'Cumulative Malicious Packets by Source IP',
+			  title: 'Cumulative Attack packets by Source IP',
 			  vAxis: {{
 				minValue: 0,
 				title: 'Packet units - {pkt_units}'
@@ -1326,7 +1389,7 @@ if __name__ == '__main__':
 			}};
 
 			var sip_bandwidth_per_day_options = {{
-			  title: 'Cumulative Malicious Bandwidth by Source IP',
+			  title: 'Cumulative Attack Volume by Source IP',
 			  vAxis: {{
 				minValue: 0,
 				title:'Megabytes'
@@ -1358,7 +1421,7 @@ if __name__ == '__main__':
 			}};
 
 			var policy_packets_per_day_options = {{
-			  title: 'Cumulative Malicious Packets by policy',
+			  title: 'Cumulative Attack packets by policy',
 			  vAxis: {{
 				minValue: 0,
 				title: 'Packet units - {pkt_units}'
@@ -1374,7 +1437,7 @@ if __name__ == '__main__':
 			}};
 
 			var policy_bandwidth_per_day_options = {{
-			  title: 'Cumulative Malicious Bandwidth by policy',
+			  title: 'Cumulative Attack Volume by policy',
 			  vAxis: {{
 				minValue: 0,
 				title:'{bw_units}'
@@ -1390,15 +1453,16 @@ if __name__ == '__main__':
 			}};
 
 			var traffic_per_device_combined_trends_bps_chart = new google.visualization.AreaChart(document.getElementById('traffic_per_device_combined_trends_bps_chart_div'));
-			var attacks_per_device_combined_trends_bps_chart = new google.visualization.AreaChart(document.getElementById('attacks_per_device_combined_trends_bps_chart_div'));
 
 			var traffic_per_device_combined_trends_pps_chart = new google.visualization.AreaChart(document.getElementById('traffic_per_device_combined_trends_pps_chart_div'));
-			var attacks_per_device_combined_trends_pps_chart = new google.visualization.AreaChart(document.getElementById('attacks_per_device_combined_trends_pps_chart_div'));
 					
 			
 			var cps_per_device_combined_trends_chart = new google.visualization.AreaChart(document.getElementById('cps_per_device_combined_trends_chart_div'));
 
 			var cec_per_device_combined_trends_chart = new google.visualization.AreaChart(document.getElementById('cec_per_device_combined_trends_chart_div'));
+
+			var excluded_per_device_combined_trends_bps_chart = new google.visualization.AreaChart(document.getElementById('excluded_per_device_combined_trends_bps_chart_div'));
+			var excluded_per_device_combined_trends_pps_chart = new google.visualization.AreaChart(document.getElementById('excluded_per_device_combined_trends_pps_chart_div'));
 
 			var maxpps_per_day_chart = new google.visualization.AreaChart(document.getElementById('maxpps_per_day_chart_div'));
 			var maxbps_per_day_chart = new google.visualization.AreaChart(document.getElementById('maxbps_per_day_chart_div'));
@@ -1424,130 +1488,133 @@ if __name__ == '__main__':
 			var policy_bandwidth_per_day_chart = new google.visualization.AreaChart(document.getElementById('policy_bandwidth_per_day_chart_div'));
 
             // Create checkboxes for Traffic utilization BPS per device combined
-            createCheckboxes('traffic_per_device_combined_trends_bps_chart_div', raw_traffic_per_device_combined_trends_bps_data, function(selectedCategories) {{
+            createCheckboxes('traffic_per_device_combined_trends_bps_chart_div', raw_traffic_per_device_combined_trends_bps_data, traffic_per_device_combined_trends_bps_options, function(selectedCategories) {{
                 var filteredData = filterDataByCategories(raw_traffic_per_device_combined_trends_bps_data, selectedCategories);
                 var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
                 traffic_per_device_combined_trends_bps_chart.draw(filteredDataTable, traffic_per_device_combined_trends_bps_options);
             }});
 
-            // Create checkboxes for Attacks BPS per device combined
-            createCheckboxes('attacks_per_device_combined_trends_bps_chart_div', raw_attacks_per_device_combined_trends_bps_data, function(selectedCategories) {{
-                var filteredData = filterDataByCategories(raw_attacks_per_device_combined_trends_bps_data, selectedCategories);
-                var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
-                attacks_per_device_combined_trends_bps_chart.draw(filteredDataTable, attacks_per_device_combined_trends_bps_options);
-            }});
 
             // Create checkboxes for Traffic utilization PPS per device combined
-            createCheckboxes('traffic_per_device_combined_trends_pps_chart_div', raw_traffic_per_device_combined_trends_pps_data, function(selectedCategories) {{
+            createCheckboxes('traffic_per_device_combined_trends_pps_chart_div', raw_traffic_per_device_combined_trends_pps_data, traffic_per_device_combined_trends_pps_options, function(selectedCategories) {{
                 var filteredData = filterDataByCategories(raw_traffic_per_device_combined_trends_pps_data, selectedCategories);
                 var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
                 traffic_per_device_combined_trends_pps_chart.draw(filteredDataTable, traffic_per_device_combined_trends_pps_options);
             }});
 
-            // Create checkboxes for Attacks PPS per device combined
-            createCheckboxes('attacks_per_device_combined_trends_pps_chart_div', raw_attacks_per_device_combined_trends_pps_data, function(selectedCategories) {{
-                var filteredData = filterDataByCategories(raw_attacks_per_device_combined_trends_pps_data, selectedCategories);
-                var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
-                attacks_per_device_combined_trends_pps_chart.draw(filteredDataTable, attacks_per_device_combined_trends_pps_options);
-            }});
 
             // Create checkboxes for CPS per device combined
-            createCheckboxes('cps_per_device_combined_trends_chart_div', raw_cps_per_device_combined_trends_data, function(selectedCategories) {{
+            createCheckboxes('cps_per_device_combined_trends_chart_div', raw_cps_per_device_combined_trends_data, cps_per_device_combined_trends_options, function(selectedCategories) {{
                 var filteredData = filterDataByCategories(raw_cps_per_device_combined_trends_data, selectedCategories);
                 var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
                 cps_per_device_combined_trends_chart.draw(filteredDataTable, cps_per_device_combined_trends_options);
             }});
 
             // Create checkboxes for Concurrent Established Connections (CEC) per device combined
-            createCheckboxes('cec_per_device_combined_trends_chart_div', raw_cec_per_device_combined_trends_data, function(selectedCategories) {{
+            createCheckboxes('cec_per_device_combined_trends_chart_div', raw_cec_per_device_combined_trends_data, cec_per_device_combined_trends_options, function(selectedCategories) {{
                 var filteredData = filterDataByCategories(raw_cec_per_device_combined_trends_data, selectedCategories);
                 var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
                 cec_per_device_combined_trends_chart.draw(filteredDataTable, cec_per_device_combined_trends_options);
             }});
 
-			// Create checkboxes for each chart
-			createCheckboxes('events_per_day_chart_div_alltimehigh', {events_trends_alltimehigh}, function(selectedCategories) {{
+            // Create checkboxes for Excluded BPS per device combined
+            createCheckboxes('excluded_per_device_combined_trends_bps_chart_div', raw_excluded_per_device_combined_trends_bps_data, excluded_per_device_combined_trends_bps_options, function(selectedCategories) {{
+                var filteredData = filterDataByCategories(raw_excluded_per_device_combined_trends_bps_data, selectedCategories);
+                var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
+                excluded_per_device_combined_trends_bps_chart.draw(filteredDataTable, excluded_per_device_combined_trends_bps_options);
+            }});
+
+            // Create checkboxes for Excluded PPS per device combined
+            createCheckboxes('excluded_per_device_combined_trends_pps_chart_div', raw_excluded_per_device_combined_trends_pps_data, excluded_per_device_combined_trends_pps_options, function(selectedCategories) {{
+                var filteredData = filterDataByCategories(raw_excluded_per_device_combined_trends_pps_data, selectedCategories);
+                var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
+                excluded_per_device_combined_trends_pps_chart.draw(filteredDataTable, excluded_per_device_combined_trends_pps_options);
+            }});
+
+			createCheckboxes('events_per_day_chart_div_alltimehigh', {events_trends_alltimehigh}, events_per_day_options_alltimehigh, function(selectedCategories) {{
 				var filteredData = filterDataByCategories({events_trends_alltimehigh}, selectedCategories);
 				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
 				events_per_day_chart_alltimehigh.draw(filteredDataTable, events_per_day_options_alltimehigh);
 			}});
 
-			createCheckboxes('packets_per_day_chart_div_alltimehigh', {packets_trends_chart_alltimehigh}, function(selectedCategories) {{
+			createCheckboxes('packets_per_day_chart_div_alltimehigh', {packets_trends_chart_alltimehigh}, packets_per_day_options_alltimehigh, function(selectedCategories) {{
 				var filteredData = filterDataByCategories({packets_trends_chart_alltimehigh}, selectedCategories);
 				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
 				packets_per_day_chart_alltimehigh.draw(filteredDataTable, packets_per_day_options_alltimehigh);
 			}});
 
-			createCheckboxes('bandwidth_per_day_chart_div_alltimehigh', {bw_trends_alltimehigh}, function(selectedCategories) {{
+			createCheckboxes('bandwidth_per_day_chart_div_alltimehigh', {bw_trends_alltimehigh}, bandwidth_per_day_options_alltimehigh, function(selectedCategories) {{
 				var filteredData = filterDataByCategories({bw_trends_alltimehigh}, selectedCategories);
 				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
 				bandwidth_per_day_chart_alltimehigh.draw(filteredDataTable, bandwidth_per_day_options_alltimehigh);
 			}});
 
-			createCheckboxes('events_per_day_by_device_chart_div', {events_by_device_trends_chart_data}, function(selectedCategories) {{
+			createCheckboxes('events_per_day_by_device_chart_div', {events_by_device_trends_chart_data}, events_per_day_by_device_options, function(selectedCategories) {{
 				var filteredData = filterDataByCategories({events_by_device_trends_chart_data}, selectedCategories);
 				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
 				events_per_day_by_device_chart.draw(filteredDataTable, events_per_day_by_device_options);
 			}});
 
-			createCheckboxes('packets_per_day_by_device_chart_div', {packets_by_device_trends_chart_data}, function(selectedCategories) {{
+			createCheckboxes('packets_per_day_by_device_chart_div', {packets_by_device_trends_chart_data}, packets_per_day_by_device_options, function(selectedCategories) {{
 				var filteredData = filterDataByCategories({packets_by_device_trends_chart_data}, selectedCategories);
 				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
 				packets_per_day_by_device_chart.draw(filteredDataTable, packets_per_day_by_device_options);
 			}});
 
-			createCheckboxes('bandwidth_per_day_by_device_chart_div', {bw_by_device_trends_chart_data}, function(selectedCategories) {{
+			createCheckboxes('bandwidth_per_day_by_device_chart_div', {bw_by_device_trends_chart_data}, bandwidth_per_day_by_device_options, function(selectedCategories) {{
 				var filteredData = filterDataByCategories({bw_by_device_trends_chart_data}, selectedCategories);
 				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
 				bandwidth_per_day_by_device_chart.draw(filteredDataTable, bandwidth_per_day_by_device_options);
 			}});
 
-			createCheckboxes('sip_events_per_day_chart_div', {sip_events_trends_chart}, function(selectedCategories) {{
+			createCheckboxes('sip_events_per_day_chart_div', {sip_events_trends_chart}, sip_events_per_day_options, function(selectedCategories) {{
 				var filteredData = filterDataByCategories({sip_events_trends_chart}, selectedCategories);
 				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
 				sip_events_per_day_chart.draw(filteredDataTable, sip_events_per_day_options);
 			}});
 
-			createCheckboxes('sip_packets_per_day_chart_div', {sip_packets_trends_chart}, function(selectedCategories) {{
+			createCheckboxes('sip_packets_per_day_chart_div', {sip_packets_trends_chart}, sip_packets_per_day_options, function(selectedCategories) {{
 				var filteredData = filterDataByCategories({sip_packets_trends_chart}, selectedCategories);
 				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
 				sip_packets_per_day_chart.draw(filteredDataTable, sip_packets_per_day_options);
 			}});
 
-			createCheckboxes('sip_bandwidth_per_day_chart_div', {sip_bw_trends_chart}, function(selectedCategories) {{
+			createCheckboxes('sip_bandwidth_per_day_chart_div', {sip_bw_trends_chart}, sip_bandwidth_per_day_options, function(selectedCategories) {{
 				var filteredData = filterDataByCategories({sip_bw_trends_chart}, selectedCategories);
 				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
 				sip_bandwidth_per_day_chart.draw(filteredDataTable, sip_bandwidth_per_day_options);
 			}});
 
-			createCheckboxes('policy_events_per_day_chart_div', {policy_events_trends_chart}, function(selectedCategories) {{
+			createCheckboxes('policy_events_per_day_chart_div', {policy_events_trends_chart}, policy_events_per_day_options, function(selectedCategories) {{
 				var filteredData = filterDataByCategories({policy_events_trends_chart}, selectedCategories);
 				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
 				policy_events_per_day_chart.draw(filteredDataTable, policy_events_per_day_options);
 			}});
 
-			createCheckboxes('policy_packets_per_day_chart_div', {policy_packets_trends_chart}, function(selectedCategories) {{
+			createCheckboxes('policy_packets_per_day_chart_div', {policy_packets_trends_chart}, policy_packets_per_day_options, function(selectedCategories) {{
 				var filteredData = filterDataByCategories({policy_packets_trends_chart}, selectedCategories);
 				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
 				policy_packets_per_day_chart.draw(filteredDataTable, policy_packets_per_day_options);
 			}});
 
-			createCheckboxes('policy_bandwidth_per_day_chart_div', {policy_bw_trends_chart}, function(selectedCategories) {{
+			createCheckboxes('policy_bandwidth_per_day_chart_div', {policy_bw_trends_chart}, policy_bandwidth_per_day_options, function(selectedCategories) {{
 				var filteredData = filterDataByCategories({policy_bw_trends_chart}, selectedCategories);
 				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
 				policy_bandwidth_per_day_chart.draw(filteredDataTable, policy_bandwidth_per_day_options);
 			}});
 
-
+			// Draw charts with consistent colors
 			traffic_per_device_combined_trends_bps_chart.draw(traffic_per_device_combined_trends_bps_data, traffic_per_device_combined_trends_bps_options);
-			attacks_per_device_combined_trends_bps_chart.draw(attacks_per_device_combined_trends_bps_data, attacks_per_device_combined_trends_bps_options);
 
 			traffic_per_device_combined_trends_pps_chart.draw(traffic_per_device_combined_trends_pps_data, traffic_per_device_combined_trends_pps_options);
-			attacks_per_device_combined_trends_pps_chart.draw(attacks_per_device_combined_trends_pps_data, attacks_per_device_combined_trends_pps_options);
 
 			cps_per_device_combined_trends_chart.draw(cps_per_device_combined_trends_data, cps_per_device_combined_trends_options);
 
 			cec_per_device_combined_trends_chart.draw(cec_per_device_combined_trends_data, cec_per_device_combined_trends_options);
+
+			excluded_per_device_combined_trends_bps_chart.draw(excluded_per_device_combined_trends_bps_data, excluded_per_device_combined_trends_bps_options);
+			excluded_per_device_combined_trends_pps_chart.draw(excluded_per_device_combined_trends_pps_data, excluded_per_device_combined_trends_pps_options);
+
 
 			maxpps_per_day_chart.draw(maxpps_per_day_data, maxpps_per_day_options);
 			maxbps_per_day_chart.draw(maxbps_per_day_data, maxbps_per_day_options);
@@ -1577,117 +1644,197 @@ if __name__ == '__main__':
 			// Add radio button toggles for stacked/non-stacked
 
 
-            addStackedToggle('traffic_per_device_combined_trends_bps_chart_div', traffic_per_device_combined_trends_bps_chart, traffic_per_device_combined_trends_bps_data, traffic_per_device_combined_trends_bps_options);
-            addStackedToggle('attacks_per_device_combined_trends_bps_chart_div', attacks_per_device_combined_trends_bps_chart, attacks_per_device_combined_trends_bps_data, attacks_per_device_combined_trends_bps_options);
+            addStackedToggle('traffic_per_device_combined_trends_bps_chart_div', traffic_per_device_combined_trends_bps_chart, raw_traffic_per_device_combined_trends_bps_data, traffic_per_device_combined_trends_bps_options);
+            addStackedToggle('traffic_per_device_combined_trends_pps_chart_div', traffic_per_device_combined_trends_pps_chart, raw_traffic_per_device_combined_trends_pps_data, traffic_per_device_combined_trends_pps_options);
 
-            addStackedToggle('cps_per_device_combined_trends_chart_div', cps_per_device_combined_trends_chart, cps_per_device_combined_trends_data, cps_per_device_combined_trends_options);
+            addStackedToggle('cps_per_device_combined_trends_chart_div', cps_per_device_combined_trends_chart, raw_cps_per_device_combined_trends_data, cps_per_device_combined_trends_options);
+            addStackedToggle('cec_per_device_combined_trends_chart_div', cec_per_device_combined_trends_chart, raw_cec_per_device_combined_trends_data, cec_per_device_combined_trends_options);
 
-            addStackedToggle('traffic_per_device_combined_trends_pps_chart_div', traffic_per_device_combined_trends_pps_chart, traffic_per_device_combined_trends_pps_data, traffic_per_device_combined_trends_pps_options);
-            addStackedToggle('attacks_per_device_combined_trends_pps_chart_div', attacks_per_device_combined_trends_pps_chart, attacks_per_device_combined_trends_pps_data, attacks_per_device_combined_trends_pps_options);
+            addStackedToggle('excluded_per_device_combined_trends_bps_chart_div', excluded_per_device_combined_trends_bps_chart, raw_excluded_per_device_combined_trends_bps_data, excluded_per_device_combined_trends_bps_options);
+			addStackedToggle('excluded_per_device_combined_trends_pps_chart_div', excluded_per_device_combined_trends_pps_chart, raw_excluded_per_device_combined_trends_pps_data, excluded_per_device_combined_trends_pps_options);
 
-            addStackedToggle('cec_per_device_combined_trends_chart_div', cec_per_device_combined_trends_chart, cec_per_device_combined_trends_data, cec_per_device_combined_trends_options);
+			addStackedToggle('events_per_day_chart_div_alltimehigh', events_per_day_chart_alltimehigh, {events_trends_alltimehigh}, events_per_day_options_alltimehigh);
+			addStackedToggle('packets_per_day_chart_div_alltimehigh', packets_per_day_chart_alltimehigh, {packets_trends_chart_alltimehigh}, packets_per_day_options_alltimehigh);
+			addStackedToggle('bandwidth_per_day_chart_div_alltimehigh', bandwidth_per_day_chart_alltimehigh, {bw_trends_alltimehigh}, bandwidth_per_day_options_alltimehigh);
 
-			addStackedToggle('events_per_day_chart_div_alltimehigh', events_per_day_chart_alltimehigh, events_per_day_data_alltimehigh, events_per_day_options_alltimehigh);
-			addStackedToggle('packets_per_day_chart_div_alltimehigh', packets_per_day_chart_alltimehigh, packets_per_day_data_alltimehigh, packets_per_day_options_alltimehigh);
-			addStackedToggle('bandwidth_per_day_chart_div_alltimehigh', bandwidth_per_day_chart_alltimehigh, bandwidth_per_day_data_alltimehigh, bandwidth_per_day_options_alltimehigh);
+			addStackedToggle('events_per_day_by_device_chart_div', events_per_day_by_device_chart, {events_by_device_trends_chart_data}, events_per_day_by_device_options);
+			addStackedToggle('packets_per_day_by_device_chart_div', packets_per_day_by_device_chart, {packets_by_device_trends_chart_data}, packets_per_day_by_device_options);
+			addStackedToggle('bandwidth_per_day_by_device_chart_div', bandwidth_per_day_by_device_chart, {bw_by_device_trends_chart_data}, bandwidth_per_day_by_device_options);
 
-			addStackedToggle('events_per_day_by_device_chart_div', events_per_day_by_device_chart, events_per_day_by_device_data, events_per_day_by_device_options);
-			addStackedToggle('packets_per_day_by_device_chart_div', packets_per_day_by_device_chart, packets_per_day_by_device_data, packets_per_day_by_device_options);
-			addStackedToggle('bandwidth_per_day_by_device_chart_div', bandwidth_per_day_by_device_chart, bandwidth_per_day_by_device_data, bandwidth_per_day_by_device_options);
+			addStackedToggle('sip_events_per_day_chart_div', sip_events_per_day_chart, {sip_events_trends_chart}, sip_events_per_day_options);
+			addStackedToggle('sip_packets_per_day_chart_div', sip_packets_per_day_chart, {sip_packets_trends_chart}, sip_packets_per_day_options);
+			addStackedToggle('sip_bandwidth_per_day_chart_div', sip_bandwidth_per_day_chart, {sip_bw_trends_chart}, sip_bandwidth_per_day_options);
 
-			addStackedToggle('sip_events_per_day_chart_div', sip_events_per_day_chart, sip_events_per_day_data, sip_events_per_day_options);
-			addStackedToggle('sip_packets_per_day_chart_div', sip_packets_per_day_chart, sip_packets_per_day_data, sip_packets_per_day_options);
-			addStackedToggle('sip_bandwidth_per_day_chart_div', sip_bandwidth_per_day_chart, sip_bandwidth_per_day_data, sip_bandwidth_per_day_options);
-
-			addStackedToggle('policy_events_per_day_chart_div', policy_events_per_day_chart, policy_events_per_day_data, policy_events_per_day_options);
-			addStackedToggle('policy_packets_per_day_chart_div', policy_packets_per_day_chart, policy_packets_per_day_data, policy_packets_per_day_options);
-			addStackedToggle('policy_bandwidth_per_day_chart_div', policy_bandwidth_per_day_chart, policy_bandwidth_per_day_data, policy_bandwidth_per_day_options);
+			addStackedToggle('policy_events_per_day_chart_div', policy_events_per_day_chart, {policy_events_trends_chart}, policy_events_per_day_options);
+			addStackedToggle('policy_packets_per_day_chart_div', policy_packets_per_day_chart, {policy_packets_trends_chart}, policy_packets_per_day_options);
+			addStackedToggle('policy_bandwidth_per_day_chart_div', policy_bandwidth_per_day_chart, {policy_bw_trends_chart}, policy_bandwidth_per_day_options);
 
 		  }}
 
-			// Function to create checkboxes
-			function createCheckboxes(containerId, data, callback) {{
-			var container = document.getElementById(containerId);
-			var categories = data[0].slice(1);  // Extract categories from the first row
+		  
+			function updateColorPersistence(containerId, selectedCategories, data, options) {{
+				if (!colorMap[containerId]) {{
+					colorMap[containerId] = {{}};
+				}}
 
-			var checkboxContainer = document.createElement('div');
-			checkboxContainer.className = 'checkbox-container';
-			
-			categories.forEach(function(category, index) {{
-				var checkbox = document.createElement('input');
-				checkbox.type = 'checkbox';
-				checkbox.checked = true;
-				checkbox.value = index + 1;  // Offset for data columns
+				selectedCategories.forEach((selectedIndex, i) => {{
+					let category = data[0][selectedIndex];
+					if (!colorMap[containerId][category]) {{
+						colorMap[containerId][category] = options.colors[i % options.colors.length];
+					}}
+				}});
 
-				checkbox.onchange = function() {{
-				var selectedCategories = Array.from(checkboxContainer.querySelectorAll('input:checked')).map(input => input.value);
-				callback(selectedCategories);
-				}};
-
-				var label = document.createElement('label');
-				label.appendChild(checkbox);
-				label.appendChild(document.createTextNode(category));
-				
-				checkboxContainer.appendChild(label);
-			}});
-
-			container.parentNode.insertBefore(checkboxContainer, container);
+				options.colors = selectedCategories.map(index => colorMap[containerId][data[0][index]]);
 			}}
+
+
+			// Function to create checkboxes
+			function createCheckboxes(containerId, data, options, callback) {{
+				var container = document.getElementById(containerId);
+				var categories = data[0].slice(1); // Extract categories from the first row
+
+				var checkboxContainer = document.createElement('div');
+				checkboxContainer.className = 'checkbox-container';
+
+				if (!selectedCategoriesMap[containerId]) {{
+					selectedCategoriesMap[containerId] = categories.map((_, i) => i + 1);
+				}}
+
+				// Ensure colorMap is initialized
+				if (!colorMap[containerId]) {{
+					colorMap[containerId] = {{}};
+				}}
+
+				// **Prepopulate colorMap to avoid losing colors**
+				categories.forEach((category, index) => {{
+					if (!colorMap[containerId][category]) {{
+						if (options && options.colors) {{
+							colorMap[containerId][category] = options.colors[index % options.colors.length];
+						}} else {{
+							colorMap[containerId][category] = default_google_colors[index % default_google_colors.length]; // Fallback in case options are missing
+						}}
+					}}
+				}});
+
+				categories.forEach(function(category, index) {{
+					var checkbox = document.createElement('input');
+					checkbox.type = 'checkbox';
+					checkbox.checked = selectedCategoriesMap[containerId].includes(index + 1);
+					checkbox.value = index + 1;
+
+			checkbox.onchange = function() {{ 
+
+				var selectedCategories = Array.from(checkboxContainer.querySelectorAll('input:checked'))
+					.map(input => parseInt(input.value));
+
+				selectedCategoriesMap[containerId] = selectedCategories;
+
+				let selectedSet = new Set(selectedCategories);
+
+
+
+
+				updateColorPersistence(containerId, selectedCategories, data, options);
+
+
+
+				var filteredData = filterDataByCategories(data, selectedCategories);
+
+				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
+
+				callback(selectedCategories);
+			}};
+
+
+					var label = document.createElement('label');
+					label.appendChild(checkbox);
+					label.appendChild(document.createTextNode(category));
+
+					checkboxContainer.appendChild(label);
+				}});
+
+				container.parentNode.insertBefore(checkboxContainer, container);
+			}}
+
 
 			// Function to filter data based on selected categories
 			function filterDataByCategories(data, selectedCategories) {{
-			var header = [data[0][0], ...selectedCategories.map(index => data[0][index])];  // Filter header row
-			var rows = data.slice(1).map(row => [row[0], ...selectedCategories.map(index => row[index])]);  // Filter data rows
-			return [header, ...rows];
+				return data.map((row, rowIndex) => rowIndex === 0 
+					? [row[0], ...selectedCategories.map(index => row[index])] 
+					: [row[0], ...selectedCategories.map(index => row[index])]
+				);
 			}}
+
+
+			var selectedCategoriesMap = {{}}; // Global store for checkbox selections per chart
+				
 
 			// Function to add Stacked/Non-Stacked toggle via radio buttons
-			function addStackedToggle(containerId, chart, data, options) {{
-			var container = document.getElementById(containerId);
-			var radioContainer = document.createElement('div');
-			radioContainer.className = 'radio-container';
-			
-			var stackedLabel = document.createElement('label');
-			var stackedRadio = document.createElement('input');
-			stackedRadio.type = 'radio';
-			stackedRadio.name = 'stackedToggle_' + containerId;
-			stackedRadio.value = 'stacked';
-			
-			stackedRadio.onchange = function() {{
-				options.isStacked = true;
-				chart.draw(data, options);
-			}};
-			stackedLabel.appendChild(stackedRadio);
-			stackedLabel.appendChild(document.createTextNode('Stacked'));
+			function addStackedToggle(containerId, chart, rawData, options) {{
+				var container = document.getElementById(containerId);
+				var radioContainer = document.createElement('div');
+				radioContainer.className = 'radio-container';
 
-			var nonStackedLabel = document.createElement('label');
-			var nonStackedRadio = document.createElement('input');
-			nonStackedRadio.type = 'radio';
-			nonStackedRadio.name = 'stackedToggle_' + containerId;
-			nonStackedRadio.value = 'non-stacked';
+				var stackedLabel = document.createElement('label');
+				var stackedRadio = document.createElement('input');
+				stackedRadio.type = 'radio';
+				stackedRadio.name = 'stackedToggle_' + containerId;
+				stackedRadio.value = 'stacked';
 
-			 // Set radio button checked state based on the initial options.isStacked value
-			 if (options.isStacked) {{
-			     stackedRadio.checked = true;
-			     nonStackedRadio.checked = false;
-			 }} else {{
-			     stackedRadio.checked = false;
-			     nonStackedRadio.checked = true;
-			 }}
+				var nonStackedLabel = document.createElement('label');
+				var nonStackedRadio = document.createElement('input');
+				nonStackedRadio.type = 'radio';
+				nonStackedRadio.name = 'stackedToggle_' + containerId;
+				nonStackedRadio.value = 'non-stacked';
 
-			nonStackedRadio.onchange = function() {{
-				options.isStacked = false;
-				chart.draw(data, options);
-			}};
-			nonStackedLabel.appendChild(nonStackedRadio);
-			nonStackedLabel.appendChild(document.createTextNode('Non-Stacked'));
+				// Set initial state
+				stackedRadio.checked = options.isStacked === true;
+				nonStackedRadio.checked = options.isStacked === false;
 
-			radioContainer.appendChild(stackedLabel);
-			radioContainer.appendChild(nonStackedLabel);
-			
-			// container.parentNode.insertBefore(radioContainer, container);
-			container.parentNode.insertBefore(radioContainer, container.nextSibling);
+				stackedRadio.onchange = function () {{
+					updateChartWithPersistence(containerId, chart, rawData, options, true);
+				}};
+
+				nonStackedRadio.onchange = function () {{
+					updateChartWithPersistence(containerId, chart, rawData, options, false);
+				}};
+
+				stackedLabel.appendChild(stackedRadio);
+				stackedLabel.appendChild(document.createTextNode('Stacked'));
+
+				nonStackedLabel.appendChild(nonStackedRadio);
+				nonStackedLabel.appendChild(document.createTextNode('Non-Stacked'));
+
+				radioContainer.appendChild(stackedLabel);
+				radioContainer.appendChild(nonStackedLabel);
+
+				container.parentNode.insertBefore(radioContainer, container.nextSibling);
 			}}
+
+
+			function getValidData(data) {{
+				try {{
+					return google.visualization.arrayToDataTable(data);
+				}} catch (error) {{
+					console.error("Error processing data for stacked toggle:", error);
+					return null;
+				}}
+			}}
+
+
+
+			function updateChartWithPersistence(containerId, chart, rawData, options, isStacked) {{
+				options.isStacked = isStacked;
+
+				var selectedCategories = selectedCategoriesMap[containerId] || 
+										[...Array(rawData[0].length - 1).keys()].map(i => i + 1);
+
+				if ((validData = getValidData(filterDataByCategories(rawData, selectedCategories)))) {{
+					chart.draw(validData, options);
+				}}
+			}}
+
+
 
 
 		// Toggle table visibility on button click
@@ -1705,14 +1852,18 @@ if __name__ == '__main__':
 			}}
 		}}
 
-		// Show/hide "Back to TOC" button based on scroll position
-		window.addEventListener('scroll', function () {{
-		let button = document.getElementById('backToToc');
-		if (window.scrollY > 300) {{ // Show button after scrolling down
-			button.classList.remove('hidden');
-		}} else {{
-			button.classList.add('hidden');
-		}}
+		document.addEventListener("DOMContentLoaded", function () {{
+			let button = document.getElementById('backToToc');
+			if (!button) return; // Safety check in case the button is missing
+
+			// Show/hide "Back to TOC" button based on scroll position
+			window.addEventListener('scroll', function () {{
+				if (window.scrollY > 300) {{
+					button.classList.remove('hidden'); // Show button when scrolled down
+				}} else {{
+					button.classList.add('hidden'); // Hide button when near the top
+				}}
+			}});
 		}});
 
 		// Smoothly scroll to the top of the page when button is clicked
@@ -2168,14 +2319,13 @@ if __name__ == '__main__':
 						<li>
 						<b><a href="#section1">Attack Traffic Overview (Volume - Mbps/Cumulative GB)</a></b>
 						<ul class="sub-list">
-							<li><a href="#section1-1">All Attacks per device</a></li>
-							<li><a href="#section1-2">Legitimate Traffic Volume per device</a></li>
+							<li><a href="#section1-2">Traffic and Attack Rate for each DefensePro</a></li>
 							<li><a href="#section1-3">Highest volume attack of the day</a></li>
-							<li><a href="#section1-4">Cumulative malicious bandwidth per day</a></li>
-							<li><a href="#section1-5">Cumulative malicious bandwidth breakdown by attack vector</a></li>
-							<li><a href="#section1-6">Cumulative malicious bandwidth breakdown by device</a></li>
-							<li><a href="#section1-7">Cumulative malicious bandwidth breakdown by policy</a></li>
-							<li><a href="#section1-8">Cumulative malicious bandwidth breakdown by source IP's</a></li>	
+							<li><a href="#section1-4">Cumulative Attack Volume per day</a></li>
+							<li><a href="#section1-5">Cumulative Attack Volume breakdown by attack vector</a></li>
+							<li><a href="#section1-6">Cumulative Attack Volume breakdown by DefensePro</a></li>
+							<li><a href="#section1-7">Cumulative Attack Volume breakdown by policy</a></li>
+							<li><a href="#section1-8">Cumulative Attack Volume breakdown by source IP's</a></li>	
 						</ul>
 						</li>
 					</ul>
@@ -2190,14 +2340,13 @@ if __name__ == '__main__':
 						<b><a href="#section1">Attack Traffic Overview (Packets- PPS/Cumulative)</a></b>
 							
 							<ul class="sub-list">
-								<li><a href="#section2-1">All Attacks per device (PPS)</a></li>
-								<li><a href="#section2-2">Legitimate Traffic Volume per device(PPS)</a></li>
+								<li><a href="#section2-2">Traffic and Attack Rate for each DefensePro (PPS)</a></li>
 								<li><a href="#section2-3">Highest volume attack of the day(PPS)</a></li>
-								<li><a href="#section2-4">Cumulative malicious packets per day</a></li>
-								<li><a href="#section2-5">Cumulative malicious packets breakdown by attack vector</a></li>
-								<li><a href="#section2-6">Cumulative malicious packets breakdown by device</a></li>
-								<li><a href="#section2-7">Cumulative malicious packets breakdown by policy</a></li>
-								<li><a href="#section2-8">Cumulative malicious packets breakdown by source IP's</a></li>	
+								<li><a href="#section2-4">Cumulative Attack packets per day</a></li>
+								<li><a href="#section2-5">Cumulative Attack packets breakdown by attack vector</a></li>
+								<li><a href="#section2-6">Cumulative Attack packets breakdown by DefensePro</a></li>
+								<li><a href="#section2-7">Cumulative Attack packets breakdown by policy</a></li>
+								<li><a href="#section2-8">Cumulative Attack packets breakdown by source IP's</a></li>	
 							</ul>
 							
 						</li>
@@ -2215,7 +2364,7 @@ if __name__ == '__main__':
 						<ul class="sub-list">
 							<li><a href="#section3-2">Number of attack events per day</a></li>
 							<li><a href="#section3-3">Number of attack events by attack vector</a></li>
-							<li><a href="#section3-4">Number of attack events by device</a></li>
+							<li><a href="#section3-4">Number of attack events by DefensePro</a></li>
 							<li><a href="#section3-5">Number of attack events by policy</a></li>
 							<li><a href="#section3-6">Number of attack events by source IP's</a></li>
 						</ul>
@@ -2232,6 +2381,8 @@ if __name__ == '__main__':
 						<ul class="sub-list">
 							<li><a href="#section4-1">Connections Per Second</a></li>
 							<li><a href="#section4-2">Concurrent Connections</a></li>
+							<li><a href="#section4-3">Excluded Uninspected Traffic Volume (Mbps)</a></li>
+							<li><a href="#section4-4">Excluded Uninspected Traffic Rate (PPS)</a></li>
 
 	
 						</ul>
@@ -2257,17 +2408,12 @@ if __name__ == '__main__':
   <table>
 	
 		<thead>
-          <tr>
-            <td colspan="3" style="border-top: 0;">
-            <h3 id="section1-1">All Attacks per device (Mbps)</h3>
-            <div id="attacks_per_device_combined_trends_bps_chart_div" style="height: 400px;">
-            </td>
-          </tr> 
+
 			
           <tr >
             <td colspan="3" style="border-bottom: 0;" >
-            <h3 id="section1-2">Legitimate Traffic Volume per device (Mbps)</h3>
-            <div id="traffic_per_device_combined_trends_bps_chart_div" style="height: 400px;">
+            <h3 id="section1-2">Traffic and Attack Volume for each DefensePro (Mbps)</h3>
+            <div id="traffic_per_device_combined_trends_bps_chart_div" style="height: 510px;">
             </td>
           </tr> 
 		  
@@ -2293,7 +2439,7 @@ if __name__ == '__main__':
 
 		  <tr>
 		  	<td colspan="3" style="border-bottom: 0;">
-			  <h3 id="section1-4">Cumulative malicious bandwidth per day ({bw_units})</h3>
+			  <h3 id="section1-4">Cumulative Attack Volume per day ({bw_units})</h3>
 				<div id="bandwidth_per_day_chart_div">
 			</td>
 		  </tr>
@@ -2315,7 +2461,7 @@ if __name__ == '__main__':
 
 		  <tr>
 		  	<td colspan="3" style="border-bottom: 0;" class="fit-text">
-			<h3 id="section1-5">Cumulative malicious bandwidth breakdown by attack vectors</h3>
+			<h3 id="section1-5">Cumulative Attack Volume breakdown by attack vectors</h3>
 			<div id="bandwidth_per_day_chart_div_alltimehigh" style="height: 400px;">
 			</td>
 		  </tr>
@@ -2335,7 +2481,7 @@ if __name__ == '__main__':
 
 				<!-- Button container for centering -->
 				<div class="button-container">
-					<button class="toggle-btn" data-original-text="Distribution of accumulated malicious bandwidth across Devices and Policies" onclick="toggleTable('DistributionOfBWPerDayTable', this)">Distribution of accumulated malicious bandwidth across Devices and Policies</button>
+					<button class="toggle-btn" data-original-text="Distribution of accumulated Attack Volume across Devices and Policies" onclick="toggleTable('DistributionOfBWPerDayTable', this)">Distribution of accumulated Attack Volume across Devices and Policies</button>
 				</div>
 		  		<div id="DistributionOfBWPerDayTable" class="collapsible-content">
 				
@@ -2352,7 +2498,7 @@ if __name__ == '__main__':
 
 		  <tr>
 		  	<td colspan="3" style="border-bottom: 0;">
-			<h3 id="section1-6">Cumulative malicious bandwidth breakdown by device</h3>
+			<h3 id="section1-6">Cumulative Attack Volume breakdown by DefensePro</h3>
 			<div id="bandwidth_per_day_by_device_chart_div" style="height: 400px;">
 			</td>
 		  </tr>
@@ -2362,7 +2508,7 @@ if __name__ == '__main__':
 			<td colspan="3" valign="top" style="border-top: 0;" class="fit-text">
 				<!-- Button container for centering -->
 				<div class="button-container">
-					<button class="toggle-btn" data-original-text="Malicious Bandwidth by device table" onclick="toggleTable('AttackDeviceBWPerDayTable', this)">Malicious Bandwidth by device table</button>
+					<button class="toggle-btn" data-original-text="Attack Volume by DefensePro table" onclick="toggleTable('AttackDeviceBWPerDayTable', this)">Attack Volume by DefensePro table</button>
 				</div>
 		  		<div id="AttackDeviceBWPerDayTable" class="collapsible-content">
 				{bw_by_device_table}
@@ -2371,7 +2517,7 @@ if __name__ == '__main__':
 
 				<!-- Button container for centering -->
 				<div class="button-container">
-					<button class="toggle-btn" data-original-text="Distribution of accumulated malicious bandwidth across Devices and Policies" onclick="toggleTable('DistributionOfDeviceBWPerDayTable', this)">Distribution of accumulated malicious bandwidth across Devices and Policies</button>
+					<button class="toggle-btn" data-original-text="Distribution of accumulated Attack Volume across Devices and Policies" onclick="toggleTable('DistributionOfDeviceBWPerDayTable', this)">Distribution of accumulated Attack Volume across Devices and Policies</button>
 				</div>
 		  		<div id="DistributionOfDeviceBWPerDayTable" class="collapsible-content">
 				
@@ -2385,7 +2531,7 @@ if __name__ == '__main__':
 
 		  <tr>
 		  	<td colspan="3" style="border-bottom: 0;">
-			<h3 id="section1-7">Cumulative malicious bandwidth breakdown by policy</h3>
+			<h3 id="section1-7">Cumulative Attack Volume breakdown by policy</h3>
 			<div id="policy_bandwidth_per_day_chart_div" style="height: 400px;">
 			</td>
 		  </tr>
@@ -2393,7 +2539,7 @@ if __name__ == '__main__':
 			<td colspan="3" valign="top" style="border-top: 0;" class="fit-text">
 				<!-- Button container for centering -->
 				<div class="button-container">
-					<button class="toggle-btn" data-original-text="Malicious Bandwidth by policy table" onclick="toggleTable('AttackPolicyBWPerDayTable', this)">Malicious Bandwidth by policy table</button>
+					<button class="toggle-btn" data-original-text="Attack Volume by policy table" onclick="toggleTable('AttackPolicyBWPerDayTable', this)">Attack Volume by policy table</button>
 				</div>
 		  		<div id="AttackPolicyBWPerDayTable" class="collapsible-content">
 				{policy_bw_table}
@@ -2402,7 +2548,7 @@ if __name__ == '__main__':
 
 				<!-- Button container for centering -->
 				<div class="button-container">
-					<button class="toggle-btn" data-original-text="Distribution of accumulated malicious bandwidth across Devices and Policies" onclick="toggleTable('DistributionOfPolicyBWPerDayTable', this)">Distribution of accumulated malicious bandwidth across Devices and Policies</button>
+					<button class="toggle-btn" data-original-text="Distribution of accumulated Attack Volume across Devices and Policies" onclick="toggleTable('DistributionOfPolicyBWPerDayTable', this)">Distribution of accumulated Attack Volume across Devices and Policies</button>
 				</div>
 		  		<div id="DistributionOfPolicyBWPerDayTable" class="collapsible-content">
 				
@@ -2416,7 +2562,7 @@ if __name__ == '__main__':
 
 		  <tr>
 		  	<td colspan="3" style="border-bottom: 0;">
-			<h3 id="section1-8">Cumulative malicious bandwidth breakdown by source IP's</h3>
+			<h3 id="section1-8">Cumulative Attack Volume breakdown by source IP's</h3>
 			<div id="sip_bandwidth_per_day_chart_div" style="height: 400px;">
 			</td>
 		  </tr>
@@ -2425,7 +2571,7 @@ if __name__ == '__main__':
 			<td colspan="3" valign="top" style="border-top: 0;" class="fit-text">
 				<!-- Button container for centering -->
 				<div class="button-container">
-					<button class="toggle-btn" data-original-text="Malicious Bandwidth by Source IP" onclick="toggleTable('AttackSIPBWPerDayTable', this)">Malicious Bandwidth by Source IP</button>
+					<button class="toggle-btn" data-original-text="Attack Volume by Source IP" onclick="toggleTable('AttackSIPBWPerDayTable', this)">Attack Volume by Source IP</button>
 				</div>
 		  		<div id="AttackSIPBWPerDayTable" class="collapsible-content">
 				{sip_bw_table}
@@ -2434,7 +2580,7 @@ if __name__ == '__main__':
 
 				<!-- Button container for centering -->
 				<div class="button-container">
-					<button class="toggle-btn" data-original-text="Distribution of topmost malicious bandwidth for Source IP's" onclick="toggleTable('DistributionOfSIPBWPerDayTable', this)">Distribution of topmost malicious bandwidth for Source IP's</button>
+					<button class="toggle-btn" data-original-text="Distribution of topmost Attack Volume for Source IP's" onclick="toggleTable('DistributionOfSIPBWPerDayTable', this)">Distribution of topmost Attack Volume for Source IP's</button>
 				</div>
 		  		<div id="DistributionOfSIPBWPerDayTable" class="collapsible-content">
 				
@@ -2461,16 +2607,10 @@ if __name__ == '__main__':
 		<table>
 		<thead>
 
-          <tr>
-            <td colspan="3" style="border-bottom: 0;">
-            <h3 id="section2-1">All Attacks per device (PPS)</h3>
-            <div id="attacks_per_device_combined_trends_pps_chart_div" style="height: 400px;">
-            </td>
-          </tr> 
 
           <tr>
             <td colspan="3" style="border-bottom: 0;">
-            <h3 id="section2-2">Legitimate Traffic Volume per device (PPS)</h3>
+            <h3 id="section2-2">Traffic and Attack Rate for each DefensePro (PPS)</h3>
             <div id="traffic_per_device_combined_trends_pps_chart_div" style="height: 400px;">
             </td>
           </tr> 
@@ -2496,7 +2636,7 @@ if __name__ == '__main__':
 		  
 		  <tr>
 		  	<td colspan="3" style="border-bottom: 0;">
-			<h3 id="section2-4">Cumulative malicious packets per day</h3>
+			<h3 id="section2-4">Cumulative Attack packets per day</h3>
 				<div id="packets_per_day_chart_div">
 			</td>
 		  </tr>
@@ -2515,7 +2655,7 @@ if __name__ == '__main__':
 		  
 		  <tr>
 		  	<td colspan="3" style="border-bottom: 0;">
-			<h3 id="section2-5">Cumulative malicious packets breakdown by attack vector</h3>
+			<h3 id="section2-5">Cumulative Attack packets breakdown by attack vector</h3>
 			<div id="packets_per_day_chart_div_alltimehigh" style="height: 400px;">
 			</td>
 		  </tr>
@@ -2526,7 +2666,7 @@ if __name__ == '__main__':
 			<td colspan="3" valign="top" style="border-top: 0;" class="fit-text">
 				<!-- Button container for centering -->
 				<div class="button-container">
-					<button class="toggle-btn" data-original-text="Malicious packets table" onclick="toggleTable('AttackPacketsPerDayTable', this)">Malicious packets table</button>
+					<button class="toggle-btn" data-original-text="Attack packets table" onclick="toggleTable('AttackPacketsPerDayTable', this)">Attack packets table</button>
 				</div>
 		  		<div id="AttackPacketsPerDayTable" class="collapsible-content">
 				{packets_table_alltimehigh}
@@ -2535,7 +2675,7 @@ if __name__ == '__main__':
 
 				<!-- Button container for centering -->
 				<div class="button-container">
-					<button class="toggle-btn" data-original-text="Distribution of topmost malicious packets across Devices and Policies" onclick="toggleTable('DistributionOfPacketsPerDayTable', this)">Distribution of topmost malicious packets across Devices and Policies</button>
+					<button class="toggle-btn" data-original-text="Distribution of topmost Attack packets across Devices and Policies" onclick="toggleTable('DistributionOfPacketsPerDayTable', this)">Distribution of topmost Attack packets across Devices and Policies</button>
 				</div>
 		  		<div id="DistributionOfPacketsPerDayTable" class="collapsible-content">
 				
@@ -2549,7 +2689,7 @@ if __name__ == '__main__':
 
 		  <tr>
 		  	<td colspan="3" style="border-bottom: 0;">
-			<h3 id="section2-6">Cumulative malicious packets breakdown by device</h3>
+			<h3 id="section2-6">Cumulative Attack packets breakdown by DefensePro</h3>
 			<div id="packets_per_day_by_device_chart_div" style="height: 400px;">
 			</td>
 		  </tr>
@@ -2561,7 +2701,7 @@ if __name__ == '__main__':
 			<td colspan="3" valign="top" style="border-top: 0;" class="fit-text">
 				<!-- Button container for centering -->
 				<div class="button-container">
-					<button class="toggle-btn" data-original-text="Malicious packets by device table" onclick="toggleTable('AttackDevicePacketsPerDayTable', this)">Malicious packets by device table</button>
+					<button class="toggle-btn" data-original-text="Attack packets by DefensePro table" onclick="toggleTable('AttackDevicePacketsPerDayTable', this)">Attack packets by DefensePro table</button>
 				</div>
 		  		<div id="AttackDevicePacketsPerDayTable" class="collapsible-content">
 				{packets_by_device_table}
@@ -2570,7 +2710,7 @@ if __name__ == '__main__':
 
 				<!-- Button container for centering -->
 				<div class="button-container">
-					<button class="toggle-btn" data-original-text="Distribution of topmost malicious packets for device" onclick="toggleTable('DistributionOfDevicePacketsPerDayTable', this)">Distribution of topmost malicious packets for device</button>
+					<button class="toggle-btn" data-original-text="Distribution of topmost Attack packets for device" onclick="toggleTable('DistributionOfDevicePacketsPerDayTable', this)">Distribution of topmost Attack packets for device</button>
 				</div>
 		  		<div id="DistributionOfDevicePacketsPerDayTable" class="collapsible-content">
 				
@@ -2584,7 +2724,7 @@ if __name__ == '__main__':
 
 		  <tr>
 		  	<td colspan="3" style="border-bottom: 0;" class="fit-text">
-			<h3 id="section2-7">Cumulative malicious packets breakdown by policy</h3>
+			<h3 id="section2-7">Cumulative Attack packets breakdown by policy</h3>
 			<div id="policy_packets_per_day_chart_div" style="height: 400px;">
 			</td>
 		  </tr>
@@ -2593,7 +2733,7 @@ if __name__ == '__main__':
 			<td colspan="3" valign="top" style="border-top: 0;" class="fit-text">
 				<!-- Button container for centering -->
 				<div class="button-container">
-					<button class="toggle-btn" data-original-text="Malicious packets by device table" onclick="toggleTable('AttackPolicyPacketsPerDayTable', this)">Malicious packets by policy table</button>
+					<button class="toggle-btn" data-original-text="Attack packets by DefensePro table" onclick="toggleTable('AttackPolicyPacketsPerDayTable', this)">Attack packets by policy table</button>
 				</div>
 		  		<div id="AttackPolicyPacketsPerDayTable" class="collapsible-content">
 				{policy_packets_table}
@@ -2602,7 +2742,7 @@ if __name__ == '__main__':
 
 				<!-- Button container for centering -->
 				<div class="button-container">
-					<button class="toggle-btn" data-original-text="Distribution of topmost malicious packets for device" onclick="toggleTable('DistributionOfPolicyPacketsPerDayTable', this)">Distribution of topmost malicious packets</button>
+					<button class="toggle-btn" data-original-text="Distribution of topmost Attack packets for device" onclick="toggleTable('DistributionOfPolicyPacketsPerDayTable', this)">Distribution of topmost Attack packets</button>
 				</div>
 		  		<div id="DistributionOfPolicyPacketsPerDayTable" class="collapsible-content">
 				
@@ -2617,7 +2757,7 @@ if __name__ == '__main__':
 
 		  <tr>
 		  	<td colspan="3" style="border-bottom: 0;">
-			<h3 id="section2-8">Cumulative malicious packets breakdown by source IP's</h3>
+			<h3 id="section2-8">Cumulative Attack packets breakdown by source IP's</h3>
 			<div id="sip_packets_per_day_chart_div" style="height: 400px;">
 			</td>
 		  </tr>
@@ -2626,7 +2766,7 @@ if __name__ == '__main__':
 			<td colspan="3" valign="top" style="border-top: 0;" class="fit-text">
 				<!-- Button container for centering -->
 				<div class="button-container">
-					<button class="toggle-btn" data-original-text="Malicious packets per day by Source IP" onclick="toggleTable('AttackSIPPacketsPerDayTable', this)">Malicious packets per day by Source IP</button>
+					<button class="toggle-btn" data-original-text="Attack packets per day by Source IP" onclick="toggleTable('AttackSIPPacketsPerDayTable', this)">Attack packets per day by Source IP</button>
 				</div>
 		  		<div id="AttackSIPPacketsPerDayTable" class="collapsible-content">
 				{sip_packets_table}
@@ -2635,7 +2775,7 @@ if __name__ == '__main__':
 
 				<!-- Button container for centering -->
 				<div class="button-container">
-					<button class="toggle-btn" data-original-text="Distribution of topmost malicious packets for Source IP's" onclick="toggleTable('DistributionOfSIPPacketsPerDayTable', this)">Distribution of topmost malicious packets for Source IP's</button>
+					<button class="toggle-btn" data-original-text="Distribution of topmost Attack packets for Source IP's" onclick="toggleTable('DistributionOfSIPPacketsPerDayTable', this)">Distribution of topmost Attack packets for Source IP's</button>
 				</div>
 		  		<div id="DistributionOfSIPPacketsPerDayTable" class="collapsible-content">
 				
@@ -2724,7 +2864,7 @@ if __name__ == '__main__':
 
 		  <tr>
 		  	<td colspan="3" style="border-bottom: 0;">
-			<h3 id="section3-4">Number of attack events by device</h3>
+			<h3 id="section3-4">Number of attack events by DefensePro</h3>
 			<div id="events_per_day_by_device_chart_div" style="height: 400px;" style="border-bottom: 0;">
 			</td>
 		  </tr>	
@@ -2733,7 +2873,7 @@ if __name__ == '__main__':
 			<td colspan="3" valign="top" style="border-top: 0;" class="fit-text">
 				<!-- Button container for centering -->
 				<div class="button-container">
-					<button class="toggle-btn" data-original-text="Attack Events by device table" onclick="toggleTable('DeviceAttackEventsPerDayTable', this)">Attack Events by device table</button>
+					<button class="toggle-btn" data-original-text="Attack Events by DefensePro table" onclick="toggleTable('DeviceAttackEventsPerDayTable', this)">Attack Events by DefensePro table</button>
 				</div>
 		  		<div id="DeviceAttackEventsPerDayTable" class="collapsible-content">
 				  
@@ -2855,6 +2995,20 @@ if __name__ == '__main__':
             <td colspan="3" style="border-bottom: 0;">
             <h3 id="section4-2">Concurrent Established Connections per device</h3>
             <div id="cec_per_device_combined_trends_chart_div" style="height: 400px;">
+            </td>
+          </tr>   
+
+         <tr>
+            <td colspan="3" style="border-bottom: 0;">
+            <h3 id="section4-3">Excluded Uninspected Traffic Volume (Mbps)</h3>
+            <div id="excluded_per_device_combined_trends_bps_chart_div" style="height: 400px;">
+            </td>
+          </tr>   
+
+         <tr>
+            <td colspan="3" style="border-bottom: 0;">
+            <h3 id="section4-4">Excluded Uninspected Traffic Rate (PPS)</h3>
+            <div id="excluded_per_device_combined_trends_pps_chart_div" style="height: 400px;">
             </td>
           </tr>   
 
