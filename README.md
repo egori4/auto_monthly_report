@@ -371,13 +371,19 @@ V11.10 (3/28/2025)
 - Daily report - Aligned naming convention malicious bandwidth, malicioius packets renamed to Attack Volume, Attack Packets respectively
 - Daily report - Added 2 charts - Excluded traffic (Mbps) and Excluded traffic (PPS)
 
+V11.10.1
+- Added daily report enhancments to monthly report(coloring persistence upon checking/unchecking)
+- Monthly report - fixed buttons alignment (attack packets distribution and attack packets per month)
+- Monthly report - changed expandable tables headline text style from white to black
+- Monthly report - some minor cosmetical adjustments here and there
 
 Next steps/Functionality/ideas to add more charts
 
-	align/fix color persistence, checkbox vs stacking functionality in monthly report similarly to daily
 
 	Review Glenn's feedback
 
+	write high level management report, text from email
+	Explore getting license and alert if traffic is getting close to it (AmirP comment)
 	Add MAX daily bps/pps/cec/cps max values graph per da
 	Add Radware banner
 	https://files.constantcontact.com/01bf4ea6901/d24931ad-5b43-4e8b-bc1d-d8cc76ab21e3.png

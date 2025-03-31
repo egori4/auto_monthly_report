@@ -931,12 +931,17 @@ if __name__ == '__main__':
 		  google.charts.load('current', {{'packages':['corechart']}});
 		  google.charts.setOnLoadCallback(drawChart);
 
+			var default_google_colors = [
+				"#3366cc", "#dc3912", "#ff9900", "#109618", "#990099", "#0099c6",
+				"#dd4477", "#66aa00", "#b82e2e", "#316395", "#994499", "#22aa99",
+				"#aaaa11", "#6633cc", "#e67300", "#8b0707", "#651067", "#329262",
+				"#5574a6", "#3b3eac", "#b77322", "#16d620", "#b91383", "#f4359e",
+				"#9c5935", "#a9c413", "#2a778d", "#668d1c", "#bea413", "#0c5922", "#743411"
+			];
+		  var colorMap = {{}}; // Store colors globally
 		  function drawChart() {{
-		  
-			// Convert epoch timestamps to Date objects before passing to Google Charts
-			var raw_traffic_per_device_combined_trends_bps_data = {traffic_per_device_combined_trends_bps}.map(row => {{
-				return [new Date(row[0]), ...row.slice(1)]; // Convert first column, keep others unchanged
-			}});
+			
+
 
   
 			var epm_total_data = google.visualization.arrayToDataTable({events_total_bar_chart});
@@ -1117,7 +1122,7 @@ if __name__ == '__main__':
 			}};
 
 			var epm_by_device_options = {{
-			  title: 'Events by device trends',
+			  title: 'Attack Events by device trends',
 			  vAxis: {{
 				minValue: 0,
 				title: 'Number of Attack Events'}},
@@ -1131,7 +1136,7 @@ if __name__ == '__main__':
 			}};
 
 			var ppm_by_device_options = {{
-			  title: 'Packets by device trends',
+			  title: 'Attack Packets by device trends',
 			  vAxis: {{
 				minValue: 0,
 				title: 'Attack Packets (units {pkt_units})'}},
@@ -1357,93 +1362,114 @@ if __name__ == '__main__':
 
 
 
-			// Create checkboxes for each chart
-			createCheckboxes('epm_chart_div', {events_trends}, function(selectedCategories) {{
+			// Create checkboxes for "Number of Attack Events - Ranked by Last Month"
+			createCheckboxes('epm_chart_div', {events_trends}, epm_options, function(selectedCategories) {{
 				var filteredData = filterDataByCategories({events_trends}, selectedCategories);
 				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
 				epm_chart.draw(filteredDataTable, epm_options);
 			}});
 
-			createCheckboxes('ppm_chart_div', {packets_trends_chart}, function(selectedCategories) {{
+			// Create checkboxes for "Attack Packets trends - Ranked by Last Month"
+			createCheckboxes('ppm_chart_div', {packets_trends_chart}, ppm_options, function(selectedCategories) {{
 				var filteredData = filterDataByCategories({packets_trends_chart}, selectedCategories);
 				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
 				ppm_chart.draw(filteredDataTable, ppm_options);
 			}});
 
-			createCheckboxes('bpm_chart_div', {bw_trends}, function(selectedCategories) {{
+			// Create checkboxes for "Attack volume trends - Ranked by Last Month"
+			createCheckboxes('bpm_chart_div', {bw_trends}, bpm_options, function(selectedCategories) {{
 				var filteredData = filterDataByCategories({bw_trends}, selectedCategories);
 				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
 				bpm_chart.draw(filteredDataTable, bpm_options);
 			}});
 
-			createCheckboxes('epm_chart_div_alltimehigh', {events_trends_alltimehigh}, function(selectedCategories) {{
+			////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+			// Create checkboxes for "Top {top_n} Attacks trends - Ranked by All Months Combined"
+			createCheckboxes('epm_chart_div_alltimehigh', {events_trends_alltimehigh}, epm_options_alltimehigh, function(selectedCategories) {{
 				var filteredData = filterDataByCategories({events_trends_alltimehigh}, selectedCategories);
 				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
 				epm_chart_alltimehigh.draw(filteredDataTable, epm_options_alltimehigh);
 			}});
 
-			createCheckboxes('ppm_chart_div_alltimehigh', {packets_trends_chart_alltimehigh}, function(selectedCategories) {{
+			// Create checkboxes for "Attack Packets trends - {top_n} all time high"
+			createCheckboxes('ppm_chart_div_alltimehigh', {packets_trends_chart_alltimehigh}, ppm_options_alltimehigh, function(selectedCategories) {{
 				var filteredData = filterDataByCategories({packets_trends_chart_alltimehigh}, selectedCategories);
 				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
 				ppm_chart_alltimehigh.draw(filteredDataTable, ppm_options_alltimehigh);
 			}});
 
-			createCheckboxes('bpm_chart_div_alltimehigh', {bw_trends_alltimehigh}, function(selectedCategories) {{
+			// Create checkboxes for "Attack Volume trends - {top_n} all time high"
+			createCheckboxes('bpm_chart_div_alltimehigh', {bw_trends_alltimehigh}, bpm_options_alltimehigh, function(selectedCategories) {{
 				var filteredData = filterDataByCategories({bw_trends_alltimehigh}, selectedCategories);
 				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
 				bpm_chart_alltimehigh.draw(filteredDataTable, bpm_options_alltimehigh);
 			}});
 
+			///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-			createCheckboxes('epm_by_device_chart_div', {events_by_device_trends_chart_data}, function(selectedCategories) {{
+			// Create checkboxes for "Events by device trends"
+			createCheckboxes('epm_by_device_chart_div', {events_by_device_trends_chart_data}, epm_by_device_options, function(selectedCategories) {{
 				var filteredData = filterDataByCategories({events_by_device_trends_chart_data}, selectedCategories);
 				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
 				epm_by_device_chart.draw(filteredDataTable, epm_by_device_options);
 			}});
 
-			createCheckboxes('ppm_by_device_chart_div', {packets_by_device_trends_chart_data}, function(selectedCategories) {{
+			// Create checkboxes for "Attack Packets by device trends"
+			createCheckboxes('ppm_by_device_chart_div', {packets_by_device_trends_chart_data}, ppm_by_device_options, function(selectedCategories) {{
 				var filteredData = filterDataByCategories({packets_by_device_trends_chart_data}, selectedCategories);
 				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
 				ppm_by_device_chart.draw(filteredDataTable, ppm_by_device_options);
 			}});
 
-			createCheckboxes('bpm_by_device_chart_div', {bw_by_device_trends_chart_data}, function(selectedCategories) {{
+			// Create checkboxes for "Attack Volume by device trends"
+			createCheckboxes('bpm_by_device_chart_div', {bw_by_device_trends_chart_data}, bpm_by_device_options, function(selectedCategories) {{
 				var filteredData = filterDataByCategories({bw_by_device_trends_chart_data}, selectedCategories);
 				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
 				bpm_by_device_chart.draw(filteredDataTable, bpm_by_device_options);
 			}});
 
-			createCheckboxes('sip_epm_chart_div', {sip_events_trends_chart}, function(selectedCategories) {{
+			//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+			// Create checkboxes for "Attack Events trends by source IP"
+			createCheckboxes('sip_epm_chart_div', {sip_events_trends_chart}, sip_epm_options, function(selectedCategories) {{
 				var filteredData = filterDataByCategories({sip_events_trends_chart}, selectedCategories);
 				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
 				sip_epm_chart.draw(filteredDataTable, sip_epm_options);
 			}});
 
-			createCheckboxes('sip_ppm_chart_div', {sip_packets_trends_chart}, function(selectedCategories) {{
+			// Create checkboxes for "Attack Packets trends by source IP"
+			createCheckboxes('sip_ppm_chart_div', {sip_packets_trends_chart}, sip_ppm_options, function(selectedCategories) {{
 				var filteredData = filterDataByCategories({sip_packets_trends_chart}, selectedCategories);
 				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
 				sip_ppm_chart.draw(filteredDataTable, sip_ppm_options);
 			}});
 
-			createCheckboxes('sip_bpm_chart_div', {sip_bw_trends_chart}, function(selectedCategories) {{
+			// Create checkboxes for "Attack Volume trends by source IP"
+			createCheckboxes('sip_bpm_chart_div', {sip_bw_trends_chart}, sip_bpm_options, function(selectedCategories) {{
 				var filteredData = filterDataByCategories({sip_bw_trends_chart}, selectedCategories);
 				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
 				sip_bpm_chart.draw(filteredDataTable, sip_bpm_options);
 			}});
 
-			createCheckboxes('policy_epm_chart_div', {policy_events_trends_chart}, function(selectedCategories) {{
+			//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+			// Create checkboxes for "Attack Events trends by Policy"
+			createCheckboxes('policy_epm_chart_div', {policy_events_trends_chart}, policy_epm_options, function(selectedCategories) {{
 				var filteredData = filterDataByCategories({policy_events_trends_chart}, selectedCategories);
 				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
 				policy_epm_chart.draw(filteredDataTable, policy_epm_options);
 			}});
 
-			createCheckboxes('policy_ppm_chart_div', {policy_packets_trends_chart}, function(selectedCategories) {{
+			// Create checkboxes for "Attack Packets trends by Policy"
+			createCheckboxes('policy_ppm_chart_div', {policy_packets_trends_chart}, policy_ppm_options, function(selectedCategories) {{
 				var filteredData = filterDataByCategories({policy_packets_trends_chart}, selectedCategories);
 				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
 				policy_ppm_chart.draw(filteredDataTable, policy_ppm_options);
 			}});
 
-			createCheckboxes('policy_bpm_chart_div', {policy_bw_trends_chart}, function(selectedCategories) {{
+			// Create checkboxes for "Attack Volume trends by Policy"
+			createCheckboxes('policy_bpm_chart_div', {policy_bw_trends_chart}, policy_bpm_options, function(selectedCategories) {{
 				var filteredData = filterDataByCategories({policy_bw_trends_chart}, selectedCategories);
 				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
 				policy_bpm_chart.draw(filteredDataTable, policy_bpm_options);
@@ -1451,7 +1477,7 @@ if __name__ == '__main__':
 
 
 
-			// Draw initial charts
+			// Draw charts with consistent colors
 
 
 			epm_total_chart.draw(epm_total_data, epm_total_options);
@@ -1488,111 +1514,192 @@ if __name__ == '__main__':
 
 			// Add radio button toggles for stacked/non-stacked
 
-			addStackedToggle('epm_chart_div', epm_chart, epm_data, epm_options);
-			addStackedToggle('ppm_chart_div', ppm_chart, ppm_data, ppm_options);
-			addStackedToggle('bpm_chart_div', bpm_chart, bpm_data, bpm_options);
+			addStackedToggle('epm_chart_div', epm_chart, {events_trends}, epm_options);
+			addStackedToggle('ppm_chart_div', ppm_chart, {packets_trends_chart}, ppm_options);
+			addStackedToggle('bpm_chart_div', bpm_chart, {bw_trends}, bpm_options);
 
-			addStackedToggle('epm_chart_div_alltimehigh', epm_chart_alltimehigh, epm_data_alltimehigh, epm_options_alltimehigh);
-			addStackedToggle('ppm_chart_div_alltimehigh', ppm_chart_alltimehigh, ppm_data_alltimehigh, ppm_options_alltimehigh);
-			addStackedToggle('bpm_chart_div_alltimehigh', bpm_chart_alltimehigh, bpm_data_alltimehigh, bpm_options_alltimehigh);
+			addStackedToggle('epm_chart_div_alltimehigh', epm_chart_alltimehigh, {events_trends_alltimehigh}, epm_options_alltimehigh);
+			addStackedToggle('ppm_chart_div_alltimehigh', ppm_chart_alltimehigh, {packets_trends_chart_alltimehigh}, ppm_options_alltimehigh);
+			addStackedToggle('bpm_chart_div_alltimehigh', bpm_chart_alltimehigh, {bw_trends_alltimehigh}, bpm_options_alltimehigh);
 
-			addStackedToggle('epm_by_device_chart_div', epm_by_device_chart, epm_by_device_data, epm_by_device_options);
-			addStackedToggle('ppm_by_device_chart_div', ppm_by_device_chart, ppm_by_device_data, ppm_by_device_options);
-			addStackedToggle('bpm_by_device_chart_div', bpm_by_device_chart, bpm_by_device_data, bpm_by_device_options);
+			addStackedToggle('epm_by_device_chart_div', epm_by_device_chart, {events_by_device_trends_chart_data}, epm_by_device_options);
+			addStackedToggle('ppm_by_device_chart_div', ppm_by_device_chart, {packets_by_device_trends_chart_data}, ppm_by_device_options);
+			addStackedToggle('bpm_by_device_chart_div', bpm_by_device_chart, {bw_by_device_trends_chart_data}, bpm_by_device_options);
 
-			addStackedToggle('sip_epm_chart_div', sip_epm_chart, sip_epm_data, sip_epm_options);
-			addStackedToggle('sip_ppm_chart_div', sip_ppm_chart, sip_ppm_data, sip_ppm_options);
-			addStackedToggle('sip_bpm_chart_div', sip_bpm_chart, sip_bpm_data, sip_bpm_options);
+			addStackedToggle('sip_epm_chart_div', sip_epm_chart, {sip_events_trends_chart}, sip_epm_options);
+			addStackedToggle('sip_ppm_chart_div', sip_ppm_chart, {sip_packets_trends_chart}, sip_ppm_options);
+			addStackedToggle('sip_bpm_chart_div', sip_bpm_chart, {sip_bw_trends_chart}, sip_bpm_options);
 
-			addStackedToggle('policy_epm_chart_div', policy_epm_chart, policy_epm_data, policy_epm_options);
-			addStackedToggle('policy_ppm_chart_div', policy_ppm_chart, policy_ppm_data, policy_ppm_options);
-			addStackedToggle('policy_bpm_chart_div', policy_bpm_chart, policy_bpm_data, policy_bpm_options);
+			addStackedToggle('policy_epm_chart_div', policy_epm_chart, {policy_events_trends_chart}, policy_epm_options);
+			addStackedToggle('policy_ppm_chart_div', policy_ppm_chart, {policy_packets_trends_chart}, policy_ppm_options);
+			addStackedToggle('policy_bpm_chart_div', policy_bpm_chart, {policy_bw_trends_chart}, policy_bpm_options);
 
+		  }}
 
+		  
+			function updateColorPersistence(containerId, selectedCategories, data, options) {{
+				if (!colorMap[containerId]) {{
+					colorMap[containerId] = {{}};
+				}}
+
+				selectedCategories.forEach((selectedIndex, i) => {{
+					let category = data[0][selectedIndex];
+					if (!colorMap[containerId][category]) {{
+						colorMap[containerId][category] = options.colors[i % options.colors.length];
+					}}
+				}});
+
+				options.colors = selectedCategories.map(index => colorMap[containerId][data[0][index]]);
 			}}
+
 
 			// Function to create checkboxes
-			function createCheckboxes(containerId, data, callback) {{
-			var container = document.getElementById(containerId);
-			var categories = data[0].slice(1);  // Extract categories from the first row
+			function createCheckboxes(containerId, data, options, callback) {{
+				var container = document.getElementById(containerId);
+				var categories = data[0].slice(1); // Extract categories from the first row
 
-			var checkboxContainer = document.createElement('div');
-			checkboxContainer.className = 'checkbox-container';
-			
-			categories.forEach(function(category, index) {{
-				var checkbox = document.createElement('input');
-				checkbox.type = 'checkbox';
-				checkbox.checked = true;
-				checkbox.value = index + 1;  // Offset for data columns
+				var checkboxContainer = document.createElement('div');
+				checkboxContainer.className = 'checkbox-container';
 
-				checkbox.onchange = function() {{
-				var selectedCategories = Array.from(checkboxContainer.querySelectorAll('input:checked')).map(input => input.value);
+				if (!selectedCategoriesMap[containerId]) {{
+					selectedCategoriesMap[containerId] = categories.map((_, i) => i + 1);
+				}}
+
+				// Ensure colorMap is initialized
+				if (!colorMap[containerId]) {{
+					colorMap[containerId] = {{}};
+				}}
+
+				// **Prepopulate colorMap to avoid losing colors**
+				categories.forEach((category, index) => {{
+					if (!colorMap[containerId][category]) {{
+						if (options && options.colors) {{
+							colorMap[containerId][category] = options.colors[index % options.colors.length];
+						}} else {{
+							colorMap[containerId][category] = default_google_colors[index % default_google_colors.length]; // Fallback in case options are missing
+						}}
+					}}
+				}});
+
+				categories.forEach(function(category, index) {{
+					var checkbox = document.createElement('input');
+					checkbox.type = 'checkbox';
+					checkbox.checked = selectedCategoriesMap[containerId].includes(index + 1);
+					checkbox.value = index + 1;
+
+			checkbox.onchange = function() {{ 
+
+				var selectedCategories = Array.from(checkboxContainer.querySelectorAll('input:checked'))
+					.map(input => parseInt(input.value));
+
+				selectedCategoriesMap[containerId] = selectedCategories;
+
+				let selectedSet = new Set(selectedCategories);
+
+
+
+
+				updateColorPersistence(containerId, selectedCategories, data, options);
+
+
+
+				var filteredData = filterDataByCategories(data, selectedCategories);
+
+				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
+
 				callback(selectedCategories);
-				}};
+			}};
 
-				var label = document.createElement('label');
-				label.appendChild(checkbox);
-				label.appendChild(document.createTextNode(category));
-				
-				checkboxContainer.appendChild(label);
-			}});
 
-			container.parentNode.insertBefore(checkboxContainer, container);
+					var label = document.createElement('label');
+					label.appendChild(checkbox);
+					label.appendChild(document.createTextNode(category));
+
+					checkboxContainer.appendChild(label);
+				}});
+
+				container.parentNode.insertBefore(checkboxContainer, container);
 			}}
+
 
 			// Function to filter data based on selected categories
 			function filterDataByCategories(data, selectedCategories) {{
-			var header = [data[0][0], ...selectedCategories.map(index => data[0][index])];  // Filter header row
-			var rows = data.slice(1).map(row => [row[0], ...selectedCategories.map(index => row[index])]);  // Filter data rows
-			return [header, ...rows];
+				return data.map((row, rowIndex) => rowIndex === 0 
+					? [row[0], ...selectedCategories.map(index => row[index])] 
+					: [row[0], ...selectedCategories.map(index => row[index])]
+				);
 			}}
+
+
+			var selectedCategoriesMap = {{}}; // Global store for checkbox selections per chart
+				
 
 			// Function to add Stacked/Non-Stacked toggle via radio buttons
-			function addStackedToggle(containerId, chart, data, options) {{
-			var container = document.getElementById(containerId);
-			var radioContainer = document.createElement('div');
-			radioContainer.className = 'radio-container';
-			
-			var stackedLabel = document.createElement('label');
-			var stackedRadio = document.createElement('input');
-			stackedRadio.type = 'radio';
-			stackedRadio.name = 'stackedToggle_' + containerId;
-			stackedRadio.value = 'stacked';
+			function addStackedToggle(containerId, chart, rawData, options) {{
+				var container = document.getElementById(containerId);
+				var radioContainer = document.createElement('div');
+				radioContainer.className = 'radio-container';
 
-			stackedRadio.onchange = function() {{
-				options.isStacked = true;
-				chart.draw(data, options);
-			}};
-			stackedLabel.appendChild(stackedRadio);
-			stackedLabel.appendChild(document.createTextNode('Stacked'));
+				var stackedLabel = document.createElement('label');
+				var stackedRadio = document.createElement('input');
+				stackedRadio.type = 'radio';
+				stackedRadio.name = 'stackedToggle_' + containerId;
+				stackedRadio.value = 'stacked';
 
-			var nonStackedLabel = document.createElement('label');
-			var nonStackedRadio = document.createElement('input');
-			nonStackedRadio.type = 'radio';
-			nonStackedRadio.name = 'stackedToggle_' + containerId;
-			nonStackedRadio.value = 'non-stacked';
-			 // Set radio button checked state based on the initial options.isStacked value
-			 if (options.isStacked) {{
-			     stackedRadio.checked = true;
-			     nonStackedRadio.checked = false;
-			 }} else {{
-			     stackedRadio.checked = false;
-			     nonStackedRadio.checked = true;
-			 }}
+				var nonStackedLabel = document.createElement('label');
+				var nonStackedRadio = document.createElement('input');
+				nonStackedRadio.type = 'radio';
+				nonStackedRadio.name = 'stackedToggle_' + containerId;
+				nonStackedRadio.value = 'non-stacked';
 
-			nonStackedRadio.onchange = function() {{
-				options.isStacked = false;
-				chart.draw(data, options);
-			}};
-			nonStackedLabel.appendChild(nonStackedRadio);
-			nonStackedLabel.appendChild(document.createTextNode('Non-Stacked'));
+				// Set initial state
+				stackedRadio.checked = options.isStacked === true;
+				nonStackedRadio.checked = options.isStacked === false;
 
-			radioContainer.appendChild(stackedLabel);
-			radioContainer.appendChild(nonStackedLabel);
-			
-			// container.parentNode.insertBefore(radioContainer, container);
-			container.parentNode.insertBefore(radioContainer, container.nextSibling);
+				stackedRadio.onchange = function () {{
+					updateChartWithPersistence(containerId, chart, rawData, options, true);
+				}};
+
+				nonStackedRadio.onchange = function () {{
+					updateChartWithPersistence(containerId, chart, rawData, options, false);
+				}};
+
+				stackedLabel.appendChild(stackedRadio);
+				stackedLabel.appendChild(document.createTextNode('Stacked'));
+
+				nonStackedLabel.appendChild(nonStackedRadio);
+				nonStackedLabel.appendChild(document.createTextNode('Non-Stacked'));
+
+				radioContainer.appendChild(stackedLabel);
+				radioContainer.appendChild(nonStackedLabel);
+
+				container.parentNode.insertBefore(radioContainer, container.nextSibling);
 			}}
+
+
+			function getValidData(data) {{
+				try {{
+					return google.visualization.arrayToDataTable(data);
+				}} catch (error) {{
+					console.error("Error processing data for stacked toggle:", error);
+					return null;
+				}}
+			}}
+
+
+
+			function updateChartWithPersistence(containerId, chart, rawData, options, isStacked) {{
+				options.isStacked = isStacked;
+
+				var selectedCategories = selectedCategoriesMap[containerId] || 
+										[...Array(rawData[0].length - 1).keys()].map(i => i + 1);
+
+				if ((validData = getValidData(filterDataByCategories(rawData, selectedCategories)))) {{
+					chart.draw(validData, options);
+				}}
+			}}
+
+
 
 
 		// Toggle table visibility on button click
@@ -1610,14 +1717,33 @@ if __name__ == '__main__':
 			}}
 		}}
 
-		// Show/hide "Back to TOC" button based on scroll position
-		window.addEventListener('scroll', function () {{
-		let button = document.getElementById('backToToc');
-		if (window.scrollY > 300) {{ // Show button after scrolling down
-			button.classList.remove('hidden');
-		}} else {{
-			button.classList.add('hidden');
+		// New function for merged row behavior
+		function toggleTableMerged(tableId, button) {{
+			const collapsibleRow = document.getElementById(tableId);
+
+			if (collapsibleRow.style.display === 'none' || collapsibleRow.style.display === '') {{
+				collapsibleRow.style.display = 'table-row'; // Ensure it's displayed as a full row
+				button.textContent = 'Hide Details';
+				button.classList.add('active');
+			}} else {{
+				collapsibleRow.style.display = 'none';
+				button.textContent = button.getAttribute('data-original-text'); // Restore original text
+				button.classList.remove('active');
+			}}
 		}}
+
+		document.addEventListener("DOMContentLoaded", function () {{
+			let button = document.getElementById('backToToc');
+			if (!button) return; // Safety check in case the button is missing
+
+			// Show/hide "Back to TOC" button based on scroll position
+			window.addEventListener('scroll', function () {{
+				if (window.scrollY > 300) {{
+					button.classList.remove('hidden'); // Show button when scrolled down
+				}} else {{
+					button.classList.add('hidden'); // Hide button when near the top
+				}}
+			}});
 		}});
 
 		// Smoothly scroll to the top of the page when button is clicked
@@ -1978,13 +2104,16 @@ if __name__ == '__main__':
             transform: scale(1.05);
         }}
 
+		table thead th {{
+			color: black !important; /* Forces table headers to be black */
+			// background-color: #f0f0f0; /* Optional: Change background for better contrast */
+		}}
+
         /* Initial state to hide the collapsible content */
         .collapsible-content {{
             display: none;
             margin-top: 15px;
         }}
-
-		
 
         /* Styling for the table */
         .dataframe {{
@@ -2002,7 +2131,6 @@ if __name__ == '__main__':
         .dataframe thead th {{
             background-color: #f2f2f2;
         }}
-
 
 	</style>
 	<title>Radware Monthly Reports</title>
@@ -2221,39 +2349,44 @@ if __name__ == '__main__':
 		  </tr>			  
 
 
+    <!-- Second Row with Monthly Buttons (Expands Across 3 Columns) -->
+    <tr>
+        <td style="text-align: center;border-top: 0">
+            <button class="toggle-btn" data-original-text="Number of Attack Events per Month" onclick="toggleTableMerged('SecurityEventsPerMonth', this)">Number of Attack Events per Month</button>
+        </td>
+        <td style="text-align: center;border-top: 0">
+            <button class="toggle-btn" data-original-text="Attack Packets per Month" onclick="toggleTableMerged('PacketsPerMonth', this)">Attack Packets per Month</button>
+        </td>
+        <td style="text-align: center;border-top: 0">
+            <button class="toggle-btn" data-original-text="Attack Volume per Month" onclick="toggleTableMerged('BWPerMonth', this)">Attack Volume per Month</button>
+        </td>
+    </tr>
 
-		  <tr>
-			<td colspan="3" style="vertical-align: top;border-top: 0;">
-				<!-- Button container for centering -->
-				<div class="button-container" align="center">
-					<button class="toggle-btn" data-original-text="Number of Attack Events per Month" onclick="toggleTable('SecurityEventsPerMonth', this)">Number of Attack Events per Month</button>
-				
-
-					<button align="center" class="toggle-btn" data-original-text="Attack Packets per Month" onclick="toggleTable('PacketsPerMonth', this)">Attack Packets per Month</button>
-
-					<button class="toggle-btn" data-original-text="Attack Volume per Month" onclick="toggleTable('BWPerMonth', this)">Attack Volume per Month</button>
-				</div>
-
-
-		  		<div id="SecurityEventsPerMonth" class="collapsible-content" style="text-align: left;">
-				  <h4 align="center">Attack Events table</h4>
-					{events_trends_table}
-				</div>
-
-		  		<div id="PacketsPerMonth" class="collapsible-content" style="text-align: left;">
-				  <h4 align="center">Attack Packets table (units {pkt_units})</h4>
-					{packets_table}
-				</div>
-				
-		  		<div id="BWPerMonth" class="collapsible-content" style="text-align: left;">
-				  <h4 align="center">Attack Volume table (units {bw_units})</h4>
-					{bw_table}
-				</div>
+    <!-- Hidden expandable content for second row (Expands Across 3 Columns) -->
+    <tr id="SecurityEventsPerMonth" class="collapsible-content" style="display: none;">
+        <td colspan="3">
+            <h4 align="center">Attack Events table</h4>
+            {events_trends_table}
+        </td>
+    </tr>
+    <tr id="PacketsPerMonth" class="collapsible-content" style="display: none;">
+        <td colspan="3">
+            <h4 align="center">Attack Packets table (units {pkt_units})</h4>
+            {packets_table}
+        </td>
+    </tr>
+    <tr id="BWPerMonth" class="collapsible-content" style="display: none;">
+        <td colspan="3">
+            <h4 align="center">Attack Volume table (units {bw_units})</h4>
+            {bw_table}
+        </td>
+    </tr>
 
 
 
-			</td>
-		  </tr>	  
+
+		  
+
 	</tbody>
 	  </table>
 
@@ -2356,7 +2489,7 @@ if __name__ == '__main__':
 					<button class="toggle-btn" data-original-text="Attack Volume change trends" onclick="toggleTable('BWDeviceTrendText', this)">Attack Volume change trends</button>
 				</div>
 		  		<div id="BWDeviceTrendText" class="collapsible-content" style="text-align: left;">
-					<h4>Change in Malicious Traffic sum by device this month compared to the previous month</h4>
+					<h4>Change in Attack Traffic sum by device this month compared to the previous month</h4>
 					{bw_by_device_trends_move_text}
 				</div>
 
@@ -2476,7 +2609,7 @@ if __name__ == '__main__':
 
 				<!-- Button container for centering -->
 				<div class="button-container">
-					<button class="toggle-btn" data-original-text="Attack packets distributionbution" onclick="toggleTable('PacketsPolicyDistribution', this)">Attack packets distributionbution</button>
+					<button class="toggle-btn" data-original-text="Attack packets distribution" onclick="toggleTable('PacketsPolicyDistribution', this)">Attack packets distributionbution</button>
 				</div>
 		  		<div id="PacketsPolicyDistribution" class="collapsible-content" style="text-align: center;">
 					{policy_ppm_html_final}
@@ -2501,34 +2634,37 @@ if __name__ == '__main__':
 
 		  </tr>		
 
-		  <tr>
-			<td colspan="3" style="border-top: 0;">
-				<!-- Button container for centering -->
-				<div class="button-container" align="center">
-					<button class="toggle-btn" data-original-text="Number of Attack Events per Month" onclick="toggleTable('SecurityEventsPolicyPerMonth', this)">Number of Attack Events per Month</button>
-				
-					<button align="center" class="toggle-btn" data-original-text="Attack Packets per Month" onclick="toggleTable('PacketsPolicyPerMonth', this)">Attack Packets per Month</button>
+    <tr>
+        <td style="text-align: center;border-top: 0">
+            <button class="toggle-btn" data-original-text="Number of Attack Events per Month" onclick="toggleTableMerged('SecurityEventsPolicyPerMonth', this)">Number of Attack Events per Month</button>
+        </td>
+        <td style="text-align: center;border-top: 0">
+            <button class="toggle-btn" data-original-text="Attack Packets per Month" onclick="toggleTableMerged('PacketsPolicyPerMonth', this)">Attack Packets per Month</button>
+        </td>
+        <td style="text-align: center;border-top: 0">
+            <button class="toggle-btn" data-original-text="Attack Volume per Month" onclick="toggleTableMerged('BWPolicyPerMonth', this)">Attack Volume per Month</button>
+        </td>
+    </tr>
 
-					<button class="toggle-btn" data-original-text="Attack Volume per Month" onclick="toggleTable('BWPolicyPerMonth', this)">Attack Volume per Month</button>
-				</div>
-
-
-		  		<div id="SecurityEventsPolicyPerMonth" class="collapsible-content" style="text-align: left;">
-				  <h4 align="center">Attack Events by policy table</h4>
-					{policy_events_trends_table}
-				</div>
-
-		  		<div id="PacketsPolicyPerMonth" class="collapsible-content" style="text-align: left;">
-				  <h4 align="center">Attack Packets by policy table (units {pkt_units})</h4>
-					{policy_packets_table}
-				</div>
-				
-		  		<div id="BWPolicyPerMonth" class="collapsible-content" style="text-align: left;">
-				  <h4 align="center">alicious Bandwidth by policy table (units {bw_units})</h4>
-					{policy_bw_table}
-				</div>
-			</td>
-		  </tr>	  
+    <!-- Hidden expandable content for second row (Expands Across 3 Columns) -->
+    <tr id="SecurityEventsPolicyPerMonth" class="collapsible-content" style="display: none;">
+        <td colspan="3">
+            <h4 align="center">Attack Events table</h4>
+            {policy_events_trends_table}
+        </td>
+    </tr>
+    <tr id="PacketsPolicyPerMonth" class="collapsible-content" style="display: none;">
+        <td colspan="3">
+            <h4 align="center">Attack Packets table (units {pkt_units})</h4>
+            {policy_packets_table}
+        </td>
+    </tr>
+    <tr id="BWPolicyPerMonth" class="collapsible-content" style="display: none;">
+        <td colspan="3">
+            <h4 align="center">Attack Volume table (units {bw_units})</h4>
+            {policy_bw_table}
+        </td>
+    </tr>
 
 	</tbody>
 </table>
@@ -2605,34 +2741,40 @@ if __name__ == '__main__':
 
 		  </tr>		
 
-		  <tr>
-			<td colspan="3" style="border-top: 0;">
-				<!-- Button container for centering -->
-				<div class="button-container" align="center">
-					<button class="toggle-btn" data-original-text="Number of Attack Events per Month" onclick="toggleTable('SecurityEventsSIPPerMonth', this)">Number of Attack Events per Month</button>
-				
-					<button align="center" class="toggle-btn" data-original-text="Attack Packets per Month" onclick="toggleTable('PacketsSIPPerMonth', this)">Attack Packets per Month</button>
-
-					<button class="toggle-btn" data-original-text="Attack Volume per Month" onclick="toggleTable('BWSIPPerMonth', this)">Attack Volume per Month</button>
-				</div>
 
 
-		  		<div id="SecurityEventsSIPPerMonth" class="collapsible-content" style="text-align: left;">
-				  <h4 align="center">Attack Events by Source IP table</h4>
-					{sip_events_trends_table}
-				</div>
 
-		  		<div id="PacketsSIPPerMonth" class="collapsible-content" style="text-align: left;">
-				  <h4 align="center">Attack Packets by Source IP table (units {pkt_units})</h4>
-					{sip_packets_table}
-				</div>
-				
-		  		<div id="BWSIPPerMonth" class="collapsible-content" style="text-align: left;">
-				  <h4 align="center">Attack Volume by Source IP table (units {bw_units})</h4>
-					{sip_bw_table}
-				</div>
-			</td>
-		  </tr>
+    <tr>
+        <td style="text-align: center;border-top: 0">
+            <button class="toggle-btn" data-original-text="Number of Attack Events per Month" onclick="toggleTableMerged('SecurityEventsSIPPerMonth', this)">Number of Attack Events per Month</button>
+        </td>
+        <td style="text-align: center;border-top: 0">
+            <button class="toggle-btn" data-original-text="Attack Packets per Month" onclick="toggleTableMerged('PacketsSIPPerMonth', this)">Attack Packets per Month</button>
+        </td>
+        <td style="text-align: center;border-top: 0">
+            <button class="toggle-btn" data-original-text="Attack Volume per Month" onclick="toggleTableMerged('BWSIPPerMonth', this)">Attack Volume per Month</button>
+        </td>
+    </tr>
+
+    <!-- Hidden expandable content for second row (Expands Across 3 Columns) -->
+    <tr id="SecurityEventsSIPPerMonth" class="collapsible-content" style="display: none;">
+        <td colspan="3">
+            <h4 align="center">Attack Events table</h4>
+            {sip_events_trends_table}
+        </td>
+    </tr>
+    <tr id="PacketsSIPPerMonth" class="collapsible-content" style="display: none;">
+        <td colspan="3">
+            <h4 align="center">Attack Packets table (units {pkt_units})</h4>
+            {sip_packets_table}
+        </td>
+    </tr>
+    <tr id="BWSIPPerMonth" class="collapsible-content" style="display: none;">
+        <td colspan="3">
+            <h4 align="center">Attack Volume table (units {bw_units})</h4>
+            {sip_bw_table}
+        </td>
+    </tr>
 
 	</tbody>
 </table>
