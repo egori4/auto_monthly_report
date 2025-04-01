@@ -122,18 +122,16 @@ def convert_packets_units(data, pkt_units=None):
 			# if the value is integer or float
 			if isinstance(value, int) or isinstance(value, float):
 				if pkt_units == "Billions":
-					value = value/1000000000
+					value = round(value/1000000000, 2)
 				elif pkt_units == "Millions":
-					value = value/1000000
+					value = round(value/1000000, 2)
+
 				elif pkt_units == "Thousands":
-					value = value/1000
+					value = round(value/1000, 2)
 				else:
 					pass
 					# print(f'Packet units is not set or invalid packets unit is set under "pkt_units" variable in the script. Please set it to "Millions" or "Billions" ')
 				
-				#if value float convert to integer
-				if isinstance(value, float):
-					value = int(value)
 
 
 			converted_row.append(value)
@@ -151,15 +149,15 @@ def convert_bw_units(data, bw_units):
 			if isinstance(value, int) or isinstance(value, float):
 
 				if bw_units.lower() == "megabytes":
-					value = value/8000
+					value = round(value/8000, 2)
 				elif bw_units.lower() == "gigabytes":
-					value = value/8000000
+					value =  round(value/8000000, 2)
 				elif bw_units.lower() == "terabytes":
-					value = value/8000000000
+					value =  round(value/8000000000, 2)
 
-				if isinstance(value, float):
-					#leave only two decimal points
-					value = round(value, 2)
+				# if isinstance(value, float):
+				# 	#leave only two decimal points
+				# 	value = round(value, 2)
 
 				
 				else:
@@ -186,12 +184,12 @@ def trends_move(data, units="events"):
 	else:
 		# Calculate and print the trends
 		for name, count_previous, count_last in zip(attack_names, attack_counts_previous, attack_counts_last):
-			if int(count_last) < int(count_previous):
+			if (count_last) < (count_previous):
 				trend = "Decrease"
 			else:
 				trend = "Increase"
 			
-			difference = abs(int(count_last) - int(count_previous))
+			difference = abs((count_last) - (count_previous))
 
 			if count_previous == 0:
 				difference_percentage = "N/A"
@@ -455,20 +453,22 @@ def bpm_html(bpm):
 
 
 def device_epm_html(device_epm):
-
+	device_epm_html = 'N/A'
 	for device_ip, device_name in defensepros.items():
 		if device_name == device_epm:
-
 			data_month_epm = data_month[data_month['Device Name'] == device_ip]
 			device_series_epm = data_month_epm.groupby(['Device Name','Attack Name','Policy Name']).size().sort_values(ascending=False).apply(format_with_commas).head(10)
 			device_epm_html = device_series_epm.to_frame('Attack Events')
 			device_epm_html=device_epm_html.to_html().replace(device_ip, device_name)
 			return device_epm_html
-		else:
-			return 'N/A'
+
+	return device_epm_html
+
+
 			
 
 def device_ppm_html(device_ppm):
+	device_ppm_html = 'N/A'
 	for device_ip, device_name in defensepros.items():
 		if device_name == device_ppm:
 			data_month_ppm = data_month[data_month['Device Name'] == device_ip]
@@ -477,11 +477,11 @@ def device_ppm_html(device_ppm):
 			device_ppm_html = device_series_ppm.to_frame('Attack Packets')
 			device_ppm_html=device_ppm_html.to_html().replace(device_ip, device_name)
 			return device_ppm_html
-		else:
-			return 'N/A'
+
+	return device_ppm_html
 
 def device_bpm_html(device_bpm):
-
+	device_df_bpm_html = 'N/A'
 	for device_ip, device_name in defensepros.items():
 		if device_name == device_bpm:
 			data_month_bpm = data_month[data_month['Device Name'] == device_ip]
@@ -490,8 +490,8 @@ def device_bpm_html(device_bpm):
 			device_df_bpm_html = device_series_bpm.to_frame('Attack Volume')
 			device_df_bpm_html= device_df_bpm_html.to_html().replace(device_ip, device_name)
 			return device_df_bpm_html
-		else:
-			return 'N/A'
+
+	return device_df_bpm_html
 
 
 def policy_epm_html(policy_epm):
@@ -671,7 +671,7 @@ if __name__ == '__main__':
 		# Add the third column (annotation) to each row
 		for row in total_attacks_days_bar_chart[1:]:
 			if row[1] > total_attacks_days_bar_chart_max: # Find the maximum value for the y-axis
-				total_attacks_days_bar_chart_max = int(row[1]*1.1)
+				total_attacks_days_bar_chart_max = int(row[1]*1.2)
 			row.append(float(row[1]))  
 
 
@@ -741,7 +741,6 @@ if __name__ == '__main__':
 	for index, value in enumerate(bpm_top_list):
 		bpm_html_final+=f'<h4>{value} distribution across devices and policies</h4>'
 		bpm_html_final+= bpm_html(bpm_top_list[index])
-
 
 
 	for index, value in enumerate(device_epm_top_list):
@@ -2473,7 +2472,7 @@ if __name__ == '__main__':
 
 				<!-- Button container for centering -->
 				<div class="button-container">
-					<button class="toggle-btn" data-original-text="Attack packets distributionbution" onclick="toggleTable('LMPacketsDeviceDistribution', this)">Attack packets distributionbution</button>
+					<button class="toggle-btn" data-original-text="Attack packets distribution" onclick="toggleTable('LMPacketsDeviceDistribution', this)">Attack packets distribution</button>
 				</div>
 		  		<div id="LMPacketsDeviceDistribution" class="collapsible-content" style="text-align: center;">
 					{device_ppm_html_final}
@@ -2609,7 +2608,7 @@ if __name__ == '__main__':
 
 				<!-- Button container for centering -->
 				<div class="button-container">
-					<button class="toggle-btn" data-original-text="Attack packets distribution" onclick="toggleTable('PacketsPolicyDistribution', this)">Attack packets distributionbution</button>
+					<button class="toggle-btn" data-original-text="Attack packets distribution" onclick="toggleTable('PacketsPolicyDistribution', this)">Attack packets distribution</button>
 				</div>
 		  		<div id="PacketsPolicyDistribution" class="collapsible-content" style="text-align: center;">
 					{policy_ppm_html_final}
@@ -2716,7 +2715,7 @@ if __name__ == '__main__':
 
 				<!-- Button container for centering -->
 				<div class="button-container">
-					<button class="toggle-btn" data-original-text="Attack packets distributionbution" onclick="toggleTable('PacketsSIPDistribution', this)">Attack packets distributionbution</button>
+					<button class="toggle-btn" data-original-text="Attack packets distribution" onclick="toggleTable('PacketsSIPDistribution', this)">Attack packets distribution</button>
 				</div>
 		  		<div id="PacketsSIPDistribution" class="collapsible-content" style="text-align: center;">
 					{sip_ppm_html_final}

@@ -371,11 +371,17 @@ V11.10 (3/28/2025)
 - Daily report - Aligned naming convention malicious bandwidth, malicioius packets renamed to Attack Volume, Attack Packets respectively
 - Daily report - Added 2 charts - Excluded traffic (Mbps) and Excluded traffic (PPS)
 
-V11.10.1
+V11.10.1 (3/31/2025)
 - Added daily report enhancments to monthly report(coloring persistence upon checking/unchecking)
 - Monthly report - fixed buttons alignment (attack packets distribution and attack packets per month)
 - Monthly report - changed expandable tables headline text style from white to black
 - Monthly report - some minor cosmetical adjustments here and there
+
+V11.10.2 (4/1/2025)
+- Monthly report - Fixed bug with "Attack distribution button" resulting in "N/A"
+- Monthly report - Changed packets/bandwdith units from integer to float to avoid resulting 0 when number of packets or volume is small
+- Monthly report - fixed several typos
+- Monthly report - added extra room on top for the chart "Total Attack Time in days" to display annotations properly
 
 Next steps/Functionality/ideas to add more charts
 
