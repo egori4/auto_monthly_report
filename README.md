@@ -383,8 +383,11 @@ V11.10.2 (4/1/2025)
 - Monthly report - fixed several typos
 - Monthly report - added extra room on top for the chart "Total Attack Time in days" to display annotations properly
 
-V11.10.3
-- Monthly report - Changed headers that were too dark from black to white 
+V11.10.3 (5/5/2025)
+- Monthly report - Changed headers that were too dark from black to white
+
+V11.11 (5/5/2025)
+- Monthly/Daily - added new feature - filter by policy
 
 Next steps/Functionality/ideas to add more charts
 

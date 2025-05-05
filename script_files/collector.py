@@ -67,6 +67,11 @@ try:
 		bw_units = selected_entry['variables']['bwUnitDaily']
 
 		try:
+			policies_list = selected_entry['policies']
+		except:
+			policies_list = [] # This is a list of policies to be used in the report. If empty, all policies will be used.
+
+		try:
 			traffic_window_granular = selected_entry['variables']['TrafficWindowGranular']
 		except:
 			traffic_window_granular = 14400 # this is in seconds (4 hours). This setting controls the period of time blocks for which the traffic volume data is pulled
@@ -937,6 +942,17 @@ class Vision:
 					"value": value,
 					"inverseFilter": True
 				})
+
+		if policies_list:
+				
+			and_filters['filters'].append({
+				"type": "termFilter",
+				"inverseFilter": False,
+				"field": "ruleName",
+				"value": policy
+			}
+			for policy in policies_list
+			)
 
 		# Create an "or" filter for DefensePro IPs
 		or_filters = {
