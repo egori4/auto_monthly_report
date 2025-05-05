@@ -2108,6 +2108,10 @@ if __name__ == '__main__':
 			// background-color: #f0f0f0; /* Optional: Change background for better contrast */
 		}}
 
+		thead.white-header th {{
+			color: white !important;
+		}}
+
         /* Initial state to hide the collapsible content */
         .collapsible-content {{
             display: none;
@@ -2232,7 +2236,7 @@ if __name__ == '__main__':
 </div>
 
 	  <table>
-		<thead>
+		<thead class="white-header">
 
 
 		  <tr>
@@ -2275,7 +2279,7 @@ if __name__ == '__main__':
 </div>		
 
 <table>
-	<thead>
+	<thead class="white-header">
 
 		  <tr>
 			<th>Month to month trends by Number of Attack Events</th>
@@ -2398,7 +2402,7 @@ if __name__ == '__main__':
 
   
 <table>
-	<thead>
+	<thead  class="white-header">
 		   <tr>
 			<th>Month to month trends by Number of Attack Events</th>
 			<th>Month to month trends by Attack Packets(cumulative)</th>
@@ -2422,7 +2426,7 @@ if __name__ == '__main__':
 </div>		
 
 <table>
-	<thead>
+	<thead  class="white-header">
 		   <tr>
 			<th>Month to month trends by Number of Attack Events</th>
 			<th>Month to month trends by Attack Packets(cumulative)</th>
@@ -2516,7 +2520,7 @@ if __name__ == '__main__':
 </div>	
 
 <table>
-	<thead>
+	<thead class="white-header">
 		  <tr>
 			<th>Number of Attack Events - this month</th>
 			<th>Attack Packets(cumulative) - this month</th>
@@ -2569,7 +2573,7 @@ if __name__ == '__main__':
 
 
 <table>
-	<thead>
+	<thead  class="white-header">
 		  <tr>
 			<th>Month to month trends by Number of Attack Events</th>
 			<th>Month to month trends by Attack Packets(cumulative)</th>
@@ -2675,7 +2679,7 @@ if __name__ == '__main__':
 </div>	
 
 <table>
-	<thead>
+	<thead  class="white-header">
 		<tr>
 			<th>Month to month trends by Number of Attack Events</th>
 			<th>Month to month trends by Attack Packets(cumulative)</th>

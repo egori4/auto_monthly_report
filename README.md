@@ -383,14 +383,22 @@ V11.10.2 (4/1/2025)
 - Monthly report - fixed several typos
 - Monthly report - added extra room on top for the chart "Total Attack Time in days" to display annotations properly
 
+V11.10.3
+- Monthly report - Changed headers that were too dark from black to white 
+
 Next steps/Functionality/ideas to add more charts
 
-
-	Review Glenn's feedback
-
+	Move device distribution this month from monthly to daily
+	Add version number at the end in html in analyze trends
+	traffic utilization stats- at the beginning of  anew month, do not overwrite, save it aside for backup
 	write high level management report, text from email
+
 	Explore getting license and alert if traffic is getting close to it (AmirP comment)
 	Add MAX daily bps/pps/cec/cps max values graph per da
+	Add checkboxes "Uncheck all" and "Check all"
+	EA comment - indent different sampling rate 15 sec vs 5 min (maybe adding a note that there is a different samplings)
+
+	Daily report - traffic utilization timezone shift - find solution (example data collected in UTC presented in ET)
 	Add Radware banner
 	https://files.constantcontact.com/01bf4ea6901/d24931ad-5b43-4e8b-bc1d-d8cc76ab21e3.png
 

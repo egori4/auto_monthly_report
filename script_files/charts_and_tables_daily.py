@@ -230,11 +230,11 @@ def gen_charts_data(db_path):
 	csv_file.close
 	###################################################################
 
-	####Get malicious bandwidth by day from the last month and write to csv########
+	####Get Attack Volume by day from the last month and write to csv########
 
 	cur.execute(f"SELECT startDayOfMonth, {bw_units_sum} FROM attacks GROUP BY startDayOfMonth")
 				
-	new_column_names = ['Day of the month', 'Malicious Bandwidth']
+	new_column_names = ['Day of the month', 'Attack Volume']
 
 	data = cur.fetchall()
 

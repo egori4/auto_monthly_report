@@ -777,7 +777,7 @@ if __name__ == '__main__':
 		policy_packets_per_day_html_final+= policy_packets_per_day_html(policy_packets_per_day_top_list[index])
 		
 	for index, value in enumerate(policy_bandwidth_per_day_top_list):
-		policy_bandwidth_per_day_html_final+=f'<h4>Distribution of Malicious bandwidth for policy "{value}" across devices</h4>'
+		policy_bandwidth_per_day_html_final+=f'<h4>Distribution of Attack Volume for policy "{value}" across devices</h4>'
 		policy_bandwidth_per_day_html_final+= policy_bandwidth_per_day_html(policy_bandwidth_per_day_top_list[index])
 
 
@@ -2472,7 +2472,7 @@ if __name__ == '__main__':
 			<td colspan="3" valign="top" style="border-top: 0;">
 				<!-- Button container for centering -->
 				<div class="button-container">
-					<button class="toggle-btn" data-original-text="Accumulated Malicious bandwidh per day table" onclick="toggleTable('AttackBWPerDayTable', this)">Accumulated Malicious bandwidh per day table</button>
+					<button class="toggle-btn" data-original-text="Accumulated Attack Volume per day table" onclick="toggleTable('AttackBWPerDayTable', this)">Accumulated Attack Volume per day table</button>
 				</div>
 		  		<div id="AttackBWPerDayTable" class="collapsible-content">
 				{bw_table_alltimehigh}

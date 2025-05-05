@@ -500,7 +500,7 @@ def gen_charts_data(db_path):
 	bandwidth_sum_trend_chart_by_last_month.head(top_n)       .to_csv(tmp_path + 'bpm_table_lm.csv') #save packets count table (sorted by last month highest to lowest) to csv file
 
 
-	###############Attack Name Malicious badwidth trends all time high################
+	###############Attack Name Attack Volume trends all time high################
 
 	bandwidth_sum_trend_chart_all_times = pd.concat(bandwidth_sum_list,axis=1).fillna(0)
 	bandwidth_sum_trend_chart_all_times.T.iloc[: , :top_n].to_csv(tmp_path + 'bpm_chart_alltimehigh.csv') #save events count chart (all time high sum) to csv file
