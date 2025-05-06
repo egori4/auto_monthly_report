@@ -67,7 +67,7 @@ try:
 		bw_units = selected_entry['variables']['bwUnitDaily']
 
 		try:
-			policies_list = selected_entry['policies']
+			policies_list = selected_entry['policiesList']
 		except:
 			policies_list = [] # This is a list of policies to be used in the report. If empty, all policies will be used.
 
