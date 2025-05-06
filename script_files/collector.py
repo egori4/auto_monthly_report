@@ -943,16 +943,6 @@ class Vision:
 					"inverseFilter": True
 				})
 
-		if policies_list:
-				
-			and_filters['filters'].append({
-				"type": "termFilter",
-				"inverseFilter": False,
-				"field": "ruleName",
-				"value": policy
-			}
-			for policy in policies_list
-			)
 
 		# Create an "or" filter for DefensePro IPs
 		or_filters = {
@@ -963,11 +953,33 @@ class Vision:
 		if dp_ips_string:
 			dps_list = dp_ips_string.split(',')
 			for dp in dps_list:
-				or_filters['filters'].append({
-					"type": "termFilter",
-					"field": "deviceIp",
-					"value": dp
-				})
+				and_filter = {
+					"type": "andFilter",
+					"inverseFilter": False,
+					"filters": [
+						{
+							"type": "termFilter",
+							"inverseFilter": False,
+							"field": "deviceIp",
+							"value": dp
+						},
+						{
+							"type": "orFilter",
+							"inverseFilter": False,
+							"filters": [
+								{
+									"type": "termFilter",
+									"inverseFilter": False,
+									"field": "ruleName",
+									"value": policy
+								} for policy in policies_list
+							]
+						}
+					]
+				}
+				or_filters["filters"].append(and_filter)
+
+				
 		else:
 			or_filters['filters'].append({
 				"type": "termFilter",
@@ -1448,8 +1460,8 @@ v.write_per_device_combined_traffic_stats_to_csv(traffic_pps_per_device_merged, 
 
 merged_attack_only_timestamps_list = sorted(set(bps_attack_only_timestamps_list) | set(pps_attack_only_timestamps_list))
 
-print('Printing all attack timestamps BPS+PPS')
-print(merged_attack_only_timestamps_list)
+# print('Printing all attack timestamps BPS+PPS')
+# print(merged_attack_only_timestamps_list)
 
 ##################### Attacks BPS Chart ############################
 # 1. Write Attacks BPS Volume to csv (reusing the same data from Traffic BPS)
