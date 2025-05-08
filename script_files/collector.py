@@ -733,7 +733,7 @@ class Vision:
 				query.update({"selectedDevices":  [
 					{
 						"deviceId": dp,
-						"networkPolicies": [],
+						"networkPolicies": policies_list,
 						"ports": []
 					}
 					]
