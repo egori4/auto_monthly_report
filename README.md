@@ -386,6 +386,10 @@ V11.10.2 (4/1/2025)
 V11.10.3
 - Monthly report - Changed headers that were too dark from black to white 
 
+V11.10.4 (5/15/2025 - by Cris)
+- Add workaround to collector.py for the issue where "duration" is missing from the collected event 
+	(Specifically where the "end date" is earlier than "start date" - looks like defect, opened case with TAC)
+
 Next steps/Functionality/ideas to add more charts
 
 	Move device distribution this month from monthly to daily
