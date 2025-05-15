@@ -1133,6 +1133,11 @@ class Vision:
 			# Insert data into the table
 			for entry in forensics_raw['data']:
 
+				# Check if duration exists before trying to insert
+				if 'duration' not in entry['row']:
+					print(f"Skipping record - missing 'duration' field. Device: {entry['row'].get('deviceIp', 'unknown')}, Attack name: {entry['row'].get('name', 'unknown')}")
+					continue
+
 				start_date = datetime.fromtimestamp(int(entry["row"]["startTime"])/ 1000)
 				orig_start_date = start_date
 				end_date = datetime.fromtimestamp(int(entry["row"]["endTime"])/ 1000)
@@ -1268,6 +1273,11 @@ class Vision:
 
 			# Insert data into the table
 			for entry in forensics_raw['data']:
+				
+				# Check if duration exists before trying to insert
+				if 'duration' not in entry['row']:
+					print(f"Skipping record - missing 'duration' field. Device: {entry['row'].get('deviceIp', 'unknown')}, Attack name: {entry['row'].get('name', 'unknown')}")
+					continue
 
 				start_date = datetime.fromtimestamp(int(entry["row"]["startTime"])/ 1000)
 				orig_start_date = start_date
