@@ -211,23 +211,6 @@ class Vision:
 		return None  # Return None if all retries fail
 
 
-
-
-		try:
-			r = self.sess.post(url=URL, verify=False, data=requestData)
-		except any as err:
-			raise err
-		
-		try:
-			r.raise_for_status()
-		except (requests.exceptions.HTTPError, requests.exceptions.ConnectionError, requests.exceptions.SSLError,
-			requests.exceptions.Timeout, requests.exceptions.ConnectTimeout,
-			requests.exceptions.ReadTimeout) as err:
-			raise err
-
-		return r
-
-
 	def generate_report_times(self,today_date):
 		# Get current time
 		
