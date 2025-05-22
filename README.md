@@ -387,7 +387,9 @@ V11.10.3 (5/5/2025)
 - Monthly report - Changed headers that were too dark from black to white
 
 V11.11 (5/5/2025)
-- Monthly/Daily - added new feature - filter by policy
+- Monthly/Daily - added new feature - filter by policy.
+	!! Must add new variable "policiesList": ["policy-a","policy-b"] unnder config_files/customers.json
+
 
 Next steps/Functionality/ideas to add more charts
 
