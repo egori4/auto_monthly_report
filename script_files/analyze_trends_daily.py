@@ -1715,7 +1715,35 @@ if __name__ == '__main__':
 						}}
 					}}
 				}});
+				// Add "Select All" checkbox
+				var selectAllLabel = document.createElement('label');
+				var selectAllCheckbox = document.createElement('input');
+				selectAllCheckbox.type = 'checkbox';
+				selectAllCheckbox.checked = true;
+				selectAllCheckbox.id = 'selectAllCheckbox_' + containerId;
 
+				selectAllCheckbox.onchange = function () {{
+					var allCheckboxes = checkboxContainer.querySelectorAll('input[type="checkbox"]:not(#' + selectAllCheckbox.id + ')');
+					allCheckboxes.forEach(cb => cb.checked = selectAllCheckbox.checked);
+
+					// Update selectedCategoriesMap accordingly
+					selectedCategoriesMap[containerId] = selectAllCheckbox.checked
+						? categories.map((_, i) => i + 1)
+						: [];
+
+					updateColorPersistence(containerId, selectedCategoriesMap[containerId], data, options);
+
+					var filteredData = filterDataByCategories(data, selectedCategoriesMap[containerId]);
+					var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
+					callback(selectedCategoriesMap[containerId]);
+				}};
+
+				selectAllLabel.appendChild(selectAllCheckbox);
+				selectAllLabel.appendChild(document.createTextNode('Select All'));
+				checkboxContainer.appendChild(selectAllLabel);
+
+
+				// Generate dynamic checkboxes for each category
 				categories.forEach(function(category, index) {{
 					var checkbox = document.createElement('input');
 					checkbox.type = 'checkbox';
@@ -1724,7 +1752,7 @@ if __name__ == '__main__':
 
 			checkbox.onchange = function() {{ 
 
-				var selectedCategories = Array.from(checkboxContainer.querySelectorAll('input:checked'))
+				var selectedCategories = Array.from(checkboxContainer.querySelectorAll('input[type="checkbox"]:not(#' + selectAllCheckbox.id + '):checked'))
 					.map(input => parseInt(input.value));
 
 				selectedCategoriesMap[containerId] = selectedCategories;
@@ -1743,6 +1771,10 @@ if __name__ == '__main__':
 				var filteredDataTable = google.visualization.arrayToDataTable(filteredData);
 
 				callback(selectedCategories);
+
+				// Sync "Select All" checkbox
+            selectAllCheckbox.checked = selectedCategories.length === categories.length;
+
 			}};
 
 

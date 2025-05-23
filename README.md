@@ -390,6 +390,9 @@ V11.10.4 (5/15/2025 - by Cris)
 - Add workaround to collector.py for the issue where "duration" is missing from the collected event 
 	(Specifically where the "end date" is earlier than "start date" - looks like defect, opened case with TAC)
 
+V11.10.5
+- Added new feature Check/uncheck all checkboxes
+
 Next steps/Functionality/ideas to add more charts
 
 	Move device distribution this month from monthly to daily
