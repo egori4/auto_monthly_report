@@ -390,6 +390,10 @@ V11.10.4 (5/15/2025 - by Cris)
 - Add workaround to collector.py for the issue where "duration" is missing from the collected event 
 	(Specifically where the "end date" is earlier than "start date" - looks like defect, opened case with TAC)
 
+V11.10.6
+- Daily report - changed the logic of storing and create charts for Traffic BPS/PPS/CPS/CEC from CSV to sqlite.
+After upgrading to this version, need to recollect the data for the last month or start on 2nd of the month
+
 Next steps/Functionality/ideas to add more charts
 
 	Move device distribution this month from monthly to daily

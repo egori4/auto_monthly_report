@@ -60,6 +60,7 @@ with open (run_file) as f:
 charts_tables_path = f"./tmp_files/{cust_id}/"
 reports_path = f"./report_files/{cust_id}/"
 db_path = f'./database_files/{cust_id}/'
+db_file = 'database_' + cust_id + '_' + str(month) + '_' + str(year) + '.sqlite'
 
 
 def convert_csv_to_list_of_lists(filename):
@@ -71,6 +72,49 @@ def convert_csv_to_list_of_lists(filename):
 			data.append(row)
 
 	return convert_strings_to_numbers(data)
+
+def convert_sqlite_to_list_of_lists(db_filename, db_table_name):
+
+	# Connect to SQLite database
+	conn = sqlite3.connect(db_filename)
+	cursor = conn.cursor()
+
+	# Fetch all column names
+	cursor.execute(f"PRAGMA table_info({db_table_name})")
+	columns_info = cursor.fetchall()
+	column_names = [col[1] for col in columns_info if col[1] != "DateTime"]
+
+	
+
+	# Quote column names to handle special characters
+	quoted_column_names = [f'"{col}"' for col in column_names]
+
+	# Query all rows ordered by Timestamp, excluding DateTime
+	cursor.execute(f'''
+		SELECT {', '.join(quoted_column_names)} 
+		FROM "{db_table_name}" 
+		ORDER BY CAST(Timestamp AS INTEGER)
+	''')
+	
+
+	rows = cursor.fetchall()
+
+	# Convert each row tuple to list and make sure Timestamp is a number
+	rows_as_lists = []
+	for row in rows:
+		row = list(row)
+		# Convert the Timestamp (first column) to int
+		try:
+			row[0] = int(row[0])
+		except ValueError:
+			pass  # leave as-is if conversion fails
+		rows_as_lists.append(row)
+
+	# Prepend the column names
+	result = [column_names] + rows_as_lists
+
+	conn.close()
+	return result
 
 def convert_strings_to_numbers(data):
   # Check values float, integer or string function
@@ -579,50 +623,6 @@ def sip_bandwidth_per_day_html(sip_bpm):
 	return df_bandwidth_per_day_html
 
 
-def get_legit_traffic(traffic_csv_file, attacks_csv_file):
-
-	# Load CSV files
-	traffic_csv = pd.read_csv(charts_tables_path + traffic_csv_file)#"traffic_per_device_bps.csv")
-	attacks_csv = pd.read_csv(charts_tables_path + attacks_csv_file)#"attacks_per_device_bps.csv")
-
-	# Ensure Timestamp is the index for easy matching
-	traffic_csv.set_index("Timestamp", inplace=True)
-	attacks_csv.set_index("Timestamp", inplace=True)
-
-	# Keep only timestamps that exist in both DataFrames (common rows)
-	traffic_csv = traffic_csv.loc[traffic_csv.index.intersection(attacks_csv.index)]
-
-	# Save filtered traffic data
-	# traffic_csv.to_csv(reports_path + "traffic.csv", index=True)
-	# attacks_csv.to_csv(reports_path + "attacks.csv", index=True)
-
-	# Subtract attacks from traffic, keeping original traffic columns
-	result = traffic_csv.sub(attacks_csv, fill_value=0)  # fill_value=0 ensures no NaN issues
-
-	return result
-
-def combine_traffic_attacks(traffic_csv_file, attacks_csv_file):
-
-	# Load both CSV files
-	traffic_df = pd.read_csv(charts_tables_path + traffic_csv_file)
-	attacks_df = pd.read_csv(charts_tables_path + attacks_csv_file)
-
-	# Rename columns (skip 'Timestamp')
-	attacks_df.columns = ["Timestamp"] + [f"Attacks {col}" for col in attacks_df.columns[1:]]
-	traffic_df.columns = ["Timestamp"] + [f"Traffic {col}" for col in traffic_df.columns[1:]]
-
-	# Merge on Timestamp
-	merged_df = pd.merge(traffic_df, attacks_df, on="Timestamp", how="outer")
-
-	# # Reorder columns: Timestamp → Attacks → Traffic
-	# columns_order = ["Timestamp"] + [col for col in merged_df.columns if "Attacks" in col] + [col for col in merged_df.columns if "Traffic" in col]
-	# merged_df = merged_df[columns_order]
-
-	# # Save to a new CSV file
-	# merged_df.to_csv("merged_traffic_attacks.csv", index=False)
-
-	return merged_df
-
 
 def format_with_commas(value):
 	return '{:,}'.format(value)
@@ -658,44 +658,29 @@ if __name__ == '__main__':
 		cps_per_device_combined_trends = [['Date,CPS']]
 		cec_per_device_combined_trends = [['Date,CEC']]
 
+		excluded_per_device_combined_trends_bps = [['Date,Excluded Traffic(Mbps)']]
+		excluded_per_device_combined_trends_pps = [['Date,Excluded Traffic(PPS)']]
+
 	else:
 
-		##################Substract attack traffic from total traffic###########################	
-		legit_traffic_without_attacks_bps = get_legit_traffic('traffic_per_device_bps.csv', 'attacks_per_device_bps.csv')
-		legit_traffic_without_attacks_bps.to_csv(charts_tables_path + "legit_traffic_without_attacks_bps.csv")
 
-		legit_traffic_without_attacks_pps = get_legit_traffic('traffic_per_device_pps.csv', 'attacks_per_device_pps.csv')
-		legit_traffic_without_attacks_pps.to_csv(charts_tables_path + "legit_traffic_without_attacks_pps.csv")
-		########################################################################################
 
-		################## Combine traffic and attacks together ###########################
+		traffic_per_device_combined_trends_bps = convert_sqlite_to_list_of_lists(db_path + db_file, "traffic_bps")
+		number_of_devices = (len(traffic_per_device_combined_trends_bps[0]) - 1) /2
 
-		merged_traffic_attacks_bps = combine_traffic_attacks('legit_traffic_without_attacks_bps.csv', 'attacks_per_device_bps.csv')
-		merged_traffic_attacks_bps.to_csv(charts_tables_path + "merged_traffic_with_attacks_bps.csv", index=False)
+		traffic_per_device_combined_trends_pps = convert_sqlite_to_list_of_lists(db_path + db_file, "traffic_pps")
 
-		merged_traffic_attacks_pps = combine_traffic_attacks('legit_traffic_without_attacks_pps.csv', 'attacks_per_device_pps.csv')
-		merged_traffic_attacks_pps.to_csv(charts_tables_path + "merged_traffic_with_attacks_pps.csv", index=False)
+		cps_per_device_combined_trends = convert_sqlite_to_list_of_lists(db_path + db_file, "traffic_cps")
+		cec_per_device_combined_trends = convert_sqlite_to_list_of_lists(db_path + db_file, "traffic_cec")
 
-		########################################################################################
+		excluded_per_device_combined_trends_bps = convert_sqlite_to_list_of_lists(db_path + db_file, "traffic_bps_excluded")
+		excluded_per_device_combined_trends_pps = convert_sqlite_to_list_of_lists(db_path + db_file, "traffic_pps_excluded")
 
-		# traffic_per_device_combined_trends_bps = convert_csv_to_list_of_lists(charts_tables_path + 'traffic_per_device_bps.csv')
-		traffic_per_device_combined_trends_bps = convert_csv_to_list_of_lists(charts_tables_path + 'merged_traffic_with_attacks_bps.csv')
-		attacks_per_device_combined_trends_bps = convert_csv_to_list_of_lists(charts_tables_path + 'attacks_per_device_bps.csv')
-		number_of_devices = len(attacks_per_device_combined_trends_bps[0]) - 1  # Exclude timestamp column
-
-		traffic_per_device_combined_trends_pps = convert_csv_to_list_of_lists(charts_tables_path + 'merged_traffic_with_attacks_pps.csv')
-		attacks_per_device_combined_trends_pps = convert_csv_to_list_of_lists(charts_tables_path + 'attacks_per_device_pps.csv')
-
-		cps_per_device_combined_trends = convert_csv_to_list_of_lists(charts_tables_path + 'cps_per_device.csv')
-		cec_per_device_combined_trends = convert_csv_to_list_of_lists(charts_tables_path + 'cec_per_device.csv')
-
-		excluded_per_device_combined_trends_bps = convert_csv_to_list_of_lists(charts_tables_path + 'excluded_per_device_bps.csv')
-		excluded_per_device_combined_trends_pps = convert_csv_to_list_of_lists(charts_tables_path + 'excluded_per_device_pps.csv')
 
 	################################################# Analyze deeper top category ##########################################################
 
 	#1 Create a data frame
-	con = sqlite3.connect(db_path + 'database_' + cust_id + '_' + str(month) + '_' + str(year) + '.sqlite')
+	con = sqlite3.connect(db_path + db_file)
 	# data = pd.read_sql_query("SELECT * from attacks", con)
 	data_month = pd.read_sql_query(f"SELECT deviceName as 'Device Name',month,year,packetBandwidth,name as 'Attack Name',packetCount,ruleName as 'Policy Name',category,sourceAddress as 'Source IP',destAddress,startTime,endTime,startDate,attackIpsId,actionType,maxAttackPacketRatePps,maxAttackRateBps,destPort,protocol,startDayOfMonth as 'Day of the Month' from attacks", con)
 
