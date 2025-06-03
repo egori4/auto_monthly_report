@@ -683,7 +683,11 @@ class Vision:
 			attack_cols = [f'Attacks {dp_name}' for dp_name in dp_names_list]
 			ordered_cols = ['Timestamp'] + ['DateTime'] + traffic_cols + attack_cols
 			df_final = df_final[ordered_cols]
-			
+		
+		# Drop rows with NaN values in 'Timestamp' or 'DateTime' - some data points maybe missing for some DPs due to IRP communication issues, CC processing issue etc.
+		df_final = df_final.dropna().reset_index(drop=True)
+
+
 		if daily:
 			# Save to SQLite
 			if self.today_day_number == 1 and self.today_month_number != 1: # This is a case for 1st of the month but not Jan 1st
