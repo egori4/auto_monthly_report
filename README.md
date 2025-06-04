@@ -383,8 +383,9 @@ V11.10.2 (4/1/2025)
 - Monthly report - fixed several typos
 - Monthly report - added extra room on top for the chart "Total Attack Time in days" to display annotations properly
 
-V11.10.3
-- Monthly report - Changed headers that were too dark from black to white 
+V11.10.3 (5/5/2025)
+- Monthly report - Changed headers that were too dark from black to white
+
 
 V11.10.4 (5/15/2025 - by Cris)
 - Add workaround to collector.py for the issue where "duration" is missing from the collected event 
@@ -392,9 +393,15 @@ V11.10.4 (5/15/2025 - by Cris)
 
 V11.10.5
 - Added new feature Check/uncheck all checkboxes
+
 V11.10.6
 - Daily report - changed the logic of storing and create charts for Traffic BPS/PPS/CPS/CEC from CSV to sqlite.
 After upgrading to this version, need to recollect the data for the last month or start on 2nd of the month
+
+V11.11 (5/5/2025)
+- Monthly/Daily - added new feature - filter by policy.
+	!! Must add new variable "policiesList": ["policy-a","policy-b"] unnder config_files/customers.json
+
 
 Next steps/Functionality/ideas to add more charts
 

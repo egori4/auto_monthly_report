@@ -68,6 +68,11 @@ try:
 		bw_units = selected_entry['variables']['bwUnitDaily']
 
 		try:
+			policies_list = selected_entry['policiesList']
+		except:
+			policies_list = [] # This is a list of policies to be used in the report. If empty, all policies will be used.
+
+		try:
 			traffic_window_granular = selected_entry['variables']['TrafficWindowGranular']
 		except:
 			traffic_window_granular = 14400 # this is in seconds (4 hours). This setting controls the period of time blocks for which the traffic volume data is pulled
@@ -205,23 +210,6 @@ class Vision:
 
 		print("Max retries reached. Request failed.")
 		return None  # Return None if all retries fail
-
-
-
-
-		try:
-			r = self.sess.post(url=URL, verify=False, data=requestData)
-		except any as err:
-			raise err
-		
-		try:
-			r.raise_for_status()
-		except (requests.exceptions.HTTPError, requests.exceptions.ConnectionError, requests.exceptions.SSLError,
-			requests.exceptions.Timeout, requests.exceptions.ConnectTimeout,
-			requests.exceptions.ReadTimeout) as err:
-			raise err
-
-		return r
 
 
 	def generate_report_times(self,today_date):
@@ -909,7 +897,7 @@ class Vision:
 				query.update({"selectedDevices":  [
 					{
 						"deviceId": dp,
-						"networkPolicies": [],
+						"networkPolicies": policies_list,
 						"ports": []
 					}
 					]
@@ -1119,6 +1107,7 @@ class Vision:
 					"inverseFilter": True
 				})
 
+
 		# Create an "or" filter for DefensePro IPs
 		or_filters = {
 			"type": "orFilter",
@@ -1128,11 +1117,33 @@ class Vision:
 		if dp_ips_string:
 			dps_list = dp_ips_string.split(',')
 			for dp in dps_list:
-				or_filters['filters'].append({
-					"type": "termFilter",
-					"field": "deviceIp",
-					"value": dp
-				})
+				and_filter = {
+					"type": "andFilter",
+					"inverseFilter": False,
+					"filters": [
+						{
+							"type": "termFilter",
+							"inverseFilter": False,
+							"field": "deviceIp",
+							"value": dp
+						},
+						{
+							"type": "orFilter",
+							"inverseFilter": False,
+							"filters": [
+								{
+									"type": "termFilter",
+									"inverseFilter": False,
+									"field": "ruleName",
+									"value": policy
+								} for policy in policies_list
+							]
+						}
+					]
+				}
+				or_filters["filters"].append(and_filter)
+
+				
 		else:
 			or_filters['filters'].append({
 				"type": "termFilter",
