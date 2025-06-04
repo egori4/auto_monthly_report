@@ -392,6 +392,9 @@ V11.10.4 (5/15/2025 - by Cris)
 
 V11.10.5
 - Added new feature Check/uncheck all checkboxes
+V11.10.6
+- Daily report - changed the logic of storing and create charts for Traffic BPS/PPS/CPS/CEC from CSV to sqlite.
+After upgrading to this version, need to recollect the data for the last month or start on 2nd of the month
 
 Next steps/Functionality/ideas to add more charts
 

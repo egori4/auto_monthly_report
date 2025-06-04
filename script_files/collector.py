@@ -9,6 +9,7 @@ import calendar
 import csv
 import sqlite3
 import urllib3
+import pandas as pd
 
 daily = False
 monthly = False
@@ -561,6 +562,186 @@ class Vision:
 				writer.writerows(final_data)
 
 			print(f"CSV file '{filename}' has been updated successfully.")
+
+
+
+	def write_traffic_stats_to_db(self,traffic_raw_response, report_type):
+		"""
+		This function parses the traffic data and saves the data to a SQLite database.
+		"""
+
+		# Build list of per-IP DataFrames
+		all_dps_df_list = [] # This will hold DataFrames for each DP
+		dp_names_list = [] # List of DP names for the report
+
+		for dp_ip, dp_ip_traffic_stats in traffic_raw_response.items():
+			
+			dp_name = dp_ip_to_name_dict.get(dp_ip, dp_ip)
+			dp_names_list.append(dp_name)
+
+
+			rows = []
+			for entry in dp_ip_traffic_stats['data']:
+				row = entry['row']
+				if report_type == "Traffic Volume BPS":
+
+					db_table_name = 'traffic_bps'
+
+					#Convert traffic volume values from string to float and set units to Mbps
+					row['trafficValue'] = round(float(row['trafficValue']) / 1000, 2)
+					row['discards'] = round(float(row['discards']) / 1000, 2)
+
+					
+
+					rows.append({
+					'Timestamp': row['timeStamp'],
+					f'Traffic {dp_name}': float(row['trafficValue']) - float(row['discards']),
+					f'Attacks {dp_name}': float(row['discards'])
+					})
+					
+				elif report_type == "Traffic Volume PPS":
+
+					db_table_name = 'traffic_pps'
+
+					#Convert traffic volume values from string to float
+					row['trafficValue'] = round(float(row['trafficValue']) ,2)
+					row['discards'] = round(float(row['discards']) , 2)
+
+					rows.append({
+					'Timestamp': row['timeStamp'],
+					f'Traffic {dp_name}': float(row['trafficValue']) - float(row['discards']),
+					f'Attacks {dp_name}': float(row['discards'])
+					})
+
+
+				if report_type == "Traffic Volume BPS Excluded":
+
+					db_table_name = 'traffic_bps_excluded'
+
+					#Convert traffic volume values from string to float and set units to Mbps
+
+					row['excluded'] = round(float(row['excluded']) / 1000, 2)
+					
+					rows.append({
+					'Timestamp': row['timeStamp'],
+					f'{dp_name}': float(row['excluded']),
+					})
+					
+				if report_type == "Traffic Volume PPS Excluded":
+
+					db_table_name = 'traffic_pps_excluded'
+
+					#Convert traffic volume values from string to float and set units to Mbps
+
+					row['excluded'] = round(float(row['excluded']) ,2)
+					
+					rows.append({
+					'Timestamp': row['timeStamp'],
+					f'{dp_name}': float(row['excluded']),
+					})
+
+				elif report_type == "Traffic CPS":
+
+					db_table_name = 'traffic_cps'
+
+					#Convert traffic volume values from string to float
+					row['connectionPerSecond'] = float(row['connectionPerSecond'])  # Convert to number
+
+					rows.append({
+					'Timestamp': row['timeStamp'],
+					f'{dp_name}': float(row['connectionPerSecond']),
+					})
+
+				elif report_type == "Traffic CEC":
+
+					db_table_name = 'traffic_cec'
+
+					#Convert traffic volume values from string to float
+					row['connectionsPerSecond'] = float(row['connectionsPerSecond'])  # Convert to number
+
+					rows.append({
+					'Timestamp': row['timeStamp'],
+					f'{dp_name}': float(row['connectionsPerSecond']),
+					})
+
+
+			df_single_dp = pd.DataFrame(rows)
+			all_dps_df_list.append(df_single_dp)
+			
+		# Merge all DP DataFrames on 'timestamp'
+		df_final = all_dps_df_list[0]
+		for df in all_dps_df_list[1:]:
+			df_final = pd.merge(df_final, df, on='Timestamp', how='outer')
+
+		# Sort timestamps by timestamp
+		df_final = df_final.sort_values(by='Timestamp')
+		df_final['DateTime'] = pd.to_datetime(df_final['Timestamp'].astype('int64'), unit='ms').dt.strftime('%Y-%m-%d %H:%M:%S')
+
+		# Rearrange columns: timestamp, all traffic_<ip>, all attacks_<ip>
+		if report_type == "Traffic Volume BPS" or report_type == "Traffic Volume PPS":
+			traffic_cols = [f'Traffic {dp_name}' for dp_name in dp_names_list]
+			attack_cols = [f'Attacks {dp_name}' for dp_name in dp_names_list]
+			ordered_cols = ['Timestamp'] + ['DateTime'] + traffic_cols + attack_cols
+			df_final = df_final[ordered_cols]
+		
+		# Drop rows with NaN values in 'Timestamp' or 'DateTime' - some data points maybe missing for some DPs due to IRP communication issues, CC processing issue etc.
+		df_final = df_final.dropna().reset_index(drop=True)
+
+
+		if daily:
+			# Save to SQLite
+			if self.today_day_number == 1 and self.today_month_number != 1: # This is a case for 1st of the month but not Jan 1st
+				db_file = db_files_path + f'database_{cust_id}_{self.today_month_number -1:02}_{self.today_year}.sqlite'
+				print(db_file)
+
+			elif self.today_day_number == 1 and self.today_month_number == 1: # This is a case for  Jan 1st
+				db_file = db_files_path + f'database_{cust_id}_{12}_{self.today_year -1:02}.sqlite'
+				print(db_file)
+
+			else:
+				db_file = db_files_path + f'database_{cust_id}_{self.today_month_number:02}_{self.today_year}.sqlite'
+				print(db_file)
+
+		elif monthly:
+
+			if self.today_month_number != 1: # This is a case for not Jan month
+				db_file = db_files_path + f'database_{cust_id}_{self.today_month_number -1:02}_{self.today_year}.sqlite'
+				print(db_file)
+
+			else: # This is a case for  Jan month
+				db_file = db_files_path + f'database_{cust_id}_{12}_{self.today_year -1}.sqlite'
+				print(db_file)
+
+
+		conn = sqlite3.connect(db_file)
+		cursor = conn.cursor()
+
+		# Create table if it doesn't exist
+		create_cols = ", ".join([f'"{col}" REAL' for col in df_final.columns if col not in ['Timestamp', 'DateTime']])
+		cursor.execute(f'''
+			CREATE TABLE IF NOT EXISTS {db_table_name} (
+				Timestamp TEXT,
+				DateTime TEXT,
+				{create_cols}
+			)
+		''')
+
+		# delete all epoch timestamps entries for the previous day and append new data
+		
+
+		end_time_inclusive = ((self.end_time_upper // 1000) + 1) * 1000
+
+		cursor.execute(f'''
+			DELETE FROM {db_table_name}
+			WHERE CAST(Timestamp AS INTEGER) >= ? AND CAST(Timestamp AS INTEGER) <= ?
+		''', (self.start_time_lower, end_time_inclusive))
+
+		
+		# Insert new data
+		df_final.to_sql(db_table_name, conn, if_exists='append', index=False)
+
+		conn.commit()
+		conn.close()
 
 
 	def ams_stats_dashboards_call(self, units="bps", uri = "/mgmt/vrm/monitoring/traffic/periodic/report", report_type="AMS Dasboard"):
@@ -1415,8 +1596,8 @@ if not offline:
 # 4. Merge attack only timestamps into aggregate data. This way attack timeframe will be granular and rest will be aggregated and averaged
 traffic_bps_per_device_merged = v.merge_attacks_to_aggregate(traffic_bps_per_device_aggregate, traffic_bps_per_device_granular,bps_attack_only_timestamps_list)
 
-# 5. Write Traffic BPS Volume to csv
-v.write_per_device_combined_traffic_stats_to_csv(traffic_bps_per_device_merged, tmp_files_path + 'traffic_per_device_bps.csv')
+# 5. Write Traffic BPS Stats to sqlite db
+v.write_traffic_stats_to_db(traffic_bps_per_device_merged, report_type="Traffic Volume BPS")
 
 
 ###################### Traffic PPS Chart ###########################
@@ -1434,34 +1615,38 @@ if not offline:
 # 4. Merge attack only timestamps into aggregate data. This way attack timeframe will be granular and rest will be aggregated and averaged
 traffic_pps_per_device_merged = v.merge_attacks_to_aggregate(traffic_pps_per_device_aggregate, traffic_pps_per_device_granular,pps_attack_only_timestamps_list)
 
-# 5. Write Traffic PPS Volume to csv
-v.write_per_device_combined_traffic_stats_to_csv(traffic_pps_per_device_merged, tmp_files_path + 'traffic_per_device_pps.csv')
+# 5. Write Traffic PPS Stats to sqlite db
+v.write_traffic_stats_to_db(traffic_pps_per_device_merged, report_type="Traffic Volume PPS")
 
 
 # Merge PPS attacks and BPS attack stamps
 
 merged_attack_only_timestamps_list = sorted(set(bps_attack_only_timestamps_list) | set(pps_attack_only_timestamps_list))
 
-print('Printing all attack timestamps BPS+PPS')
-print(merged_attack_only_timestamps_list)
+# print('Printing all attack timestamps BPS+PPS')
+# print(merged_attack_only_timestamps_list)
 
-##################### Attacks BPS Chart ############################
-# 1. Write Attacks BPS Volume to csv (reusing the same data from Traffic BPS)
-v.write_per_device_combined_traffic_stats_to_csv(traffic_bps_per_device_merged, tmp_files_path + 'attacks_per_device_bps.csv')
 
-##################### Attacks PPS Chart ############################
-# 1. Write Attacks PPS Volume to csv (reusing the same data from Traffic PPS)
-v.write_per_device_combined_traffic_stats_to_csv(traffic_pps_per_device_merged, tmp_files_path + 'attacks_per_device_pps.csv')
+
+# ##################### Attacks BPS Chart ############################
+# # 1. Write Attacks BPS Volume to csv (reusing the same data from Traffic BPS)
+# v.write_per_device_combined_traffic_stats_to_csv(traffic_bps_per_device_merged, tmp_files_path + 'attacks_per_device_bps.csv')
+
+# ##################### Attacks PPS Chart ############################
+# # 1. Write Attacks PPS Volume to csv (reusing the same data from Traffic PPS)
+# v.write_per_device_combined_traffic_stats_to_csv(traffic_pps_per_device_merged, tmp_files_path + 'attacks_per_device_pps.csv')
+
+
 
 ###################### Excluded BPS ###########################
 
-# Write Excluded BPS Volume to csv from already collected data
-v.write_per_device_combined_traffic_stats_to_csv(traffic_bps_per_device_aggregate, tmp_files_path + 'excluded_per_device_bps.csv')
+# Write Excluded BPS Volume to database
+v.write_traffic_stats_to_db(traffic_bps_per_device_aggregate, report_type="Traffic Volume BPS Excluded")
 
 ###################### Excluded PPS ###########################
 
-# Write Excluded BPS Volume to csv from already collected data
-v.write_per_device_combined_traffic_stats_to_csv(traffic_pps_per_device_aggregate, tmp_files_path + 'excluded_per_device_pps.csv')
+# Write Excluded PPS Volume to csv from already collected data
+v.write_traffic_stats_to_db(traffic_pps_per_device_aggregate, report_type="Traffic Volume PPS Excluded")
 
 
 
@@ -1479,8 +1664,8 @@ if not offline:
 
 cps_per_device_merged = v.merge_attacks_to_aggregate(cps_per_device_aggregate, cps_per_device_granular,merged_attack_only_timestamps_list)
 
-# 4. Write CPS to csv
-v.write_per_device_combined_traffic_stats_to_csv(cps_per_device_merged, tmp_files_path + 'cps_per_device.csv')
+# 4. Write CPS to database
+v.write_traffic_stats_to_db(cps_per_device_merged, report_type="Traffic CPS")
 
 
 ##################### Concurrent Connections Chart ####################################
@@ -1496,7 +1681,7 @@ if not offline:
 # 3. Merge attack only timestamps into aggregate data. This way attack timeframe will be granular and rest will be aggregated and averaged
 cec_per_device_merged = v.merge_attacks_to_aggregate(cec_per_device_aggregate, cec_per_device_granular,merged_attack_only_timestamps_list)
 
-# 4. Write Concurrent Connections to csv
-v.write_per_device_combined_traffic_stats_to_csv(cec_per_device_merged, tmp_files_path + 'cec_per_device.csv')
+# 4. Write Concurrent Connections to database
+v.write_traffic_stats_to_db(cec_per_device_merged, report_type="Traffic CEC")
 
 print(f'Finished data collection at {print(datetime.today())}')
