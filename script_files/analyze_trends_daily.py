@@ -1012,7 +1012,7 @@ if __name__ == '__main__':
 				hAxis: {{
 					title: 'Date and time'
 					}},
-				isStacked: false,
+				isStacked: true,
 				colors: redBlueColors,
 				focusTarget: 'category',
 				legend: {{position: 'top', maxLines: 10}},
@@ -1035,7 +1035,7 @@ if __name__ == '__main__':
 				hAxis: {{
 					title: 'Date and time'
 					}},
-				isStacked: false,
+				isStacked: true,
 				colors: redBlueColors,
 				focusTarget: 'category',
 				legend: {{position: 'top', maxLines: 10}},
