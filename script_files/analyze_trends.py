@@ -2585,7 +2585,7 @@ if __name__ == '__main__':
 				</div>
 				
 		  		<div id="BWDevicePerMonth" class="collapsible-content" style="text-align: left;">
-				  <h4 align="center">alicious Bandwidth by device table (units {bw_units})</h4>
+				  <h4 align="center">Malicious Bandwidth by device table (units {bw_units})</h4>
 					{bw_by_device_table}
 				</div>
 			</td>
