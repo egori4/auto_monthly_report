@@ -897,7 +897,7 @@ if __name__ == '__main__':
 
 	# Format as list of lists for Google Charts
 	# The first list is the header
-	dip_events_chart_data = [['Destination IP', 'Number of events']] + dip_top_events_df.reset_index().values.tolist()
+	dip_events_chart_data = [['Destination IP', 'Number of attack events']] + dip_top_events_df.reset_index().values.tolist()
 
 	if bar_charts_annotations:
 		dip_events_chart_data[0].append({'role': 'annotation'})
@@ -945,7 +945,7 @@ if __name__ == '__main__':
 	dip_top_bandwidth_df = (dip_top_bandwidth_df * 0.000125).round(2)  # Convert to MB
 
 	# Prepare Google Charts data
-	dip_bandwidth_chart_data = [['Destination IP', 'Total Bandwidth (MB)']] + dip_top_bandwidth_df.reset_index().values.tolist()
+	dip_bandwidth_chart_data = [['Destination IP', 'Volume (MB)']] + dip_top_bandwidth_df.reset_index().values.tolist()
 
 	if bar_charts_annotations:
 		dip_bandwidth_chart_data[0].append({'role': 'annotation'})
@@ -2991,7 +2991,7 @@ if __name__ == '__main__':
 
 			<tr>
 			<td colspan="3">
-				<h3 id="section2-9">Top attacked Destination IP's of this month</h3>
+				<h3 id="section2-9">Top attacked Destination IP's of this month(packets)</h3>
 				<div id="dip_packets_bar_chart_div"></div>
 			</td>
 			</tr>
@@ -3179,7 +3179,7 @@ if __name__ == '__main__':
 			</td>
 	
 		  </tr>	
-		  
+
 
 		  <tr>
 			<td colspan="3">
