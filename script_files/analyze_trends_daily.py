@@ -36,6 +36,14 @@ for cust_config_block in customers_json:
 			bps_unit = 1000000000
 			bps_units_desc = 'Gbps'
 
+		try:
+			if cust_config_block['variables']['barChartsAnnotations'].lower() == 'false':
+				bar_charts_annotations = False
+			else:
+				bar_charts_annotations = True
+		except:
+			bar_charts_annotations = True
+
 ##### Extract variables from run.sh ##############
 run_file = 'run_daily.sh'
 with open (run_file) as f:
@@ -876,6 +884,78 @@ if __name__ == '__main__':
 
 
 
+	############################################### Top destination IP ##########################################################
+
+	# Count occurrences of each destination IP
+	dip_top_events_df = (
+		data_month['destAddress']
+		.value_counts()
+		.drop(['Multiple', '0.0.0.0'], errors='ignore')
+		.nlargest(top_n)
+		.sort_values(ascending=False)
+	)
+
+	# Format as list of lists for Google Charts
+	# The first list is the header
+	dip_events_chart_data = [['Destination IP', 'Number of events']] + dip_top_events_df.reset_index().values.tolist()
+
+	if bar_charts_annotations:
+		dip_events_chart_data[0].append({'role': 'annotation'})
+			
+		# Add the third column (annotation) to each row
+		for row in dip_events_chart_data[1:]:
+			row.append(int(row[1]))  
+
+
+
+	###################### Dest IP Packets #########################
+	# Group by destination IP and sum the packets
+	dip_top_packets_df = (
+		data_month.groupby('destAddress')['packetCount']
+		.sum()
+		.drop(['Multiple', '0.0.0.0'], errors='ignore')
+		.nlargest(top_n)
+		.sort_values(ascending=False)
+	)
+
+	# Format for Google Charts
+	dip_packets_chart_data = [['Destination IP', 'Packets(cumulative)']] + dip_top_packets_df.reset_index().values.tolist()
+
+
+	if bar_charts_annotations:
+		dip_packets_chart_data[0].append({'role': 'annotation'})
+			
+		# Add the third column (annotation) to each row
+		for row in dip_packets_chart_data[1:]:
+			row.append(int(row[1]))
+
+
+
+	##################### Dest IP Bandwidth #########################
+
+	# Group by destination IP and sum the bandwidth (in kilobits), convert to MB
+	dip_top_bandwidth_df = (
+		data_month.groupby('destAddress')['packetBandwidth']
+		.sum()
+		.drop(['Multiple', '0.0.0.0'], errors='ignore')
+		.nlargest(top_n)
+		.sort_values(ascending=False)
+	)
+
+	dip_top_bandwidth_df = (dip_top_bandwidth_df * 0.000125).round(2)  # Convert to MB
+
+	# Prepare Google Charts data
+	dip_bandwidth_chart_data = [['Destination IP', 'Total Bandwidth (MB)']] + dip_top_bandwidth_df.reset_index().values.tolist()
+
+	if bar_charts_annotations:
+		dip_bandwidth_chart_data[0].append({'role': 'annotation'})
+			
+		# Add the third column (annotation) to each row
+		for row in dip_bandwidth_chart_data[1:]:
+			row.append(int(row[1]))
+
+
+	# Generate the HTML page with the data
 	html_page = f"""
 	<!DOCTYPE html>
 	<html lang="en">
@@ -998,6 +1078,10 @@ if __name__ == '__main__':
 			var sip_events_per_day_data = google.visualization.arrayToDataTable({sip_events_trends_chart});
 			var sip_packets_per_day_data = google.visualization.arrayToDataTable({sip_packets_trends_chart});
 			var sip_bandwidth_per_day_data = google.visualization.arrayToDataTable({sip_bw_trends_chart});
+
+			var dip_events_bar_chart_data = google.visualization.arrayToDataTable({dip_events_chart_data});
+			var dip_packets_bar_chart_data = google.visualization.arrayToDataTable({dip_packets_chart_data});
+			var dip_bandwidth_bar_chart_data = google.visualization.arrayToDataTable({dip_bandwidth_chart_data});
 
 			var policy_events_per_day_data = google.visualization.arrayToDataTable({policy_events_trends_chart });
 			var policy_packets_per_day_data = google.visualization.arrayToDataTable({policy_packets_trends_chart });
@@ -1389,6 +1473,61 @@ if __name__ == '__main__':
 			  width: '100%'
 			}};
 
+			var dip_events_bar_chart_options = {{
+			  title: 'Attack Events by Destination IP',
+			  bar: {{
+				groupWidth: "70%"
+				}},
+			  legend: {{
+				position: 'bottom'
+				}},
+			  vAxis: {{
+				minValue: 0,
+				title:'Attacked Destination IP'
+				}},
+			  annotations: {{
+            	alwaysOutside: true
+				}},
+			  width: '100%'
+			}};
+
+			var dip_packets_bar_chart_options = {{
+			  title: 'Cumulative Attack packets by Destination IP',
+			  bar: {{
+				groupWidth: "70%"
+				}},
+			  legend: {{
+				position: 'bottom'
+				}},
+			  vAxis: {{
+				minValue: 0,
+				title:'Attacked Destination IP'
+				}},
+			  annotations: {{
+            	alwaysOutside: true
+				}},
+			  width: '100%'
+			}};
+
+			var dip_bandwidth_bar_chart_options = {{
+			  title: 'Cumulative Attack Volume by Destination IP',
+			  bar: {{
+				groupWidth: "70%"
+				}},
+			  legend: {{
+				position: 'bottom'
+				}},
+			  vAxis: {{
+				minValue: 0,
+				title:'Attacked Destination IP'
+				}},
+			  annotations: {{
+            	alwaysOutside: true
+				}},
+			  width: '100%'
+			}};
+
+
 			var policy_events_per_day_options = {{
 			  title: 'Attack Events trends by Policy Name',
 			  vAxis: {{
@@ -1467,6 +1606,10 @@ if __name__ == '__main__':
 			var sip_events_per_day_chart = new google.visualization.AreaChart(document.getElementById('sip_events_per_day_chart_div'));
 			var sip_packets_per_day_chart = new google.visualization.AreaChart(document.getElementById('sip_packets_per_day_chart_div'));
 			var sip_bandwidth_per_day_chart = new google.visualization.AreaChart(document.getElementById('sip_bandwidth_per_day_chart_div'));		
+
+			var dip_events_bar_chart = new google.visualization.BarChart(document.getElementById('dip_events_bar_chart_div'));		
+			var dip_packets_bar_chart = new google.visualization.BarChart(document.getElementById('dip_packets_bar_chart_div'));
+			var dip_bandwidth_bar_chart = new google.visualization.BarChart(document.getElementById('dip_bandwidth_bar_chart_div'));
 
 			var policy_events_per_day_chart = new google.visualization.AreaChart(document.getElementById('policy_events_per_day_chart_div'));
 			var policy_packets_per_day_chart = new google.visualization.AreaChart(document.getElementById('policy_packets_per_day_chart_div'));
@@ -1619,6 +1762,10 @@ if __name__ == '__main__':
 			sip_events_per_day_chart.draw(sip_events_per_day_data, sip_events_per_day_options);
 			sip_packets_per_day_chart.draw(sip_packets_per_day_data, sip_packets_per_day_options);
 			sip_bandwidth_per_day_chart.draw(sip_bandwidth_per_day_data, sip_bandwidth_per_day_options);
+
+			dip_events_bar_chart.draw(dip_events_bar_chart_data, dip_events_bar_chart_options);
+			dip_packets_bar_chart.draw(dip_packets_bar_chart_data, dip_packets_bar_chart_options);
+			dip_bandwidth_bar_chart.draw(dip_bandwidth_bar_chart_data, dip_bandwidth_bar_chart_options);
 
 			policy_events_per_day_chart.draw(policy_events_per_day_data, policy_events_per_day_options);
 			policy_packets_per_day_chart.draw(policy_packets_per_day_data, policy_packets_per_day_options);
@@ -2186,6 +2333,31 @@ if __name__ == '__main__':
 		height: 50vh;
 	  }}
 
+	  
+	  
+	  #dip_events_bar_chart_div {{
+	    width: 33vw;  /* 33% of the screen width */
+        margin: 0 auto;  /* Centers the div horizontally */
+        text-align: center;  /* Ensures content inside is centered */
+		height: 50vh;
+	  }}
+
+	  #dip_packets_bar_chart_div {{
+	    width: 33vw;  /* 33% of the screen width */
+        margin: 0 auto;  /* Centers the div horizontally */
+        text-align: center;  /* Ensures content inside is centered */
+		height: 50vh;
+	  }}
+
+	  #dip_bandwidth_bar_chart_div {{
+	    width: 33vw;  /* 33% of the screen width */
+        margin: 0 auto;  /* Centers the div horizontally */
+        text-align: center;  /* Ensures content inside is centered */
+		height: 50vh;
+	  }}
+
+
+
 	  #policy_events_per_day_chart_div {{
 		height: 50vh;
 	  }}
@@ -2343,6 +2515,7 @@ if __name__ == '__main__':
 							<li><a href="#section1-6">Cumulative Attack Volume breakdown by DefensePro</a></li>
 							<li><a href="#section1-7">Cumulative Attack Volume breakdown by policy</a></li>
 							<li><a href="#section1-8">Cumulative Attack Volume breakdown by source IP's</a></li>	
+							<li><a href="#section1-9">Top attacked destination IP's of this month(MB)</a></li>	
 						</ul>
 						</li>
 					</ul>
@@ -2364,6 +2537,7 @@ if __name__ == '__main__':
 								<li><a href="#section2-6">Cumulative Attack packets breakdown by DefensePro</a></li>
 								<li><a href="#section2-7">Cumulative Attack packets breakdown by policy</a></li>
 								<li><a href="#section2-8">Cumulative Attack packets breakdown by source IP's</a></li>	
+								<li><a href="#section2-9">Top attacked destination IP's of this month(packets)</a></li>	
 							</ul>
 							
 						</li>
@@ -2384,6 +2558,8 @@ if __name__ == '__main__':
 							<li><a href="#section3-4">Number of attack events by DefensePro</a></li>
 							<li><a href="#section3-5">Number of attack events by policy</a></li>
 							<li><a href="#section3-6">Number of attack events by source IP's</a></li>
+							<li><a href="#section3-7">Top attacked destination IP's of this month(attack events)</a></li>	
+
 						</ul>
 						</li>
 					</ul>
@@ -2609,6 +2785,13 @@ if __name__ == '__main__':
 	
 		  </tr>
 
+		  
+		<tr>
+		<td colspan="3">
+			<h3 id="section1-9">Top attacked destination IP's of this month(MB)</h3>
+			<div id="dip_bandwidth_bar_chart_div" style="height: 400px;"></div>
+		</td>
+		</tr>
 
 		  </thead>
 		    </table>
@@ -2804,6 +2987,14 @@ if __name__ == '__main__':
 	
 		  </tr>	
 
+		  
+
+			<tr>
+			<td colspan="3">
+				<h3 id="section2-9">Top attacked Destination IP's of this month</h3>
+				<div id="dip_packets_bar_chart_div"></div>
+			</td>
+			</tr>
 
 
 
@@ -2987,6 +3178,14 @@ if __name__ == '__main__':
 
 			</td>
 	
+		  </tr>	
+		  
+
+		  <tr>
+			<td colspan="3">
+				<h3 id="section3-7">Top attacked Destination IP's of this month</h3>
+				<div id="dip_events_bar_chart_div"></div>
+			</td>
 		  </tr>	
 
 		  </thead>

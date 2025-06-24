@@ -402,6 +402,8 @@ V11.11 (5/5/2025)
 - Monthly/Daily - added new feature - filter by policy.
 	!! Must add new variable "policiesList": ["policy-a","policy-b"] unnder config_files/customers.json
 
+V11.12 (6/24/2025)
+- Added new charts - Top attacked destinations
 
 Next steps/Functionality/ideas to add more charts
 
