@@ -2336,21 +2336,21 @@ if __name__ == '__main__':
 	  
 	  
 	  #dip_events_bar_chart_div {{
-	    width: 33vw;  /* 33% of the screen width */
+	    width: 33vw;  /* 40% of the screen width */
         margin: 0 auto;  /* Centers the div horizontally */
         text-align: center;  /* Ensures content inside is centered */
 		height: 50vh;
 	  }}
 
 	  #dip_packets_bar_chart_div {{
-	    width: 33vw;  /* 33% of the screen width */
+	    width: 33vw;  /* 40% of the screen width */
         margin: 0 auto;  /* Centers the div horizontally */
         text-align: center;  /* Ensures content inside is centered */
 		height: 50vh;
 	  }}
 
 	  #dip_bandwidth_bar_chart_div {{
-	    width: 33vw;  /* 33% of the screen width */
+	    width: 33vw;  /* 40% of the screen width */
         margin: 0 auto;  /* Centers the div horizontally */
         text-align: center;  /* Ensures content inside is centered */
 		height: 50vh;
@@ -2515,7 +2515,7 @@ if __name__ == '__main__':
 							<li><a href="#section1-6">Cumulative Attack Volume breakdown by DefensePro</a></li>
 							<li><a href="#section1-7">Cumulative Attack Volume breakdown by policy</a></li>
 							<li><a href="#section1-8">Cumulative Attack Volume breakdown by source IP's</a></li>	
-							<li><a href="#section1-9">Top attacked destination IP's of this month(MB)</a></li>	
+							<li><a href="#section1-9">Top attacked destination IP's by volume(MB)</a></li>	
 						</ul>
 						</li>
 					</ul>
@@ -2537,7 +2537,7 @@ if __name__ == '__main__':
 								<li><a href="#section2-6">Cumulative Attack packets breakdown by DefensePro</a></li>
 								<li><a href="#section2-7">Cumulative Attack packets breakdown by policy</a></li>
 								<li><a href="#section2-8">Cumulative Attack packets breakdown by source IP's</a></li>	
-								<li><a href="#section2-9">Top attacked destination IP's of this month(packets)</a></li>	
+								<li><a href="#section2-9">Top attacked destination IP's(cumulative packets)</a></li>	
 							</ul>
 							
 						</li>
@@ -2558,7 +2558,7 @@ if __name__ == '__main__':
 							<li><a href="#section3-4">Number of attack events by DefensePro</a></li>
 							<li><a href="#section3-5">Number of attack events by policy</a></li>
 							<li><a href="#section3-6">Number of attack events by source IP's</a></li>
-							<li><a href="#section3-7">Top attacked destination IP's of this month(attack events)</a></li>	
+							<li><a href="#section3-7">Top attacked destination IP's(attack events)</a></li>	
 
 						</ul>
 						</li>
@@ -2788,7 +2788,7 @@ if __name__ == '__main__':
 		  
 		<tr>
 		<td colspan="3">
-			<h3 id="section1-9">Top attacked destination IP's of this month(MB)</h3>
+			<h3 id="section1-9">Top attacked destination IP's by volume (MB)</h3>
 			<div id="dip_bandwidth_bar_chart_div" style="height: 400px;"></div>
 		</td>
 		</tr>
@@ -2991,7 +2991,7 @@ if __name__ == '__main__':
 
 			<tr>
 			<td colspan="3">
-				<h3 id="section2-9">Top attacked Destination IP's of this month(packets)</h3>
+				<h3 id="section2-9">Top attacked Destination IP's(cumulative packets)</h3>
 				<div id="dip_packets_bar_chart_div"></div>
 			</td>
 			</tr>
@@ -3183,7 +3183,7 @@ if __name__ == '__main__':
 
 		  <tr>
 			<td colspan="3">
-				<h3 id="section3-7">Top attacked Destination IP's of this month</h3>
+				<h3 id="section3-7">Top attacked Destination IP's (attack events)</h3>
 				<div id="dip_events_bar_chart_div"></div>
 			</td>
 		  </tr>	
