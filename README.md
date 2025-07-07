@@ -405,6 +405,9 @@ V11.11 (5/5/2025)
 V11.12 (6/24/2025)
 - Added new charts - Top attacked destinations
 
+V11.12.1 (7/7/2025)
+- Fixed Table of Content wrong indexing
+
 Next steps/Functionality/ideas to add more charts
 
 	Move device distribution this month from monthly to daily

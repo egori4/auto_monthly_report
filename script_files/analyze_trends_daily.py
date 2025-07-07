@@ -2527,7 +2527,7 @@ if __name__ == '__main__':
 				<div id="toc" class="toc-container">
 					<ul class="toc-list">
 						<li>
-						<b><a href="#section1">Attack Traffic Overview (Packets- PPS/Cumulative)</a></b>
+						<b><a href="#section2">Attack Traffic Overview (Packets- PPS/Cumulative)</a></b>
 							
 							<ul class="sub-list">
 								<li><a href="#section2-2">Traffic and Attack Rate for each DefensePro (PPS)</a></li>
@@ -2551,7 +2551,7 @@ if __name__ == '__main__':
 				<div id="toc" class="toc-container">
 					<ul class="toc-list">
 						<li>
-						<b><a href="#section1">Attack Traffic Overview (Number of Attack Events)</a></b>
+						<b><a href="#section3">Attack Traffic Overview (Number of Attack Events)</a></b>
 						<ul class="sub-list">
 							<li><a href="#section3-2">Number of attack events per day</a></li>
 							<li><a href="#section3-3">Number of attack events by attack vector</a></li>
