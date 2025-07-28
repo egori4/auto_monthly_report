@@ -654,7 +654,8 @@ class Vision:
 
 
 			df_single_dp = pd.DataFrame(rows)
-			all_dps_df_list.append(df_single_dp)
+			if not df_single_dp.empty:
+				all_dps_df_list.append(df_single_dp)
 			
 		# Merge all DP DataFrames on 'timestamp'
 		df_final = all_dps_df_list[0]

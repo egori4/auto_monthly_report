@@ -408,6 +408,10 @@ V11.12 (6/24/2025)
 V11.12.1 (7/7/2025)
 - Fixed Table of Content wrong indexing
 
+V11.12.2 (7/18/2025)
+- Added condition that will prevent the script to fail on traffic stats collection if user added DefensePro that does not exist
+
+
 Next steps/Functionality/ideas to add more charts
 
 	Move device distribution this month from monthly to daily
