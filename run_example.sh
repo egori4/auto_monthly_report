@@ -1,9 +1,13 @@
 #!/bin/bash
 
 #-------------------------------------------
-# PHP code by Marcelo Dantas
-# Bash orchestration, dockerization, python - by Egor Egorov
+# Developer/Maintainer: Egor Egorov
 #-------------------------------------------
+
+######################## Logging verbosity control ###############################
+# This variable is used to control the verbosity of the script output.
+log_verbosity=info  # Options: info, debug or disabled (disabled = silent)
+##################################################################################
 
 current_date_time=$(date +"%Y-%m-%d %H:%M:%S")
 echo "Current Date and Time: $current_date_time"

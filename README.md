@@ -411,6 +411,8 @@ V11.12.1 (7/7/2025)
 V11.12.2 (7/18/2025)
 - Added condition that will prevent the script to fail on traffic stats collection if user added DefensePro that does not exist
 
+V12.0.0 
+- Refactoring attack_analyzer.py to optimize data processing + adding debug
 
 Next steps/Functionality/ideas to add more charts
 

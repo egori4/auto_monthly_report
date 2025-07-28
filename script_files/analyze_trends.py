@@ -4,10 +4,28 @@ import csv
 import sys
 import pandas as pd
 import json
+from logger import Logger
+
+from datetime import datetime
+import tracemalloc
+import time
+
+
+
+
+
+start_time = time.time()
+
+
+print(f'Start time {datetime.today()}')
+tracemalloc.start() # Start memory tracking
 
 cust_id = sys.argv[1]
 month = sys.argv[2]
 year = sys.argv[3]
+
+
+
 
 ############################# Extract variables from customers.json file #############################
 
@@ -72,6 +90,15 @@ with open (run_file) as f:
 		if line.startswith('top_n'):	
 			top_n = int(line.split('=')[1].replace('\n',''))
 			continue
+
+		if line.startswith('log_verbosity'):
+			log_verbosity = line.split('=')[1].replace('\n','').replace('"','').lower()
+			continue
+
+#################################### Set log verbosity ####################################
+
+log = Logger(log_verbosity)
+
 
 ########################################### Functions ####################################################
 def convert_csv_to_list_of_lists(filename):
@@ -763,6 +790,7 @@ if __name__ == '__main__':
 		policy_bpm_html_final+= policy_bpm_html(policy_bpm_top_list[index])
 
 
+	print('[DEBUG] - SIP Top lists:', sip_epm_top_list, sip_ppm_top_list, sip_bpm_top_list)
 	for index, value in enumerate(sip_epm_top_list):
 		sip_epm_html_final+=f'<h4>Distribution of attacks and devices for Source IP {value}</h4>'
 		sip_epm_html_final+= sip_epm_html(sip_epm_top_list[index])
@@ -2832,4 +2860,9 @@ if __name__ == '__main__':
 	# write html_page to file
 	write_html(html_page,month,year)
 
+
+
+current, peak = tracemalloc.get_traced_memory()
+print(f"[DEBUG] Memory used: {current / 10**6:.2f}MB; Peak: {peak / 10**6:.2f}MB")
+print("--- %s seconds ---" % (time.time() - start_time))
 # Path: trends_analyzer.py

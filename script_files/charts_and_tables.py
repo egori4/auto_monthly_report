@@ -12,9 +12,18 @@ import json
 import urllib.request
 import json
 import csv
+from logger import Logger
 from datetime import datetime
+import tracemalloc
+import time
+
+
+start_time = time.time()
+
 
 print(f'Start time {datetime.today()}')
+tracemalloc.start() # Start memory tracking
+
 
 start_time = time.time()
 cust_id = sys.argv[1]
@@ -45,8 +54,13 @@ with open (run_file) as f:
 				print(f'abuseipdb = {abuseipdb}')
 				continue
 
+		if line.startswith('log_verbosity'):
+			log_verbosity = line.split('=')[1].replace('\n','').replace('"','').lower()
+			continue
 
-			
+#################################### Set log verbosity ####################################
+
+log = Logger(log_verbosity)
 
 ########DefensePro IP to Name translation########
 
@@ -192,11 +206,16 @@ def gen_charts_data(db_path):
 				print(e)
 
 			cur = con.cursor()
+
+			log.debug(f"Started processing SQL query 'SELECT DISTINCT month FROM attacks' to get month number")
+
 			cur.execute("SELECT DISTINCT month FROM attacks")
 			month_num = cur.fetchall()[0][0]
 
 			# convert numeric month to month name
 			month_name = time.strftime('%B', time.strptime(str(month_num), '%m'))
+
+			log.debug(f"Finished processing SQL query 'SELECT DISTINCT month FROM attacks' to get month number: {month_num} - {month_name}")
 
 
 
@@ -356,11 +375,16 @@ def gen_charts_data(db_path):
 					writer.writerows(device_bpm_this_month)
 
 			########Get total events count this month and write to csv#########
+			log.debug(f"Started processing file epm_total_bar.csv")
+			log.debug(f"SQL query: select month as Month,count(1) as \'Total Events\' from attacks", indent=1)
+
 			cur.execute("select month as Month,count(1) as \'Total Events\' from attacks")
 			total_events_this_month = cur.fetchall()[0][1]
 
 			with open(tmp_path + 'epm_total_bar.csv', 'a') as f:
 				f.write(f'\n{month_name},{total_events_this_month}')
+
+			log.debug(f"Finished processing month {month_name} - file epm_total_bar.csv")
 			###################################################################
 
 			########Get total Attack Packets this month and write to csv#########
@@ -682,6 +706,9 @@ def gen_charts_data(db_path):
 
 
 gen_charts_data(db_path)
+
+current, peak = tracemalloc.get_traced_memory()
+print(f"[DEBUG] Memory used: {current / 10**6:.2f}MB; Peak: {peak / 10**6:.2f}MB")
 
 print(f'End time {datetime.today()}')
 print("--- %s seconds ---" % (time.time() - start_time))
