@@ -10,6 +10,10 @@ import csv
 import sqlite3
 import urllib3
 import pandas as pd
+from logger import Logger
+import tracemalloc
+
+start_time = time.time()
 
 daily = False
 monthly = False
@@ -34,6 +38,21 @@ cur_year = int(sys.argv[5])
 raw_data_path = f"./raw_data_files/{cust_id}/"
 tmp_files_path = f"./tmp_files/{cust_id}/"
 db_files_path = f"./database_files/{cust_id}/"
+run_file = 'run.sh'
+
+############## Read run.sh file to extract variables ######################
+with open (run_file) as f:
+	for line in f:
+		if line.startswith('log_verbosity'):
+			log_verbosity = line.split('=')[1].replace('\n','').replace('"','').lower()
+			continue
+
+#################################### Set log verbosity ####################################
+
+log = Logger(log_verbosity)
+
+log.debug(f"Log verbosity is set to: {log.verbosity}")
+log.debug(f"Script start time is {datetime.today()}")
 
 ################################# !!! Temp config for testing  ##################
 
@@ -142,7 +161,7 @@ class Vision:
 		# To manipulate the desired date, replace day = 1 with the desired day or month with desired month , e.g self.today_date = datetime.today().replace(month=2) )
 		self.today_date = datetime.today().replace(month=cur_month,day=cur_day,year=cur_year)#,tzinfo=timezone.utc)
 
-		print(f'Today date is {self.today_date}')
+		log.info(f'Today date is set to {self.today_date}')
 
 		self.today_day_number = self.today_date.day
 
@@ -681,25 +700,25 @@ class Vision:
 			# Save to SQLite
 			if self.today_day_number == 1 and self.today_month_number != 1: # This is a case for 1st of the month but not Jan 1st
 				db_file = db_files_path + f'database_{cust_id}_{self.today_month_number -1:02}_{self.today_year}.sqlite'
-				print(db_file)
+				# print(db_file)
 
 			elif self.today_day_number == 1 and self.today_month_number == 1: # This is a case for  Jan 1st
 				db_file = db_files_path + f'database_{cust_id}_{12}_{self.today_year -1:02}.sqlite'
-				print(db_file)
+				# print(db_file)
 
 			else:
 				db_file = db_files_path + f'database_{cust_id}_{self.today_month_number:02}_{self.today_year}.sqlite'
-				print(db_file)
+				# print(db_file)
 
 		elif monthly:
 
 			if self.today_month_number != 1: # This is a case for not Jan month
 				db_file = db_files_path + f'database_{cust_id}_{self.today_month_number -1:02}_{self.today_year}.sqlite'
-				print(db_file)
+				# print(db_file)
 
 			else: # This is a case for  Jan month
 				db_file = db_files_path + f'database_{cust_id}_{12}_{self.today_year -1}.sqlite'
-				print(db_file)
+				# print(db_file)
 
 
 		conn = sqlite3.connect(db_file)
@@ -1242,11 +1261,232 @@ class Vision:
 			json.dump(final_response, json_file, indent=4)  # Save JSON with indentation
 		print("\n\nResponse body saved as pretty JSON in forensics_raw.json")
 		return final_response
-	
-	def compile_to_sqldb(self):
-		
 
+
+	def write_forensics_to_db_optimized(self):
+		"""Writes forensics data to SQLite with deduplication using attackIpsId as primary key."""
+
+		log.info("Writing forensics raw json data to SQLite database")
+
+		if log.debug:
+			function_start_time = time.time()
+
+		######################## Ddefine the database filename ########################
+
+		is_jan_1 = self.today_day_number == 1 and self.today_month_number == 1
+		is_day_1 = self.today_day_number == 1
+		is_jan = self.today_month_number == 1
+
+		if (daily and is_day_1):
+			if is_jan_1:
+				db_file = f'{db_files_path}database_{cust_id}_12_{self.today_year - 1}.sqlite'
+			else:
+				db_file = f'{db_files_path}database_{cust_id}_{self.today_month_number - 1:02}_{self.today_year}.sqlite'
+		elif daily:
+			db_file = f'{db_files_path}database_{cust_id}_{self.today_month_number:02}_{self.today_year}.sqlite'
+		elif monthly:
+			if is_jan:
+				db_file = f'{db_files_path}database_{cust_id}_12_{self.today_year - 1}.sqlite'
+			else:
+				db_file = f'{db_files_path}database_{cust_id}_{self.today_month_number - 1:02}_{self.today_year}.sqlite'
 		
+		else:
+			raise ValueError("Either daily or monthly must be True")
+		
+		log.debug(f"Database file: {db_file}")
+
+		conn = sqlite3.connect(db_file)
+		cursor = conn.cursor()
+
+		# Ensure the attacks table exists with the right schema
+		cursor.executescript('''
+			CREATE TABLE IF NOT EXISTS attacks (
+				attackIpsId TEXT PRIMARY KEY,
+				deviceName TEXT NOT NULL,
+				startDate DATE NOT NULL,
+				endDate DATE NOT NULL,
+				name TEXT NOT NULL,
+				actionType TEXT NOT NULL,
+				ruleName TEXT NOT NULL,
+				sourceAddress TEXT NOT NULL,
+				destAddress TEXT NOT NULL,
+				sourcePort TEXT NOT NULL,
+				destPort TEXT NOT NULL,
+				protocol TEXT NOT NULL,
+				threatGroup TEXT NOT NULL,
+				category TEXT NOT NULL,
+				duration INTEGER NOT NULL,
+				risk TEXT NOT NULL,
+				startTime INTEGER NOT NULL,
+				endTime INTEGER NOT NULL,
+				month INTEGER NOT NULL,
+				year INTEGER NOT NULL,
+				startDayOfMonth INTEGER NOT NULL,
+				endDayOfMonth INTEGER NOT NULL,
+				vlanTag TEXT NOT NULL,
+				packetCount INTEGER NOT NULL,
+				packetBandwidth INTEGER NOT NULL,
+				averageAttackPacketRatePps INTEGER NOT NULL,
+				averageAttackRateBps INTEGER NOT NULL,
+				maxAttackRateBps INTEGER NOT NULL,
+				maxAttackPacketRatePps INTEGER NOT NULL,
+				lastPeriodBandwidth INTEGER NOT NULL,
+				poId TEXT NOT NULL,
+				radwareId TEXT NOT NULL,
+				direction TEXT NOT NULL,
+				geoLocation TEXT NOT NULL,
+				activationId TEXT NOT NULL,
+				packetType TEXT NOT NULL,
+				physicalPort TEXT NOT NULL,
+				lastPeriodPacketRate INTEGER NOT NULL,
+				originalStartDate DATE NOT NULL
+			);
+					   
+			CREATE INDEX IF NOT EXISTS idx_month ON attacks (month);
+			CREATE INDEX IF NOT EXISTS idx_startDayOfMonth ON attacks (startDayOfMonth);
+			CREATE INDEX IF NOT EXISTS idx_deviceName ON attacks (deviceName);
+			CREATE INDEX IF NOT EXISTS idx_sourceAddress ON attacks (sourceAddress);
+			CREATE INDEX IF NOT EXISTS idx_ruleName ON attacks (ruleName);
+			CREATE INDEX IF NOT EXISTS idx_name ON attacks (name);
+			CREATE INDEX IF NOT EXISTS idx_start_end_time ON attacks (startTime, endTime);
+			CREATE INDEX IF NOT EXISTS idx_month_year ON attacks (month, year);
+
+		''')
+
+		# Set PRAGMAs for performance optimization
+		cursor.executescript('''
+			PRAGMA journal_mode=OFF;
+			PRAGMA synchronous=OFF;
+			PRAGMA temp_store=MEMORY;
+			PRAGMA locking_mode=EXCLUSIVE;
+		''')
+
+		conn.execute("BEGIN")
+
+		rows_batch = []
+		batch_size = 50000
+
+		insert_sql = '''
+		INSERT INTO attacks (
+			attackIpsId, deviceName, startDate, endDate, name, actionType, ruleName,
+			sourceAddress, destAddress, sourcePort, destPort, protocol, threatGroup, category,
+			duration, risk, startTime, endTime, month, year, startDayOfMonth, endDayOfMonth,
+			vlanTag, packetCount, packetBandwidth, averageAttackPacketRatePps,
+			averageAttackRateBps, maxAttackRateBps, maxAttackPacketRatePps,
+			lastPeriodBandwidth, poId, radwareId, direction, geoLocation, activationId,
+			packetType, physicalPort, lastPeriodPacketRate, originalStartDate
+		)
+		VALUES (
+			?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+		)
+		ON CONFLICT(attackIpsId) DO NOTHING
+		'''
+
+		for entry in forensics_raw.get("data", []):
+			row = entry.get("row", {})
+			if "duration" not in row:
+				continue
+
+			try:
+				start_ts = int(row["startTime"]) / 1000
+				end_ts = int(row["endTime"]) / 1000
+				start_date = datetime.fromtimestamp(start_ts)
+				end_date = datetime.fromtimestamp(end_ts)
+				orig_start_date = start_date
+
+				geo = json.loads(row.get("enrichmentContainer", "{}")).get("geoLocation", {})
+				geo_code = geo.get("countryCode")
+
+
+				##################################### Adjust start_date for monthly and daily reports - this is for ongoing attacks started in previous month ####################################
+				if daily and self.today_day_number == 2:
+					day_before_yesterday = self.today_date - timedelta(days=2) # This is a case when the attack started in the day before yesterday day and continued to yesterday
+					if start_date.day == day_before_yesterday.day:
+						start_date = start_date.replace(day=1, hour=0, minute=0, second=0, month=self.today_month_number if self.today_month_number != 1 else 1, year=self.today_year)
+
+
+				elif monthly:
+					if self.today_month_number > 2:
+						two_months_ago = self.today_month_number - 2
+					else:
+						two_months_ago = self.today_month_number + 10
+
+					if start_date.month == two_months_ago:
+						if self.today_month_number != 1:
+							start_date = start_date.replace(day=1, month=self.today_month_number - 1, hour=0, minute=0, second=0)
+						else:
+							start_date = start_date.replace(day=1, month=12, hour=0, minute=0, second=0)
+				############################################################################################################################################################################
+
+				rows_batch.append((
+					row.get("attackIpsId"),
+					row.get("deviceIp"),
+					start_date.strftime('%Y-%m-%d %H:%M:%S'),
+					end_date.strftime('%Y-%m-%d %H:%M:%S'),
+					row.get("name"),
+					row.get("actionType"),
+					row.get("ruleName"),
+					row.get("sourceAddress"),
+					row.get("destAddress"),
+					row.get("sourcePort"),
+					row.get("destPort"),
+					row.get("protocol"),
+					row.get("threatGroup"),
+					row.get("category"),
+					row.get("duration"),
+					row.get("risk"),
+					row.get("startTime"),
+					row.get("endTime"),
+					end_date.month,
+					end_date.year,
+					start_date.day,
+					end_date.day,
+					row.get("vlanTag"),
+					row.get("packetCount"),
+					row.get("packetBandwidth"),
+					row.get("averageAttackPacketRatePps"),
+					row.get("averageAttackRateBps"),
+					row.get("maxAttackRateBps"),
+					row.get("maxAttackPacketRatePps"),
+					row.get("lastPeriodBandwidth"),
+					row.get("poId"),
+					row.get("radwareId"),
+					row.get("direction"),
+					geo_code,
+					row.get("activationId"),
+					row.get("packetType"),
+					row.get("physicalPort"),
+					row.get("lastPeriodPacketRate"),
+					orig_start_date.strftime('%Y-%m-%d %H:%M:%S')
+				))
+
+				if len(rows_batch) >= batch_size:
+					cursor.executemany(insert_sql, rows_batch)
+					rows_batch.clear()
+					log.debug("Inserted %d rows into the database" % len(rows_batch))
+
+			except Exception:
+				continue
+
+		if rows_batch:
+			cursor.executemany(insert_sql, rows_batch)
+
+		conn.commit()
+		conn.close()
+
+		if log.debug:
+			log.debug("Insert runtime, processing time: %d minutes and %d seconds" % ((time.time() - function_start_time) // 60, (time.time() - function_start_time) % 60))
+			log.debug("Insert runtime in seconds: %.2f seconds" % (time.time() - function_start_time))
+
+
+
+	def write_forensics_to_db_old(self):
+		
+		log.info("Start old function to write data to db")
+		if log.debug:
+			function_start_time = time.time()	
+
+
 		if daily:
 
 			if self.today_day_number == 1 and self.today_month_number != 1: # This is a case for not Jan 1st
@@ -1308,7 +1548,7 @@ class Vision:
 					packetType TEXT NOT NULL,
 					physicalPort TEXT NOT NULL,
 					lastPeriodPacketRate INTEGER NOT NULL,
-				  	originalStartDate DATE NOT NULL)
+					originalStartDate DATE NOT NULL)
 				''')
 			
 			if self.today_day_number == 1 and self.today_month_number == 1: # This is a case for  Jan 1st
@@ -1400,12 +1640,12 @@ class Vision:
 		if monthly:
 			if self.today_month_number != 1: # This is a case for not Jan month
 				db_file = db_files_path + f'database_{cust_id}_{self.today_month_number -1:02}_{self.today_year}.sqlite'
-				print(db_file)
+				# print(db_file)
 
 
 			else: # This is a case for  Jan month
 				db_file = db_files_path + f'database_{cust_id}_{12}_{self.today_year -1}.sqlite'
-				print(db_file)
+				# print(db_file)
 
 					
 			# Connect to SQLite database (it will be created if it doesn't exist)
@@ -1452,9 +1692,14 @@ class Vision:
 					packetType TEXT NOT NULL,
 					physicalPort TEXT NOT NULL,
 					lastPeriodPacketRate INTEGER NOT NULL,
-				  	originalStartDate DATE NOT NULL)
+					originalStartDate DATE NOT NULL)
 				''')
 			
+
+			if log.debug:
+				del_start_time = time.time()
+
+			log.debug(f"Deleting old data for the previous month")
 			if self.today_month_number != 1: # This is a case for not January month
 				# Clear the table content for the previous month
 				cursor.execute(f'DELETE FROM attacks where month = {self.today_month_number -1}')
@@ -1464,7 +1709,13 @@ class Vision:
 				# Clear the table content for the previous month (December)
 				cursor.execute('DELETE FROM attacks where month = 12')
 
+			log.debug("Old data for the previous month deleted successfully, processing time : %.2f seconds" % (time.time() - del_start_time))
+
 			# Insert data into the table
+			if log.debug:
+				insert_start_time = time.time()
+			log.debug(f"Start Inserting new data into the table")
+
 			for entry in forensics_raw['data']:
 				
 				# Check if duration exists before trying to insert
@@ -1485,7 +1736,7 @@ class Vision:
 					two_months_ago_month = self.today_month_number + 10  # Wrap around (12 months in a year)
 				
 				if start_date.month == two_months_ago_month: # This is a case when the attack started in the last day of the month before last month and continued to the first day of the last month
-					print(f'Attack started in the last day of the month before last month and continued to the first day of the last month ({start_date})')
+					#print(f'Attack started in the last day of the month before last month and continued to the first day of the last month ({start_date})')
 					
 					if self.today_month_number !=1 : # This is a case for 2nd of the month, but not January month
 						start_date = start_date.replace(day= 1, month=self.today_month_number-1, hour=0, minute=0, second=0)
@@ -1541,27 +1792,35 @@ class Vision:
 					orig_start_date.strftime('%Y-%m-%d %H:%M:%S')
 					))
 
-
 			# Commit changes and close the connection
 			conn.commit()
 			conn.close()
+			log.debug("Insert runtime, processing time: %d minutes and %d seconds" % ((time.time() - insert_start_time) // 60, (time.time() - function_start_time) % 60))
+			log.debug("Insert runtime: %.2f seconds" % (time.time() - function_start_time))
 
-
-
+			if log.debug:
+				log.debug("Function runtime, processing time: %d minutes and %d seconds" % ((time.time() - function_start_time) // 60, (time.time() - function_start_time) % 60))
 
 v = Vision(vision_ip, username, password)
 
 
-# Get Forensics data
+# # Get Forensics data
 if not offline:
 	forensics_raw = v.get_forensics(v.start_time_lower,v.end_time_upper,v.days_in_prev_month)
-	v.compile_to_sqldb()
+	
 
 
-######################################################################
-# !!!!!!!!!!! For testing - remove. Open json file and read it and set variable traffic_bps_per_device instead of getting it
+# ######################################################################
+# # !!!!!!!!!!! For testing - remove. Open json file and read it and set variable traffic_bps_per_device instead of getting it
 
 if offline:
+	if log.debug:
+		raw_data_read_start_time = time.time()
+	log.debug("Reading forensics raw data from JSON file")
+	with open(raw_data_path + "forensics_raw.json", "r") as json_file:
+		forensics_raw = json.load(json_file)
+	log.debug("Forensics raw data loaded from JSON file, processing time: %.2f seconds" % (time.time() - raw_data_read_start_time))
+
 	with open(raw_data_path + "traffic_per_device_bps_raw_granular.json", "r") as json_file:
 		traffic_bps_per_device_granular = json.load(json_file)
 
@@ -1590,110 +1849,113 @@ if offline:
 		cec_per_device_aggregate = json.load(json_file)
 #####################################################################
 
+v.write_forensics_to_db_optimized()
+# v.write_forensics_to_db_old()
+
+# ###################### Traffic BPS Chart ###########################
+# # 1. Collect the traffic data granularly (every 15 sec)
+# if not offline:
+# 	traffic_bps_per_device_granular = v.ams_stats_dashboards_per_device_window_calls(v.start_time_lower, v.end_time_upper, traffic_window_granular, units = "bps", report_type="Traffic Volume BPS Granular")
+
+# # 2. Identify the attack timestamps
+# bps_attack_only_timestamps_list = v.extract_attack_data_only(traffic_bps_per_device_granular, bps_attack_threshold, pre_attack_extra_timestamps, post_attack_extra_timestamps)
+
+# # 3. Collect the averaged traffic data (average depending on the traffic_window)
+# if not offline:
+# 	traffic_bps_per_device_aggregate = v.ams_stats_dashboards_per_device_window_calls(v.start_time_lower, v.end_time_upper, traffic_window_averaged, units = "bps", report_type="Traffic Volume BPS Aggregate")
+
+# # 4. Merge attack only timestamps into aggregate data. This way attack timeframe will be granular and rest will be aggregated and averaged
+# traffic_bps_per_device_merged = v.merge_attacks_to_aggregate(traffic_bps_per_device_aggregate, traffic_bps_per_device_granular,bps_attack_only_timestamps_list)
+
+# # 5. Write Traffic BPS Stats to sqlite db
+# v.write_traffic_stats_to_db(traffic_bps_per_device_merged, report_type="Traffic Volume BPS")
+
+
+# ###################### Traffic PPS Chart ###########################
+# # 1. Collect the traffic data granularly (every 15 sec)
+# if not offline:
+# 	traffic_pps_per_device_granular = v.ams_stats_dashboards_per_device_window_calls(v.start_time_lower, v.end_time_upper, traffic_window_granular, units = "pps", report_type="Traffic Volume PPS Granular")
+
+# # 2. Identify the attack timestamps
+# pps_attack_only_timestamps_list = v.extract_attack_data_only(traffic_pps_per_device_granular, pps_attack_threshold, pre_attack_extra_timestamps, post_attack_extra_timestamps)
+
+# # 3. Collect the averaged traffic data (average depending on the traffic_window)
+# if not offline:
+# 	traffic_pps_per_device_aggregate = v.ams_stats_dashboards_per_device_window_calls(v.start_time_lower, v.end_time_upper, traffic_window_averaged, units = "pps", report_type="Traffic Volume PPS Aggregate")
+
+# # 4. Merge attack only timestamps into aggregate data. This way attack timeframe will be granular and rest will be aggregated and averaged
+# traffic_pps_per_device_merged = v.merge_attacks_to_aggregate(traffic_pps_per_device_aggregate, traffic_pps_per_device_granular,pps_attack_only_timestamps_list)
+
+# # 5. Write Traffic PPS Stats to sqlite db
+# v.write_traffic_stats_to_db(traffic_pps_per_device_merged, report_type="Traffic Volume PPS")
+
+
+# # Merge PPS attacks and BPS attack stamps
+
+# merged_attack_only_timestamps_list = sorted(set(bps_attack_only_timestamps_list) | set(pps_attack_only_timestamps_list))
+
+# # print('Printing all attack timestamps BPS+PPS')
+# # print(merged_attack_only_timestamps_list)
 
 
 
-###################### Traffic BPS Chart ###########################
-# 1. Collect the traffic data granularly (every 15 sec)
-if not offline:
-	traffic_bps_per_device_granular = v.ams_stats_dashboards_per_device_window_calls(v.start_time_lower, v.end_time_upper, traffic_window_granular, units = "bps", report_type="Traffic Volume BPS Granular")
+# # ##################### Attacks BPS Chart ############################
+# # # 1. Write Attacks BPS Volume to csv (reusing the same data from Traffic BPS)
+# # v.write_per_device_combined_traffic_stats_to_csv(traffic_bps_per_device_merged, tmp_files_path + 'attacks_per_device_bps.csv')
 
-# 2. Identify the attack timestamps
-bps_attack_only_timestamps_list = v.extract_attack_data_only(traffic_bps_per_device_granular, bps_attack_threshold, pre_attack_extra_timestamps, post_attack_extra_timestamps)
-
-# 3. Collect the averaged traffic data (average depending on the traffic_window)
-if not offline:
-	traffic_bps_per_device_aggregate = v.ams_stats_dashboards_per_device_window_calls(v.start_time_lower, v.end_time_upper, traffic_window_averaged, units = "bps", report_type="Traffic Volume BPS Aggregate")
-
-# 4. Merge attack only timestamps into aggregate data. This way attack timeframe will be granular and rest will be aggregated and averaged
-traffic_bps_per_device_merged = v.merge_attacks_to_aggregate(traffic_bps_per_device_aggregate, traffic_bps_per_device_granular,bps_attack_only_timestamps_list)
-
-# 5. Write Traffic BPS Stats to sqlite db
-v.write_traffic_stats_to_db(traffic_bps_per_device_merged, report_type="Traffic Volume BPS")
-
-
-###################### Traffic PPS Chart ###########################
-# 1. Collect the traffic data granularly (every 15 sec)
-if not offline:
-	traffic_pps_per_device_granular = v.ams_stats_dashboards_per_device_window_calls(v.start_time_lower, v.end_time_upper, traffic_window_granular, units = "pps", report_type="Traffic Volume PPS Granular")
-
-# 2. Identify the attack timestamps
-pps_attack_only_timestamps_list = v.extract_attack_data_only(traffic_pps_per_device_granular, pps_attack_threshold, pre_attack_extra_timestamps, post_attack_extra_timestamps)
-
-# 3. Collect the averaged traffic data (average depending on the traffic_window)
-if not offline:
-	traffic_pps_per_device_aggregate = v.ams_stats_dashboards_per_device_window_calls(v.start_time_lower, v.end_time_upper, traffic_window_averaged, units = "pps", report_type="Traffic Volume PPS Aggregate")
-
-# 4. Merge attack only timestamps into aggregate data. This way attack timeframe will be granular and rest will be aggregated and averaged
-traffic_pps_per_device_merged = v.merge_attacks_to_aggregate(traffic_pps_per_device_aggregate, traffic_pps_per_device_granular,pps_attack_only_timestamps_list)
-
-# 5. Write Traffic PPS Stats to sqlite db
-v.write_traffic_stats_to_db(traffic_pps_per_device_merged, report_type="Traffic Volume PPS")
-
-
-# Merge PPS attacks and BPS attack stamps
-
-merged_attack_only_timestamps_list = sorted(set(bps_attack_only_timestamps_list) | set(pps_attack_only_timestamps_list))
-
-# print('Printing all attack timestamps BPS+PPS')
-# print(merged_attack_only_timestamps_list)
+# # ##################### Attacks PPS Chart ############################
+# # # 1. Write Attacks PPS Volume to csv (reusing the same data from Traffic PPS)
+# # v.write_per_device_combined_traffic_stats_to_csv(traffic_pps_per_device_merged, tmp_files_path + 'attacks_per_device_pps.csv')
 
 
 
-# ##################### Attacks BPS Chart ############################
-# # 1. Write Attacks BPS Volume to csv (reusing the same data from Traffic BPS)
-# v.write_per_device_combined_traffic_stats_to_csv(traffic_bps_per_device_merged, tmp_files_path + 'attacks_per_device_bps.csv')
+# ###################### Excluded BPS ###########################
 
-# ##################### Attacks PPS Chart ############################
-# # 1. Write Attacks PPS Volume to csv (reusing the same data from Traffic PPS)
-# v.write_per_device_combined_traffic_stats_to_csv(traffic_pps_per_device_merged, tmp_files_path + 'attacks_per_device_pps.csv')
+# # Write Excluded BPS Volume to database
+# v.write_traffic_stats_to_db(traffic_bps_per_device_aggregate, report_type="Traffic Volume BPS Excluded")
 
+# ###################### Excluded PPS ###########################
 
-
-###################### Excluded BPS ###########################
-
-# Write Excluded BPS Volume to database
-v.write_traffic_stats_to_db(traffic_bps_per_device_aggregate, report_type="Traffic Volume BPS Excluded")
-
-###################### Excluded PPS ###########################
-
-# Write Excluded PPS Volume to csv from already collected data
-v.write_traffic_stats_to_db(traffic_pps_per_device_aggregate, report_type="Traffic Volume PPS Excluded")
+# # Write Excluded PPS Volume to csv from already collected data
+# v.write_traffic_stats_to_db(traffic_pps_per_device_aggregate, report_type="Traffic Volume PPS Excluded")
 
 
 
-##################### CPS Chart ####################################
+# ##################### CPS Chart ####################################
 
-# 1. Collect the CPS data granularly (every 15 sec)
-if not offline:
-	cps_per_device_granular = v.ams_stats_dashboards_per_device_window_calls(v.start_time_lower, v.end_time_upper, traffic_window_granular, units=None, uri = "/mgmt/vrm/monitoring/traffic/cps", report_type="CPS Granular")
+# # 1. Collect the CPS data granularly (every 15 sec)
+# if not offline:
+# 	cps_per_device_granular = v.ams_stats_dashboards_per_device_window_calls(v.start_time_lower, v.end_time_upper, traffic_window_granular, units=None, uri = "/mgmt/vrm/monitoring/traffic/cps", report_type="CPS Granular")
 
-# 2. Collect the averaged traffic data (average depending on the traffic_window)
-if not offline:
-	cps_per_device_aggregate = v.ams_stats_dashboards_per_device_window_calls(v.start_time_lower, v.end_time_upper, traffic_window_averaged, units=None, uri = "/mgmt/vrm/monitoring/traffic/cps", report_type="CPS Aggregate")
+# # 2. Collect the averaged traffic data (average depending on the traffic_window)
+# if not offline:
+# 	cps_per_device_aggregate = v.ams_stats_dashboards_per_device_window_calls(v.start_time_lower, v.end_time_upper, traffic_window_averaged, units=None, uri = "/mgmt/vrm/monitoring/traffic/cps", report_type="CPS Aggregate")
 
-# 3. Merge attack only timestamps into aggregate data. This way attack timeframe will be granular and rest will be aggregated and averaged
+# # 3. Merge attack only timestamps into aggregate data. This way attack timeframe will be granular and rest will be aggregated and averaged
 
-cps_per_device_merged = v.merge_attacks_to_aggregate(cps_per_device_aggregate, cps_per_device_granular,merged_attack_only_timestamps_list)
+# cps_per_device_merged = v.merge_attacks_to_aggregate(cps_per_device_aggregate, cps_per_device_granular,merged_attack_only_timestamps_list)
 
-# 4. Write CPS to database
-v.write_traffic_stats_to_db(cps_per_device_merged, report_type="Traffic CPS")
+# # 4. Write CPS to database
+# v.write_traffic_stats_to_db(cps_per_device_merged, report_type="Traffic CPS")
 
 
-##################### Concurrent Connections Chart ####################################
+# ##################### Concurrent Connections Chart ####################################
 
-# 1. Collect the Concurent Connections data granularly (every 15 sec)
-if not offline:
-	cec_per_device_granular = v.ams_stats_dashboards_per_device_window_calls(v.start_time_lower, v.end_time_upper, traffic_window_granular, units=None, uri = "/mgmt/vrm/monitoring/traffic/concurrent-connections", report_type="Concurrent Connections Granular")
+# # 1. Collect the Concurent Connections data granularly (every 15 sec)
+# if not offline:
+# 	cec_per_device_granular = v.ams_stats_dashboards_per_device_window_calls(v.start_time_lower, v.end_time_upper, traffic_window_granular, units=None, uri = "/mgmt/vrm/monitoring/traffic/concurrent-connections", report_type="Concurrent Connections Granular")
 
-# 2. Collect the averaged traffic data (average depending on the traffic_window)
-if not offline:
-	cec_per_device_aggregate = v.ams_stats_dashboards_per_device_window_calls(v.start_time_lower, v.end_time_upper, traffic_window_averaged, units=None, uri = "/mgmt/vrm/monitoring/traffic/concurrent-connections", report_type="Concurrent Connections Aggregate")
+# # 2. Collect the averaged traffic data (average depending on the traffic_window)
+# if not offline:
+# 	cec_per_device_aggregate = v.ams_stats_dashboards_per_device_window_calls(v.start_time_lower, v.end_time_upper, traffic_window_averaged, units=None, uri = "/mgmt/vrm/monitoring/traffic/concurrent-connections", report_type="Concurrent Connections Aggregate")
 
-# 3. Merge attack only timestamps into aggregate data. This way attack timeframe will be granular and rest will be aggregated and averaged
-cec_per_device_merged = v.merge_attacks_to_aggregate(cec_per_device_aggregate, cec_per_device_granular,merged_attack_only_timestamps_list)
+# # 3. Merge attack only timestamps into aggregate data. This way attack timeframe will be granular and rest will be aggregated and averaged
+# cec_per_device_merged = v.merge_attacks_to_aggregate(cec_per_device_aggregate, cec_per_device_granular,merged_attack_only_timestamps_list)
 
-# 4. Write Concurrent Connections to database
-v.write_traffic_stats_to_db(cec_per_device_merged, report_type="Traffic CEC")
+# # 4. Write Concurrent Connections to database
+# v.write_traffic_stats_to_db(cec_per_device_merged, report_type="Traffic CEC")
 
-print(f'Finished data collection at {print(datetime.today())}')
+# print(f'Finished data collection at {print(datetime.today())}')
+
+log.debug(f'Script end time {datetime.today()}')
+log.debug("Total processing time is %s seconds" % (time.time() - start_time))

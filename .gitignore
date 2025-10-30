@@ -36,3 +36,4 @@ run_php.sh
 run_daily_php.sh
 .vscode/
 log/
+venv/

@@ -412,10 +412,38 @@ V11.12.2 (7/18/2025)
 - Added condition that will prevent the script to fail on traffic stats collection if user added DefensePro that does not exist
 
 V12.0.0 
-- Refactoring attack_analyzer.py to optimize data processing + adding debug
+- Added debug logging and logging to file (/log dir)
+	run.sh new variable "log_verbosity"
+
+		######################## Logging verbosity control ###############################
+		# This variable is used to control the verbosity of the script output.
+		log_verbosity=debug
+		# Options: info, debug or disabled (disabled = silent)
+		##################################################################################
+
+
+- Refactoring attack_analyzer.py to optimize data processing
+		Added PRAGMA optimizations, indexes, batch insert instead of row insert
+		Consolidated monthly/daily data collection more logically
+		Optimized duplication prevention (Removed deletion before insert, instead just insert ON CONFLICT(attackIpsId) DO NOTHING)
+		
+		Overal optimizations reduced time to insert entries x13 times faster (tested 250K entries from 2 min 29 sec to 6.68 sec)
+
+
+
+- bugfix(by Cris) - added handling the date extracts the value as octal if digits between 0-7. This fix changes to be base 10
+
+cur_day=$(date +'%d')
+cur_month=$((10#$cur_month))
+
+
+
+
 
 Next steps/Functionality/ideas to add more charts
 
+	Create modular charts to be controlled by user aligned with table of contents
+	
 	Move device distribution this month from monthly to daily
 	Add version number at the end in html in analyze trends
 	traffic utilization stats- at the beginning of  anew month, do not overwrite, save it aside for backup

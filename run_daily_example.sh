@@ -1,9 +1,14 @@
 #!/bin/bash
 
 #-------------------------------------------
-# PHP code by Marcelo Dantas
-# Bash orchestration, dockerization, python - by Egor Egorov
+# Developer/Maintainer- Egor Egorov
 #-------------------------------------------
+
+######################## Logging verbosity control ###############################
+# This variable is used to control the verbosity of the script output.
+log_verbosity=debug
+# Options: info, debug or disabled (disabled = silent)
+##################################################################################
 
 current_date_time=$(date +"%Y-%m-%d %H:%M:%S")
 echo "Current Date and Time: $current_date_time"
@@ -17,9 +22,11 @@ cust_list=(Customer-Name)	#space separated list of customer IDs, do not use unde
 
 cur_day=$(date +'%d')
 #cur_day=1
+cur_day=$((10#$cur_day))
 
 cur_month=$(date +'%m') # This sets the month to the current month by default, so the data will be collected and report will be generatd for the previous $report_range. If the data needs to be collected for the different month, set the numberic value. For example if set to 4 (April), the script will collect and generate report for March.
 #cur_month=1
+cur_month=$((10#$cur_month))
 
 cur_year=$(date +%Y)
 #cur_year=2024

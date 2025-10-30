@@ -22,6 +22,8 @@ cur_day=$(date +'%d')
 
 cur_month=$(date +'%m') # This sets the month to the current month by default, so the data will be collected and report will be generatd for the previous $report_range. If the data needs to be collected for the different month, set the numberic value. For example if set to 4 (April), the script will collect and generate report for March.
 # cur_month=3
+cur_month=$((10#$cur_month))
+
 cur_year=$(date +%Y)
 # cur_year=2024
 prev_year=$(expr $cur_year - 1)
