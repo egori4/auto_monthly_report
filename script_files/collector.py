@@ -560,12 +560,15 @@ class Vision:
 
 		# Build list of per-IP DataFrames
 		all_dps_df_list = [] # This will hold DataFrames for each DP
-		dp_names_list = [] # List of DP names for the report
+		dp_names_list = [] # List of DP names for the report (only devices with data)
 
 		for dp_ip, dp_ip_traffic_stats in traffic_raw_response.items():
 			
 			dp_name = dp_ip_to_name_dict.get(dp_ip, dp_ip)
-			dp_names_list.append(dp_name)
+
+			if not dp_ip_traffic_stats.get('data'):
+				print(f"[WARNING] No data for device {dp_ip} ({dp_name}) — skipping for report_type='{report_type}'.")
+				continue
 
 
 			rows = []
@@ -656,7 +659,14 @@ class Vision:
 			df_single_dp = pd.DataFrame(rows)
 			if not df_single_dp.empty:
 				all_dps_df_list.append(df_single_dp)
-			
+				dp_names_list.append(dp_name)
+			else:
+				print(f"[WARNING] Device {dp_ip} ({dp_name}) produced no rows for report_type='{report_type}' — skipping.")
+
+		if not all_dps_df_list:
+			print(f"[WARNING] No data available for any device for report_type='{report_type}' — skipping DB write.")
+			return
+
 		# Merge all DP DataFrames on 'timestamp'
 		df_final = all_dps_df_list[0]
 		for df in all_dps_df_list[1:]:
@@ -1609,7 +1619,10 @@ if not offline:
 traffic_bps_per_device_merged = v.merge_attacks_to_aggregate(traffic_bps_per_device_aggregate, traffic_bps_per_device_granular,bps_attack_only_timestamps_list)
 
 # 5. Write Traffic BPS Stats to sqlite db
-v.write_traffic_stats_to_db(traffic_bps_per_device_merged, report_type="Traffic Volume BPS")
+try:
+	v.write_traffic_stats_to_db(traffic_bps_per_device_merged, report_type="Traffic Volume BPS")
+except Exception as e:
+	print(f"[ERROR] write_traffic_stats_to_db failed for 'Traffic Volume BPS': {e} — continuing.")
 
 
 ###################### Traffic PPS Chart ###########################
@@ -1628,7 +1641,10 @@ if not offline:
 traffic_pps_per_device_merged = v.merge_attacks_to_aggregate(traffic_pps_per_device_aggregate, traffic_pps_per_device_granular,pps_attack_only_timestamps_list)
 
 # 5. Write Traffic PPS Stats to sqlite db
-v.write_traffic_stats_to_db(traffic_pps_per_device_merged, report_type="Traffic Volume PPS")
+try:
+	v.write_traffic_stats_to_db(traffic_pps_per_device_merged, report_type="Traffic Volume PPS")
+except Exception as e:
+	print(f"[ERROR] write_traffic_stats_to_db failed for 'Traffic Volume PPS': {e} — continuing.")
 
 
 # Merge PPS attacks and BPS attack stamps
@@ -1653,12 +1669,18 @@ merged_attack_only_timestamps_list = sorted(set(bps_attack_only_timestamps_list)
 ###################### Excluded BPS ###########################
 
 # Write Excluded BPS Volume to database
-v.write_traffic_stats_to_db(traffic_bps_per_device_aggregate, report_type="Traffic Volume BPS Excluded")
+try:
+	v.write_traffic_stats_to_db(traffic_bps_per_device_aggregate, report_type="Traffic Volume BPS Excluded")
+except Exception as e:
+	print(f"[ERROR] write_traffic_stats_to_db failed for 'Traffic Volume BPS Excluded': {e} — continuing.")
 
 ###################### Excluded PPS ###########################
 
 # Write Excluded PPS Volume to csv from already collected data
-v.write_traffic_stats_to_db(traffic_pps_per_device_aggregate, report_type="Traffic Volume PPS Excluded")
+try:
+	v.write_traffic_stats_to_db(traffic_pps_per_device_aggregate, report_type="Traffic Volume PPS Excluded")
+except Exception as e:
+	print(f"[ERROR] write_traffic_stats_to_db failed for 'Traffic Volume PPS Excluded': {e} — continuing.")
 
 
 
@@ -1677,7 +1699,10 @@ if not offline:
 cps_per_device_merged = v.merge_attacks_to_aggregate(cps_per_device_aggregate, cps_per_device_granular,merged_attack_only_timestamps_list)
 
 # 4. Write CPS to database
-v.write_traffic_stats_to_db(cps_per_device_merged, report_type="Traffic CPS")
+try:
+	v.write_traffic_stats_to_db(cps_per_device_merged, report_type="Traffic CPS")
+except Exception as e:
+	print(f"[ERROR] write_traffic_stats_to_db failed for 'Traffic CPS': {e} — continuing.")
 
 
 ##################### Concurrent Connections Chart ####################################
@@ -1694,6 +1719,9 @@ if not offline:
 cec_per_device_merged = v.merge_attacks_to_aggregate(cec_per_device_aggregate, cec_per_device_granular,merged_attack_only_timestamps_list)
 
 # 4. Write Concurrent Connections to database
-v.write_traffic_stats_to_db(cec_per_device_merged, report_type="Traffic CEC")
+try:
+	v.write_traffic_stats_to_db(cec_per_device_merged, report_type="Traffic CEC")
+except Exception as e:
+	print(f"[ERROR] write_traffic_stats_to_db failed for 'Traffic CEC': {e} — continuing.")
 
 print(f'Finished data collection at {print(datetime.today())}')
