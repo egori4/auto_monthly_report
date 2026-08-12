@@ -684,6 +684,13 @@ if __name__ == '__main__':
 		excluded_per_device_combined_trends_bps = convert_sqlite_to_list_of_lists(db_path + db_file, "traffic_bps_excluded")
 		excluded_per_device_combined_trends_pps = convert_sqlite_to_list_of_lists(db_path + db_file, "traffic_pps_excluded")
 
+	traffic_per_device_combined_trends_bps_json = json.dumps(traffic_per_device_combined_trends_bps)
+	traffic_per_device_combined_trends_pps_json = json.dumps(traffic_per_device_combined_trends_pps)
+	cps_per_device_combined_trends_json = json.dumps(cps_per_device_combined_trends)
+	cec_per_device_combined_trends_json = json.dumps(cec_per_device_combined_trends)
+	excluded_per_device_combined_trends_bps_json = json.dumps(excluded_per_device_combined_trends_bps)
+	excluded_per_device_combined_trends_pps_json = json.dumps(excluded_per_device_combined_trends_pps)
+
 
 	################################################# Analyze deeper top category ##########################################################
 
@@ -1015,35 +1022,35 @@ if __name__ == '__main__':
 		  
 			
 			// Convert epoch timestamps to Date objects before passing to Google Charts
-			var raw_traffic_per_device_combined_trends_bps_data = {traffic_per_device_combined_trends_bps}.map(row => {{
+			var raw_traffic_per_device_combined_trends_bps_data = {traffic_per_device_combined_trends_bps_json}.map(row => {{
 				return [new Date(row[0]), ...row.slice(1)]; // Convert first column, keep others unchanged
 			}});
 
 
 			
 			// Convert epoch timestamps to Date objects before passing to Google Charts
-			var raw_traffic_per_device_combined_trends_pps_data = {traffic_per_device_combined_trends_pps}.map(row => {{
+			var raw_traffic_per_device_combined_trends_pps_data = {traffic_per_device_combined_trends_pps_json}.map(row => {{
 				return [new Date(row[0]), ...row.slice(1)]; // Convert first column, keep others unchanged
 			}});
 
 
 			// Convert epoch timestamps to Date objects before passing to Google Charts
-			var raw_cps_per_device_combined_trends_data = {cps_per_device_combined_trends}.map(row => {{
+			var raw_cps_per_device_combined_trends_data = {cps_per_device_combined_trends_json}.map(row => {{
 				return [new Date(row[0]), ...row.slice(1)]; // Convert first column, keep others unchanged
 			}});
 
 			// Convert epoch timestamps to Date objects before passing to Google Charts
-			var raw_cec_per_device_combined_trends_data = {cec_per_device_combined_trends}.map(row => {{
+			var raw_cec_per_device_combined_trends_data = {cec_per_device_combined_trends_json}.map(row => {{
 				return [new Date(row[0]), ...row.slice(1)]; // Convert first column, keep others unchanged
 			}});
 
 			// Convert epoch timestamps to Date objects before passing to Google Charts
-			var raw_excluded_per_device_combined_trends_bps_data = {excluded_per_device_combined_trends_bps}.map(row => {{
+			var raw_excluded_per_device_combined_trends_bps_data = {excluded_per_device_combined_trends_bps_json}.map(row => {{
 				return [new Date(row[0]), ...row.slice(1)]; // Convert first column, keep others unchanged
 			}});
 
 			// Convert epoch timestamps to Date objects before passing to Google Charts
-			var raw_excluded_per_device_combined_trends_pps_data = {excluded_per_device_combined_trends_pps}.map(row => {{
+			var raw_excluded_per_device_combined_trends_pps_data = {excluded_per_device_combined_trends_pps_json}.map(row => {{
 				return [new Date(row[0]), ...row.slice(1)]; // Convert first column, keep others unchanged
 			}});
 
