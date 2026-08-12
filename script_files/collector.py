@@ -725,6 +725,13 @@ class Vision:
 			)
 		''')
 
+		# A device may have been skipped when this table was first created, then resume reporting later.
+		existing_columns = {column[1] for column in cursor.execute(f'PRAGMA table_info({db_table_name})')}
+		for column_name in df_final.columns:
+			if column_name not in existing_columns:
+				escaped_column_name = column_name.replace('"', '""')
+				cursor.execute(f'ALTER TABLE {db_table_name} ADD COLUMN "{escaped_column_name}" REAL')
+
 		# delete all epoch timestamps entries for the previous day and append new data
 		
 

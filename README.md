@@ -404,6 +404,9 @@ rm -rf /opt/radware/storage/scripts/radware_report
 ## Changelog
 
 
+### V11.12.4 (8/12/2026)
+- Added logic if device was skipped due to no data and no column was created for this device, when the device is recovered, the column will be created for it
+
 ### V11.12.3 (7/16/2026)
 - Added logic to skip devices with no available traffic stats from traffic charts
 
