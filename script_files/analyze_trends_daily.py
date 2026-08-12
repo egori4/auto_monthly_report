@@ -92,6 +92,17 @@ def convert_sqlite_to_list_of_lists(db_filename, db_table_name):
 	columns_info = cursor.fetchall()
 	column_names = [col[1] for col in columns_info if col[1] != "DateTime"]
 
+	# SQLite appends columns when a recovered device resumes reporting. Keep chart series grouped
+	# as traffic first and attacks second, in the configured DefensePro order.
+	if db_table_name in {"traffic_bps", "traffic_pps"}:
+		configured_device_names = list(defensepros.values())
+		traffic_columns = [f"Traffic {device_name}" for device_name in configured_device_names if f"Traffic {device_name}" in column_names]
+		attack_columns = [f"Attacks {device_name}" for device_name in configured_device_names if f"Attacks {device_name}" in column_names]
+		unrecognized_traffic_columns = [column_name for column_name in column_names if column_name.startswith("Traffic ") and column_name not in traffic_columns]
+		unrecognized_attack_columns = [column_name for column_name in column_names if column_name.startswith("Attacks ") and column_name not in attack_columns]
+		other_columns = [column_name for column_name in column_names if column_name not in {"Timestamp", *traffic_columns, *attack_columns, *unrecognized_traffic_columns, *unrecognized_attack_columns}]
+		column_names = ["Timestamp"] + traffic_columns + unrecognized_traffic_columns + attack_columns + unrecognized_attack_columns + other_columns
+
 	
 
 	# Quote column names to handle special characters
